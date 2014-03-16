@@ -1,0 +1,11 @@
+name = "Islandora Red Biodiversidad Chile"
+description = "A Islandora Repository module to handle Biodiversity data and DarwinCore schema"
+dependencies[] = islandora
+dependencies[] = islandora_basic_collection
+dependencies[] = islandora_solr
+dependencies[] = islandora_solr_metadata
+package = Islandora
+core = 7.x
+version = 7.x-dev
+configure = admin/islandora/red_biodiversidad
+stylesheets[all][] = css/islandora_red_biodiversidad.theme.css

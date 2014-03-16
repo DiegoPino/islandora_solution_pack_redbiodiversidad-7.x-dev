@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for this module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * @see islandora_red_biodiversidad_islandora_required_objects()
+ */
+function islandora_red_biodiversidad_install() {
+  module_load_include('inc', 'islandora', 'includes/solution_packs');
+  islandora_install_solution_pack('islandora_red_biodiversidad');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function islandora_red_biodiversidad_uninstall() {
+  module_load_include('inc', 'islandora', 'includes/solution_packs');
+  islandora_install_solution_pack('islandora_red_biodiversidad', 'uninstall');
+}

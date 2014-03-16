@@ -1,0 +1,8 @@
+name = GBIF Excel Importer
+description = Importer plugin for Red Biodiversidad module, imports GBIF excel Files, to create  objects.
+package = Islandora
+dependencies[] = islandora_importer
+dependencies[] = islandora_red_biodiversidad
+files[] = includes/importer.inc
+version = 7.x-dev
+core = 7.x

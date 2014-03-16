@@ -1,0 +1,394 @@
+<?php
+
+/**
+ * @file
+ * Handles the creation and display of basic image objects.
+ */
+
+/**
+ * Implements hook_islandora_view_print_object().
+ */
+/*
+function islandora_red_biodiversidad_islandora_view_print_object($object) {
+  $output = array();
+  if (in_array('islandora:sp_red_biodiversidad', $object->models)) {
+    $resource_url = url("islandora/object/{$object->id}/datastream/OBJ/view");
+    $params = array(
+      'title' => $object->label,
+      'path' => $resource_url,
+    );
+	//Diego Pino Febrero 2014, Revisar
+    // Theme the image seperatly.
+    $variables['islandora_img'] = theme('image', $params);
+    $output = theme('islandora_red_biodiversidad_print', array(
+    'islandora_content' => $variables['islandora_img']));
+  }
+
+  return $output;
+}
+
+/**
+ * Implements hook_menu().
+ *
+ * See https://api.drupal.org/api/drupal/modules!system!system.api.php/function/hook_menu/7
+ */
+function islandora_red_biodiversidad_menu() {
+  $items = array();
+  // Entry point for our new tab.
+  $items['islandora/object/%islandora_object/redbiodiversidadtab'] = array(
+    'weight' => 3,
+    'title' => 'Ficha Item',
+    'page callback' => 'islandora_red_biodiversidad_display',
+    'page arguments' => array(2),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => 'islandora_red_biodiversidad_access',
+    'access arguments' => array(2),
+  );
+  $items['islandora/object/%islandora_object/redbiodiversidad_collection_tab'] = array(
+    'weight' => 4,
+    'title' => 'Ficha Coleccion',
+    'page callback' => 'islandora_red_biodiversidad_collection_display',
+    'page arguments' => array(2),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => 'islandora_red_biodiversidad_collection_access',
+    'access arguments' => array(2),
+  );
+  
+  $items['islandora/object/%islandora_object/manage/object/redbiodiversidad_excelform'] = array(
+	  'weight' => 2,
+      'title' => 'Importar Excel a esta coleccion',
+	  'description' => 'Esto permite poblar una coleccion con datos GBIF desde excel',
+      'page callback' => 'drupal_get_form',
+	  'page arguments' => array('red_biodiversidad_excelform',2),
+	  'type' => MENU_LOCAL_ACTION,
+	  'file' =>'includes/biodiversidad_import.admin.inc',
+	  'access callback' => 'islandora_red_biodiversidad_collection_access',
+	  'access arguments' => array(2),
+  );
+  
+  return $items;
+}
+/**
+ * Determines whether or not to show this modules redbiodiversidad view tab.
+ *
+ * The tab and it's callback are defined in the islandora_red_biodiversidad_menu()
+ *
+ * We check it's cmodel here so that we do not try to display this tab for all
+ * objects.  We could also call other functions from here to help us determine
+ * if we are allowed to show the tab
+ *
+ * @param IslandoraObject $islandora_object
+ *   An Islandora object
+ *
+ * @return bool
+ *   TRUE if we are allowed to show the tab for the corresponding object
+ */
+function islandora_red_biodiversidad_access($islandora_object) {
+  if (!isset($islandora_object)) {
+    return FALSE;
+  }
+  $models = $islandora_object->models;
+  if (array_intersect(array('islandora:sp_red_biodiversidad'), $models)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+function islandora_red_biodiversidad_collection_access($islandora_object) {
+  if (!isset($islandora_object)) {
+    return FALSE;
+  }
+  $models = $islandora_object->models;
+  
+  if (isset($islandora_object['COLLECTION_POLICY']))//Es coleccion de algun tipo
+  	{
+	    $policy = new CollectionPolicy($islandora_object['COLLECTION_POLICY']->content);
+	    $policy_content_models = $policy->getContentModels();//Entrega los modelos de contenido que permite esta coleccion
+		
+	    if (array_intersect(array('islandora:sp_red_biodiversidad'), array_keys($policy_content_models)) && array_intersect(array('islandora:collectionCModel'), $models)) {
+	      return TRUE; //Es decir es coleccion y sus hijos pueden ser de modelo sp_red_biodiversidad
+	    }
+  	}
+ 
+ 
+  return FALSE;
+}
+/**
+ * This is the callback function defined in the menu array of this module.
+ *
+ * This function will be called if our islandora_red_biodiversidad_access() check returns true
+ * we call another theme function here which also invokes the desired preprocessor
+ *
+ * @param IslandoraObject $islandora_object
+ *   an islandora object
+ *
+ * @return string
+ *   the rendered output
+ */
+function islandora_red_biodiversidad_display($islandora_object) {
+  $output = theme('islandora_red_biodiversidad_tab',
+    array('islandora_object' => $islandora_object));
+  return $output;
+}
+function islandora_red_biodiversidad_collection_display($islandora_object) {
+  $output = theme('islandora_red_biodiversidad_collection',
+    array('islandora_object' => $islandora_object));
+  return $output;
+}
+/**
+ * Implements hook_preprocess_theme().
+ *
+ * We have implemented several preprocessors in this module this one is
+ * for the red_biodiversidad tabbed view
+ *
+ * This is a Drupal hook, not supplied by islandora.
+ */
+function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_tab(array &$variables) {
+  $islandora_object = $variables['islandora_object'];
+  $content = $islandora_object['OBJ']->content;
+  $variables['red_biodiversidad_content_tab'] = $content;
+}
+function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_collection(array &$variables) {
+  $islandora_object = $variables['islandora_object'];
+  $content = $islandora_object['OBJ']->content;
+  $variables['red_biodiversidad_content_tab'] = $content;
+}
+/**
+* Implements hook_CMODEL_PID_islandora_view_object().
+*
+* this function will be called everytime islandora loads an object with a
+* cmodel of islandora:sp_red_biodiversidad.
+*
+* This function is calling the theme function to
+* theme islandora_red_biodiversidad which also invokes
+* the islandora_red_biodiversidad_preprocessor
+*/
+
+function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_islandora_view_object($object, $page_number, $page_size) {
+  $output = theme('islandora_red_biodiversidad', array('islandora_object' => $object));
+  return array('' => $output);
+}
+/**
+* Implements hook_CMODEL_PID_islandora_view_object().
+*
+* this function will be called everytime islandora loads an object with a
+* cmodel of islandora:sp_red_biodiversidad_collection.
+*
+* This function is calling the theme function to
+* theme islandora_red_biodiversidad which also invokes
+* the islandora_red_biodiversidad_preprocessor
+*/
+function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_collection_islandora_view_object($object, $page_number, $page_size) {
+  $output = theme('islandora_red_biodiversidad', array('islandora_object' => $object));
+  return array('' => $output);
+}
+/**
+ * Implements hook_theme().
+ *
+ * We supply a pattern so we can overide templates at the theme level if needed.
+ * we can append a pid to a template and the new template file will be called
+ * (the pids colon should be replaced with a dash).
+*/
+function islandora_red_biodiversidad_theme($existing, $type, $theme, $path) {
+  return array(
+    'islandora_red_biodiversidad' => array(
+      'template' => 'theme/islandora-red-biodiversidad',
+      // We can add PIDs to the end of this pattern in our preprocess function
+      // and templates will be able to have have a pid appended to the
+      // template name to overide a template on a per object basis.
+      // An example template might be named:
+      // "islandora-red-biodiversidad-islandora-27.tpl.php".
+      'pattern' => 'islandora_red_biodiversidad__',
+      'variables' => array('islandora_object' => NULL),
+    ),
+    'islandora_red_biodiversidad_print' => array(
+      'template' => 'theme/islandora-red-biodiversidad-print',
+      'variables' => array('islandora_content' => NULL),
+    ),
+    // Themes the output of the piggyback tab.
+    'islandora_red_biodiversidad_tab' => array(
+      'template' => 'theme/islandora-red-biodiversidad-tab',
+      'variables' => array('islandora_object' => NULL),
+    ),
+  );
+}
+
+/**
+ * Implements hook_islandora_required_objects().
+ */
+function islandora_red_biodiversidad_islandora_required_objects(IslandoraTuque $connection) {
+  $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
+  // Biodiversidad Content Model.
+  $biodiversidad_content_model = $connection->repository->constructObject('islandora:sp_red_biodiversidad');
+  $biodiversidad_content_model->owner = 'fedoraAdmin';
+  $biodiversidad_content_model->label = 'Islandora Red Biodiversidad Content Model';
+  $biodiversidad_content_model->models = 'fedora-system:ContentModel-3.0';
+  // DS-COMPOSITE-MODEL Datastream.
+  $datastream =$biodiversidad_content_model->constructDatastream('DS-COMPOSITE-MODEL', 'X');
+  $datastream->label = 'DS-COMPOSITE-MODEL';
+  $datastream->mimetype = 'text/xml';
+  $datastream->setContentFromFile("$module_path/xml/islandora_red_biodiversidad_ds_composite_model.xml", FALSE);
+  $biodiversidad_content_model->ingestDatastream($datastream);
+  // Biodiversidad Collection.
+  $biodiversidad_collection = $connection->repository->constructObject('islandora:sp_red_biodiversidad_collection');
+  $biodiversidad_collection->owner = 'fedoraAdmin';
+  $biodiversidad_collection->label = 'Red Biodiversidad Collection';
+  $biodiversidad_collection->models = 'islandora:collectionCModel';
+  $biodiversidad_collection->relationships->add(FEDORA_RELS_EXT_URI, 'isMemberOfCollection', 'islandora:root');
+  // Collection Policy Datastream.
+  $datastream = $biodiversidad_collection->constructDatastream('COLLECTION_POLICY', 'X');
+  $datastream->label = 'Collection policy';
+  $datastream->mimetype = 'text/xml';
+  $datastream->setContentFromFile("$module_path/xml/islandora_red_biodiversidad_collection_policy.xml", FALSE);
+  $biodiversidad_collection->ingestDatastream($datastream);
+  // TN Datastream.
+  $datastream = $biodiversidad_collection->constructDatastream('TN', 'M');
+  $datastream->label = 'Thumbnail';
+  $datastream->mimetype = 'image/png';
+  $datastream->setContentFromFile("$module_path/images/folder.png", FALSE);
+  $biodiversidad_collection->ingestDatastream($datastream);
+  return array(
+    'islandora_red_biodiversidad' => array(
+      'title' => 'Islandora Red Biodiversidad',
+      'objects' => array(
+        $biodiversidad_content_model,
+        $biodiversidad_collection,
+      ),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_preprocess_theme().
+ Diego Pino, Febrero 2014
+ TODO:Acá debemos integrar todos los preprocesos de este modelo de contenido
+ El actual, el de thumbnails nos puede servir, aunque seria mejor maneras las imágenes como objetos aparte y asociados
+ deberíamos incluir Transformaciones para Darwin Core,
+ La ficha en XLS, un QR y tal vez una relación implícita para datos de author y especie
+ 
+ 
+ */
+function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad(array &$variables) {
+  drupal_add_js('misc/form.js');
+  drupal_add_js('misc/collapse.js');
+  $islandora_object = $variables['islandora_object'];
+  $repository = $islandora_object->repository;
+  module_load_include('inc', 'islandora', 'includes/datastream');
+  module_load_include('inc', 'islandora', 'includes/utilities');
+  module_load_include('inc', 'islandora', 'includes/metadata');
+
+  // We should eventually remove the DC object and dc_array code as it only
+  // exists to not break legacy implementations.
+  if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DC'])) {
+    try {
+      $dc = $islandora_object['DC']->content;
+      $dc_object = DublinCore::importFromXMLString($dc);
+    }
+    catch (Exception $e) {
+      drupal_set_message(t('Error retrieving object %s %t', array('%s' => $islandora_object->id, '%t' => $e->getMessage())), 'error', FALSE);
+    }
+  }
+  $variables['islandora_dublin_core'] = isset($dc_object) ? $dc_object : NULL;
+  $variables['dc_array'] = isset($dc_object) ? $dc_object->asArray() : array();
+  $variables['islandora_object_label'] = $islandora_object->label;
+  $variables['theme_hook_suggestions'][] = 'islandora_red_biodiversidad__' . str_replace(':', '_', $islandora_object->id);
+  $variables['parent_collections'] = islandora_get_parents_from_rels_ext($islandora_object);
+  $variables['metadata'] = islandora_retrieve_metadata_markup($islandora_object);
+  $variables['description'] = islandora_retrieve_description_markup($islandora_object);
+
+  // Original.
+  if (isset($islandora_object['OBJ']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['OBJ'])) {
+    $full_size_url = url("islandora/object/{$islandora_object->id}/datastream/OBJ/view", array('absolute' => TRUE));
+    $variables['islandora_full_url'] = $full_size_url;
+    $params = array(
+      'title' => $islandora_object->label,
+      'path' => $full_size_url,
+    );
+    $variables['islandora_full_img'] = theme('image', $params);
+  }
+  // Thumbnail.
+  if (isset($islandora_object['TN']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['TN'])) {
+    $thumbnail_size_url = url("islandora/object/{$islandora_object->id}/datastream/TN/view");
+    $params = array(
+      'title' => $islandora_object->label,
+      'path' => $thumbnail_size_url,
+    );
+    $variables['islandora_thumbnail_img'] = theme('image', $params);
+  }
+ 
+  
+}
+/**
+ * Implements hook_xml_form_builder_get_transforms().
+ Diego Pino Navarro, Febrero 2014
+ Este hook implementa la asociación de Formas HTML con el modelo de datos
+ */
+function islandora_red_biodiversidad_xml_form_builder_get_transforms() {
+  $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
+  return array(
+    'dwc2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwc2dc.xsl",
+  );
+}
+
+
+
+
+/**
+ * Implements hook_islandora_content_model_forms_form_associations().
+ Diego Pino Navarro, Febrero 2014
+ Este hook implementa la asociación de Formas HTML con el modelo de datos
+ */								
+function islandora_red_biodiversidad_islandora_content_model_forms_form_associations() {
+  return array(
+    'islandora_red_biodiversidad_dwc_form' => array(
+      'content_model' => 'islandora:sp_red_biodiversidad',
+      'form_name' => 'Simple Darwin Core form',
+      'dsid' => 'DwC',
+      'title_field' => array('SimpleDarwinRecord','dwc_fields_taxon','scientificName'),
+      'transform' => 'dwc2dc_redbiodiversidad.xsl',
+      'template' => FALSE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_islandora_xml_form_builder_forms().
+ */
+function islandora_red_biodiversidad_islandora_xml_form_builder_forms() {
+  $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
+  return array(
+    'Simple Darwin Core form' => array(
+      'form_file' => "$module_path/xml/islandora_red_biodiversidad_form_DwC.xml",
+    ),
+  );
+}
+
+/**
+ * Implements hook_islandora_ingest_steps().
+ */
+function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_islandora_ingest_steps() {
+  return array(
+    'islandora_red_biodiversidad' => array(
+      'weight' => 10,
+      'type' => 'form',
+      'form_id' => 'islandora_basic_image_image_upload_form',
+      'module' => 'islandora_basic_image',
+      'file' => 'includes/image_upload.form.inc',
+    ),
+  );
+}
+
+
+function islandora_red_biodiversidad_islandora_sp_basic_image_islandora_derivative() {
+  return array(
+    array(
+      'source_dsid' => 'OBJ',
+      'destination_dsid' => 'TN',
+      'weight' => '0',
+      'function' => array(
+        'islandora_basic_image_create_thumbnail',
+      ),
+      'file' => drupal_get_path('module', 'islandora_basic_image') . '/includes/derivatives.inc',
+    ),
+  );
+}
