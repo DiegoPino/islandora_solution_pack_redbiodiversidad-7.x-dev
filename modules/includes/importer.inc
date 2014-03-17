@@ -13,13 +13,14 @@
 class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
  protected $itemClass = 'RedbiodiversidadBatchImportObject';
 
-    protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
+protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
       module_load_include('inc', 'islandora', 'includes/utilities');
 	  if (empty($this->context['results']['pid_cache'])) {
         // Get enough PIDs for half of the remaining items.
         // (plus one, so we'll always get at least one).
+		//Instead of using the build in parent function use the Islandora API to get the identifier using de uuid variable
         $this->context['results']['pid_cache']=(array) $tuque->repository->getNextIdentifier($namespace, variable_get('islandora_basic_collection_generate_uuid', FALSE), intval((($this->context['sandbox']['max'] - $this->context['sandbox']['progress']) / 2) + 1)
-	);//@ver Repository.php
+	);//@see Repository.php
 		
       }
 
@@ -35,29 +36,8 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
    * @see IslandoraBatchImporter::getNumber()
    */
   public function getNumber() {
-  	/*try {
-  	    $inputFileType = PHPExcel_IOFactory::identify($this->file->uri);
-  	    $objReader = PHPExcel_IOFactory::createReader($inputFileType);
-  	    $objPHPExcel = $objReader->load($this->file->uri);
-  	} catch(Exception $e) {
-  		drupal_set_message(t('No se ha podido leer el archivo @filename con error @error', array('@filename' => $this->file->filename,'@error'=>$e->getMessage())));
-  	}	
-  	$sheet = $objPHPExcel->getSheet(1); 
-  	$highestRow = $sheet->getHighestRow(); 
-  	$highestColumn = $sheet->getHighestColumn();
-  	//  Loop through each row of the worksheet in turn
-  	for ($row = 1; $row <= $highestRow; $row++){ 
-  	    //  Read a row of data into an array
-  	    $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row,
-  	                                    NULL,
-  	                                    TRUE,
-  	                                    FALSE);
-  		//drupal_set_message(t('@rowData', array('@rowData' => print_r($rowData,true))));
-		
-  		} 
-	  
-    return $highestRow;*/
-	    
+  
+    
 	     return count($this->file['object_info']['excel_rows']); //Devuelve el numero de registros totales
 	   
   }
@@ -192,7 +172,7 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
 	    	$highestRow = $sheet->getHighestRow(); 
 	    	$highestColumn = $sheet->getHighestColumn();
 	    	//  Loop through each row of the worksheet in turn
-	    	if (($highestRow)>1)//Es decir tengo la menos el header con los campos y una registro
+	    	if (($highestRow)>1)//Es decir tengo al menos el header con los campos y una registro
 				{
 	   	    	 $rowHeaders = $sheet->rangeToArray('A1'. ':' . $highestColumn . 1, '', TRUE, FALSE);//Devuelve los titulos de cada columna
 				 $count = $highestRow-1; //Numero de filas, resto una 
@@ -204,8 +184,6 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
 					}
 					$info['excel_row_headers']=$rowHeaders;
 			     $objPHPExcel->disconnectWorksheets();
-				//drupal_set_message(t('Datos Headers @rowData', array('@rowData' => print_r($info['excel_row_headers'],true))));
-				//drupal_set_message(t('Datos Info @rowInfo', array('@rowInfo' => print_r($info['excel_rows'],true))));
 			     return $info;				
 				}
 			else
@@ -278,19 +256,15 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 			$dwc_xpath = new DOMXPath($dom);
 			$dwc_xpath->preserveWhiteSpace = false;
 			$dwc_xpath->registerNamespace('dwc', 'http://rs.tdwg.org/dwc/xsd/simpledarwincore/');
-			//$mods_xpath->query('//dwc:SimpleDarwinRecordSet/dwc:SimpleDarwinRecord/*');
-			drupal_set_message(t('Datos Headers @rowData', array('@rowData' => print_r($this->source['object_info']['excel_rows'],true))));
 			$headers=(array)$this->source['object_info']['excel_row_headers'];
 			foreach($headers[0] as $column => $campos)
 				{
-				drupal_set_message(t('Query data es @campos', array('@campos' => $campos)));
-			
+				//drupal_set_message(t('Query data es @campos', array('@campos' => $campos)));
 				$campos=addslashes($campos);
 					$camposdwcexistentes2=$dwc_xpath->query("//dwc:$campos");	
 					foreach($camposdwcexistentes2 as $item)
 						{
 						$item->nodeValue=$this->source['object_info']['excel_rows'][0][$column];
-						drupal_set_message(t('valores son @valores:', array('@valores' =>$item->nodeValue)));
 						}//Aca deberia agregar todos los campos que no están definidos dentro de un campo DWC adecuado como nombre=valor,
 				
 				}
@@ -382,7 +356,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  }
 
 	  /**
-	   * Generates a MODS document repersenting the imported data.
+	   * Generates a MODS document representing the imported data.
 	   *
 	   * @see IslandoraImportObject::getMODS()
 	   */
