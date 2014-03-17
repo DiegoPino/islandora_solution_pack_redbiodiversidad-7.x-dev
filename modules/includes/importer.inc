@@ -262,11 +262,12 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 				//drupal_set_message(t('Query data es @campos', array('@campos' => $campos)));
 				$campos=addslashes($campos);
 					$camposdwcexistentes2=$dwc_xpath->query("//dwc:$campos");	
+					if (sizeof($camposdwcexistentes2)>0)
 					foreach($camposdwcexistentes2 as $item)
 						{
 						$item->nodeValue=$this->source['object_info']['excel_rows'][0][$column];
 						}//Aca deberia agregar todos los campos que no están definidos dentro de un campo DWC adecuado como nombre=valor,
-				
+					}
 				}
 				
 				
