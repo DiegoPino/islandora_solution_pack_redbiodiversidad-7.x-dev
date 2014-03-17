@@ -204,7 +204,7 @@ function islandora_red_biodiversidad_theme($existing, $type, $theme, $path) {
       'template' => 'theme/islandora-red-biodiversidad-print',
       'variables' => array('islandora_content' => NULL),
     ),
-    // Themes the output of the piggyback tab.
+    // Themes the output of the  tab.
     'islandora_red_biodiversidad_tab' => array(
       'template' => 'theme/islandora-red-biodiversidad-tab',
       'variables' => array('islandora_object' => NULL),
