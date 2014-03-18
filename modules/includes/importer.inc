@@ -301,17 +301,17 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 			
 			if (sizeof($datosexcel)>0)
 			{
-			foreach($datosexcel as $key => $value)
+			foreach($datosexcel as $keydw => $valuedw)
 				{
 				//drupal_set_message(t('Query data es @campos', array('@campos' => $campos)));
-				$key=utf8_encode(stripslashes($key));
-				$value=utf8_encode($value);
-					$camposdwcexistentes2=$dwc_xpath->query("//dwc:$key");	
+				$keydw=utf8_encode(stripslashes($keydw));
+				$valuedw=utf8_encode($valuedw);
+					$camposdwcexistentes2=$dwc_xpath->query("//dwc:$keydw");	
 					if (sizeof($camposdwcexistentes2)>0)
 					{	
-					foreach($camposdwcexistentes2 as $item)
+					foreach($camposdwcexistentes2 as $itemdwc)
 						{
-						$item->nodeValue=$this->$value;
+						$itemdwc->nodeValue=$this->$value;
 						}//Aca deberia agregar todos los campos que no están definidos dentro de un campo DWC adecuado como nombre=valor,
 					}
 				}
