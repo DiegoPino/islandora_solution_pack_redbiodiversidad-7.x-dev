@@ -305,7 +305,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 				{
 				//drupal_set_message(t('Query data es @campos', array('@campos' => $campos)));
 				$key=utf8_encode(stripslashes($key));
-				$value=utf8_encode(stripslashes($value));
+				$value=utf8_encode($value);
 					$camposdwcexistentes2=$dwc_xpath->query("//dwc:$key");	
 					if (sizeof($camposdwcexistentes2)>0)
 					{	
