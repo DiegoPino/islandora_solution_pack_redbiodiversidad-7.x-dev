@@ -38,7 +38,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
   public function getNumber() {
   
     
-	     return count($this->file['object_info']['excel_rows']); //Devuelve el numero de registros totales
+	     return count($this->file['object_info']); //Devuelve el numero de registros totales
 	   
   }
 
@@ -172,18 +172,23 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 	    	$highestRow = $sheet->getHighestRow(); 
 	    	$highestColumn = $sheet->getHighestColumn();
 	    	//  Loop through each row of the worksheet in turn
-	    	if (($highestRow)>1)//Es decir tengo al menos el header con los campos y una registro
+	    	$info = array();
+			if (($highestRow)>1)//Es decir tengo al menos el header con los campos y una registro
 				{
-	   	    	 $rowHeaders = $sheet->rangeToArray('A1'. ':' . $highestColumn . 1, '', TRUE, FALSE);//Devuelve los titulos de cada columna
-				 $count = $highestRow-1; //Numero de filas, resto una 
-			     $info = array();
-			 	for ($row = 2; $row <= $highestRow; $row++)
+	   	    	$rowHeaders = $sheet->rangeToArray('A1:'.$highestColumn.'1', NULL, TRUE, TRUE,FALSE);//Devuelve los titulos de cada columna
+				error_log(var_export($rowHeaders[0],true),0);			     
+			 	for ($fila = 2; $fila <= (int)$highestRow; $fila++)
 			 		{
-			 		$rowData=$sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, '', TRUE, FALSE);//Devuelve los titulos de cada columna
-			 		$info['excel_rows'][$row-1]=$rowData;
+					error_log("ROW:".$fila,0);
+			 		$rowData=$sheet->rangeToArray('A' . $fila . ':' . $highestColumn.$fila, ' ', TRUE, TRUE, FALSE);//Devuelve los titulos de cada columna
+					$datoscombinados=array_combine($rowHeaders[0],$rowData[0]);
+					if ($datoscombinados){$info[$fila]=$datoscombinados;}
 					}
-					$info['excel_row_headers']=$rowHeaders;
+				
 			     $objPHPExcel->disconnectWorksheets();
+				 unset($sheet);
+				 unset($objPHPExcel);
+				 unset($objReader);
 			     return $info;				
 				}
 			else
@@ -196,6 +201,37 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 		
 
     
+  }
+  public function preprocess() {
+    $preprocessed = array();
+    $item_class = $this->itemClass;
+	
+    $total = $this->getNumber();
+	$internal_setID_counter=0;
+	$date = date_create();
+	$this->setId=1;
+	
+    for ($i = 0; $i < $total; $i++) {
+      $item = $item_class::getOne($this->file);
+      if ($item) {
+		$internal_setID_counter++;
+        $this->parameters['namespace'] = $this->getNamespace($item);
+        $preprocessed[] = $object = new IslandoraImporterBatchObject($this->connection, $item, $this->parameters);
+        $object->addRelationships();
+		//Added local generated id (using uui parameter from islandoras configuration)
+		$object->id=$this->getIdentifier($this->connection, $this->parameters['namespace']);
+        //$object->object_info=$item;//Solo pasaremos el objeto actual...esto está mal en la implementación parent!
+		$this->addToDatabase($object, $object->getResources());
+		if ($internal_setID_counter==5)//Diego Pino, Excel files can be large. Set group of 5 records to a batch set so we don´t run out of memory in Drupal or get PDO errors
+			{
+			
+			$this->setId++;
+			$internal_setID_counter=0;
+			}
+      }
+    }
+
+    return $preprocessed;
   }
 }
 
@@ -232,7 +268,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	   * Get an item from the source.
 	   *
 	   * @see IslandoraImportObject::getOne()
-	   * Esta funcion es la que realmente crea el nuevo stream DwC
+	   * Esta funcion es la que realmente crea la info para el nuevo stream DwC
 	   */
 	  public static function getOne(&$info) {
 		$record = array(
@@ -240,11 +276,16 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	      'file' => $info['file'],
 	      'content_model' => $info['content_model'],
 	    );
-	    $key = key($info['object_info']['excel_rows']);
-		$info['processed_objects'][$key] = $info['object_info']['excel_rows'][$key];
-	    $record['object_info'] = array('excel_row_headers'=>$info['object_info']['excel_row_headers'],'excel_rows'=>$info['object_info']['excel_rows'][$key]);
-	    unset($info['object_info']['excel_rows'][$key]);
+		error_log("esta es la info completa".var_export($info['object_info'],true),0);
+	    $key = key($info['object_info']);
+		error_log("key".$key,0);
+	  
+		
+	    $record['object_info'] = $info['processed_objects'][$key] = $info['object_info'][$key];
+	    unset($info['object_info'][$key]);
 	    return (empty($record) ? FALSE : new static($record));
+		
+	    
 	  }
 	  
 	  
@@ -256,29 +297,35 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 			$dwc_xpath = new DOMXPath($dom);
 			$dwc_xpath->preserveWhiteSpace = false;
 			$dwc_xpath->registerNamespace('dwc', 'http://rs.tdwg.org/dwc/xsd/simpledarwincore/');
-			$headers=(array)$this->source['object_info']['excel_row_headers'];
-			foreach($headers[0] as $column => $campos)
+			$datosexcel=$this->source['object_info'];
+			
+			if (sizeof($datosexcel)>0)
+			{
+			foreach($datosexcel as $key => $value)
 				{
 				//drupal_set_message(t('Query data es @campos', array('@campos' => $campos)));
 				$campos=addslashes($campos);
-					$camposdwcexistentes2=$dwc_xpath->query("//dwc:$campos");	
+					$camposdwcexistentes2=$dwc_xpath->query("//dwc:$key");	
 					if (sizeof($camposdwcexistentes2)>0)
 					foreach($camposdwcexistentes2 as $item)
 						{
-						$item->nodeValue=$this->source['object_info']['excel_rows'][0][$column];
+						$item->nodeValue=$this->$value;
 						}//Aca deberia agregar todos los campos que no están definidos dentro de un campo DWC adecuado como nombre=valor,
 					}
 				}
-				
-				
 				$this->dwc=$dom->saveXML();
+				unset($dwc_xpath);
+				unset($dom);
+				}
+				
+				
+				
 					
 				
-				
+				return	$this->dwc;
+			
 				}
-			return	$this->dwc;
-		
-	  	}
+			  	
 	  
   	  protected function isDwC($xml) {
   	    return $this->getLocalNameOfRootElement($xml) == 'SimpleDarwinRecordSet';
@@ -309,6 +356,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	        'control_group' => 'M',
 			'filename' => $name,
 	        'datastream_file' => file_create_url($file->uri),
+			
 	      );
 	    }
 	    else {
@@ -328,6 +376,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	        'mimetype' => 'text/xml',
 	        'control_group' => 'X',
 	        'datastream_file' => file_create_url($file->uri),
+			
 	      );
 	    }
 	    else {
@@ -345,6 +394,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	        'mimetype' => 'text/xml',
 	        'control_group' => 'M',
 	        'datastream_file' => file_create_url($file->uri),
+			
 	      );
 	    }
 	    else {
@@ -411,7 +461,8 @@ EOXML;
 				$result=$dwc_xpath->evaluate('//dwc:genus[text()]');
 				if ($result->length > 0){$this->title= $result->item(0)->nodeValue." sp.";}
 				}
-			
+				unset($dwc_xpath);
+				unset($dwc_doc);
 			}
 	    }
 
