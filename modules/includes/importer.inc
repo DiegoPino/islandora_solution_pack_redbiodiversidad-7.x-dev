@@ -311,7 +311,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 					{	
 					foreach($camposdwcexistentes2 as $itemdwc)
 						{
-						$itemdwc->nodeValue=$this->$value;
+						$itemdwc->nodeValue=$valuedw;
 						}//Aca deberia agregar todos los campos que no están definidos dentro de un campo DWC adecuado como nombre=valor,
 					}
 				}
