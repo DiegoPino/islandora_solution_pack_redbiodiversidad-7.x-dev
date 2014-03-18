@@ -1,47 +1,52 @@
-<?xml version="1.0"?>
-<SimpleDarwinRecordSet xmlns="http://rs.tdwg.org/dwc/xsd/simpledarwincore/" xmlns:dwr="http://rs.tdwg.org/dwc/xsd/simpledarwincore/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwc="http://rs.tdwg.org/dwc/terms/" xmlns:dc="http://purl.org/dc/terms/">
-	<SimpleDarwinRecord>
-		<dc:type></dc:type>
-		<dc:language>English</dc:language>
-		<dc:rights>This material is provided for research, education, and private use only.</dc:rights>
-		<dc:rightsHolder>Universidad Cat&#xF3;lica del Norte de Chile</dc:rightsHolder>
-		<dc:accessRights>Creative Commons Attribution-NonCommercial- NoDerivs 2.5 License</dc:accessRights>
-		<dwc:institutionCode>UCN</dwc:institutionCode>
-		<dwc:collectionCode/>
-		<dwc:basisOfRecord/>
-		<dwc:occurrenceID/>
-		<dwc:catalogNumber/>
-		<dwc:occurrenceRemarks/>
-		<dwc:recordedBy/>
-		<dwc:eventDate/>
-		<dwc:year/>
-		<dwc:month/>
-		<dwc:day/>
-		<dwc:habitat/>
-		<dwc:fieldNumber/>
-		<dwc:fieldNotes/>
-		<dwc:eventRemarks/>
-		<dwc:continent>South America</dwc:continent>
-		<dwc:country>Chile</dwc:country>
-		<dwc:countryCode>CL</dwc:countryCode>
-		<dwc:stateProvince/>
-		<dwc:county/>
-		<dwc:municipality/>
-		<dwc:locality/>
-		<dwc:verbatimLocality/>
-		<dwc:decimalLatitude/>
-		<dwc:decimalLongitude/>
-		<dwc:taxonID/>
-		<dwc:scientificName/>
-		<dwc:kingdom/>
-		<dwc:phylum/>
-		<dwc:class/>
-		<dwc:order/>
-		<dwc:family/>
-		<dwc:genus/>
-		<dwc:subgenus/>
-		<dwc:specificEpithet/>
-		<dwc:vernacularName/>
-		<dwc:taxonRemarks/>
-	</SimpleDarwinRecord>
-</SimpleDarwinRecordSet>
+<?xml version="1.0" encoding="UTF-8"?>
+<SimpleDarwinRecordSet 
+    xmlns="http://rs.tdwg.org/dwc/xsd/simpledarwincore/"
+    xmlns:dc="http://purl.org/dc/terms/"
+    xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://rs.tdwg.org/dwc/xsd/simpledarwincore/ http://rs.tdwg.org/dwc/xsd/tdwg_dwc_simple.xsd">
+		<SimpleDarwinRecord>
+			<dc:type>PreservedSpecimen</dc:type>
+			<dc:language>English</dc:language>
+			<dc:rights>This material is provided for research, education, and private use only.</dc:rights>
+			<dc:rightsHolder>Universidad Cat&#xF3;lica del Norte de Chile</dc:rightsHolder>
+			<dc:accessRights>Creative Commons Attribution-NonCommercial- NoDerivs 2.5 License</dc:accessRights>
+			<dwc:institutionCode>UCN</dwc:institutionCode>
+			<dwc:collectionCode></dwc:collectionCode>
+			<dwc:basisOfRecord></dwc:basisOfRecord>
+			<dwc:occurrenceID></dwc:occurrenceID>
+			<dwc:catalogNumber></dwc:catalogNumber>
+			<dwc:occurrenceRemarks></dwc:occurrenceRemarks>
+			<dwc:recordedBy></dwc:recordedBy>
+			<dwc:eventDate></dwc:eventDate>
+			<dwc:year></dwc:year>
+			<dwc:month></dwc:month>
+			<dwc:day></dwc:day>
+			<dwc:habitat></dwc:habitat>
+			<dwc:fieldNumber></dwc:fieldNumber>
+			<dwc:fieldNotes></dwc:fieldNotes>
+			<dwc:eventRemarks></dwc:eventRemarks>
+			<dwc:continent>South America</dwc:continent>
+			<dwc:country>Chile</dwc:country>
+			<dwc:countryCode>CL</dwc:countryCode>
+			<dwc:stateProvince></dwc:stateProvince>
+			<dwc:county></dwc:county>
+			<dwc:municipality></dwc:municipality>
+			<dwc:locality></dwc:locality>
+			<dwc:verbatimLocality/>
+			<dwc:decimalLatitude></dwc:decimalLatitude>
+			<dwc:decimalLongitude></dwc:decimalLongitude>
+			<dwc:taxonID></dwc:taxonID>
+			<dwc:scientificName></dwc:scientificName>
+			<dwc:kingdom></dwc:kingdom>
+			<dwc:phylum></dwc:phylum>
+			<dwc:class></dwc:class>
+			<dwc:order></dwc:order>
+			<dwc:family></dwc:family>
+			<dwc:genus></dwc:genus>
+			<dwc:subgenus></dwc:subgenus>
+			<dwc:specificEpithet></dwc:specificEpithet>
+			<dwc:vernacularName></dwc:vernacularName>
+			<dwc:taxonRemarks></dwc:taxonRemarks>
+		</SimpleDarwinRecord>
+	</SimpleDarwinRecordSet>
