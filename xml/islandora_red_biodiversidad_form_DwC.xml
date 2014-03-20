@@ -236,7 +236,7 @@
 								<properties>
 									<type>textfield</type>
 									<access>true</access>
-									<default_value>UPEI</default_value>
+									<default_value>UCN</default_value>
 									<required>false</required>
 									<title>Institution Code</title>
 									<tree>true</tree>
@@ -269,7 +269,7 @@
 								<properties>
 									<type>textfield</type>
 									<access>true</access>
-									<default_value>herbarium</default_value>
+									<default_value>zool</default_value>
 									<required>false</required>
 									<title>collectionCode</title>
 									<tree>true</tree>
@@ -1135,6 +1135,8 @@ http://wiki.tdwg.org/twiki/bin/view/DarwinCore/BasisOfRecord</description>
 									<access>true</access>
 									<required>true</required>
 									<title>Scientific Name</title>
+									<autocomplete_path>islandora/red_biodiversidad/autocomplete/scientificName</autocomplete_path>
+								    <executes_submit_callback>FALSE</executes_submit_callback>
 									<tree>true</tree>
 									<actions>
 										<create>
@@ -1161,36 +1163,18 @@ http://wiki.tdwg.org/twiki/bin/view/DarwinCore/BasisOfRecord</description>
 								</properties>
 								<children/>
 							</element>
-							<element name="kingdom">
+							<element name="reconciliate">
 								<properties>
-									<type>textfield</type>
+									<type>button</type>
 									<access>true</access>
-									<default_value>Plantae</default_value>
+									<default_value>Reconciliar Nombre Científico</default_value>
 									<required>false</required>
-									<title>Kingdom</title>
-									<tree>true</tree>
-									<actions>
-										<create>
-											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
-											<context>document</context>
-											<schema/>
-											<type>element</type>
-											<prefix>dwc</prefix>
-											<value>dwc:kingdom</value>
-										</create>
-										<read>
-											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:kingdom</path>
-											<context>document</context>
-										</read>
-										<update>
-											<path>self::node()</path>
-											<context>self</context>
-										</update>
-										<delete>
-											<path>self::node()</path>
-											<context>self</context>
-										</delete>
-									</actions>
+									<executes_submit_callback>false</executes_submit_callback>
+									<title>Reconciliar Nombre Científico </title>
+									<ajax>
+										<callback>islandora_red_biodiversidad_validateandpopulate</callback>
+										<wrapper>edit-simpledarwinrecord-dwc-fields-taxon-reconciliate</wrapper>
+									</ajax>					
 								</properties>
 								<children/>
 							</element>

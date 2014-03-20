@@ -34,7 +34,26 @@ function islandora_red_biodiversidad_islandora_view_print_object($object) {
  */
 function islandora_red_biodiversidad_menu() {
   $items = array();
-  // Entry point for our new tab.
+  $items['islandora/red_biodiversidad/autocomplete/%'] = array(
+    'title' => 'Form Callbacks',
+	'description' => 'Autocomplete a Field from DwC',
+    'page callback' => 'islandora_red_biodiversidad_autocomplete',
+    'page arguments' => array(3),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/callbacks.inc',
+    'access arguments' => array('search islandora solr'),
+  );
+  /*$items['islandora/red_biodiversidad/validate/%'] = array(
+    'title' => 'Form Validate and Populate Callbacks',
+	'description' => 'Validate and populates related Species info from AJAX to form',
+    'page callback' => 'islandora_red_biodiversidad_validateandpopulate',
+    'page arguments' => array(3),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/callbacks.inc',
+     'access arguments' => array('access content'),
+  );*/
+  
+  
   $items['islandora/object/%islandora_object/redbiodiversidadtab'] = array(
     'weight' => 3,
     'title' => 'Ficha Item',
@@ -44,7 +63,7 @@ function islandora_red_biodiversidad_menu() {
     'access callback' => 'islandora_red_biodiversidad_access',
     'access arguments' => array(2),
   );
-  $items['islandora/object/%islandora_object/redbiodiversidad_collection_tab'] = array(
+  /*$items['islandora/object/%islandora_object/redbiodiversidad_collection_tab'] = array(
     'weight' => 4,
     'title' => 'Ficha Coleccion',
     'page callback' => 'islandora_red_biodiversidad_collection_display',
@@ -52,9 +71,9 @@ function islandora_red_biodiversidad_menu() {
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'islandora_red_biodiversidad_collection_access',
     'access arguments' => array(2),
-  );
-  
-  $items['islandora/object/%islandora_object/manage/object/redbiodiversidad_excelform'] = array(
+  );*/
+   //Esto se movio a un modulo de islandora_import @see modules/
+  /*$items['islandora/object/%islandora_object/manage/object/redbiodiversidad_excelform'] = array(
 	  'weight' => 2,
       'title' => 'Importar Excel a esta coleccion',
 	  'description' => 'Esto permite poblar una coleccion con datos GBIF desde excel',
@@ -64,7 +83,7 @@ function islandora_red_biodiversidad_menu() {
 	  'file' =>'includes/biodiversidad_import.admin.inc',
 	  'access callback' => 'islandora_red_biodiversidad_collection_access',
 	  'access arguments' => array(2),
-  );
+  );*/
   
   return $items;
 }
@@ -392,3 +411,85 @@ function islandora_red_biodiversidad_islandora_sp_basic_image_islandora_derivati
     ),
   );
 }
+function islandora_red_biodiversidad_validateandpopulate(&$form, &$form_state)
+{        
+	
+	 drupal_set_message(t('You just performed an ajax reload.'));
+	 // $text = $form_state['values']['html_command_example'];
+	  $selector ='#edit-simpledarwinrecord-dwc-fields-taxon-scientificname';
+	  $commands = array();
+	 
+	 
+	  $parametro=urlencode(trim($form['SimpleDarwinRecord']['dwc_fields_taxon']['scientificName']['#value']));
+	 
+	  $url ="http://api.gbif.org/v0.9/species/match?strict=true&verbose=true&name=".$parametro;
+	  drupal_set_message($url);
+	  $response = drupal_http_request($url);
+	    if (!empty($response->error)) {
+	      $msg_args = array(
+	        '%url' => $url,
+	        '@code' => $response->code,
+	        '%error' => $response->error,
+	      );
+	      drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+	      return FALSE;
+	    }
+	    $data = drupal_json_decode($response->data);
+		
+		//Ya tengo la info, solo voy a sacar el match más cercano
+		if ($data['matchType']=="EXACT")//perfecto, ahora saco el resto de la info
+			{
+			if (array_key_exists('usageKey',$data))
+				{
+					if ($data['rank']=="SPECIES")
+						{
+						$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-scientificname','val',array($data['scientificName']));
+						$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-taxonid','val',array("http://www.gbif.org/species/".$data['usageKey']));
+						}
+					$url2 ="http://api.gbif.org/v0.9/species/".$data['usageKey'];
+			  	    $response2 = drupal_http_request($url2);
+			  	    if (!empty($response2->error)) {
+			  	      $msg_args = array(
+			  	        '%url' => $url2,
+			  	        '@code' => $response2->code,
+			  	        '%error' => $response2->error,
+			  	      );
+			  	      drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+			  	      return FALSE;
+			  	    }
+					 $data2 = drupal_json_decode($response2->data);
+					 if (array_key_exists('kingdom',$data2))
+						{
+					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-kingdom','val',array($data2['kingdom']));	
+						}
+					 if (array_key_exists('phylum',$data2))
+					 	{
+					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-phylum','val',array($data2['phylum']));	
+					 	}
+					 if (array_key_exists('clazz',$data2))
+					 	{
+					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-class','val',array($data2['clazz']));	
+					 	}
+					 if (array_key_exists('order',$data2))
+					 	{
+					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-order','val',array($data2['order']));		
+					 	}
+					 if (array_key_exists('family',$data2))
+					 	{
+					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-family','val',array($data2['family']));		
+					 	}
+					 if (array_key_exists('genus',$data2))
+					 	{
+					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-genus','val',array($data2['genus']));		
+					 	}
+					 
+					 
+					 
+					 
+				}
+				
+			}
+			return array('#type' => 'ajax', '#commands' => $commands);
+		
+}
+	
