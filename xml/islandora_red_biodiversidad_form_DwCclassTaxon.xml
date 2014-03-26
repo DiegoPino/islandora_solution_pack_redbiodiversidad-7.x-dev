@@ -1,0 +1,571 @@
+<?xml version="1.0"?>
+<definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3">
+	<properties>
+		<root_name>DarwinRecordSet</root_name>
+		<schema_uri/>
+		<namespaces default="http://rs.tdwg.org/dwc/dwcrecord/">
+			<namespace prefix="dwr">http://rs.tdwg.org/dwc/dwcrecord/</namespace>
+			<namespace prefix="xsi">http://www.w3.org/2001/XMLSchema-instance</namespace>
+			<namespace prefix="dwc">http://rs.tdwg.org/dwc/terms/</namespace>
+			<namespace prefix="dcterms">http://purl.org/dc/terms/</namespace>
+		</namespaces>
+	</properties>
+	<form>
+		<properties>
+			<type>form</type>
+			<access>TRUE</access>
+			<required>FALSE</required>
+			<tree>TRUE</tree>
+		</properties>
+		<children>
+			<element name="Taxon">
+				<properties>
+					<type>markup</type>
+					<access>TRUE</access>
+					<required>FALSE</required>
+					<tree>TRUE</tree>
+					<actions>
+						<create>
+							<path>/dwr:DarwinRecordSet</path>
+							<context>document</context>
+							<schema/>
+							<type>element</type>
+							<prefix>dwc</prefix>
+							<value>dwc:Taxon</value>
+						</create>
+						<read>
+							<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+							<context>document</context>
+						</read>
+						<update>
+							<path>self::node()</path>
+							<context>self</context>
+						</update>
+						<delete>
+							<path>self::node()</path>
+							<context>self</context>
+						</delete>
+					</actions>
+				</properties>
+				<children>
+					<element name="dwc_fields_taxon">
+						<properties>
+							<type>fieldset</type>
+							<access>true</access>
+							<required>false</required>
+							<title>Taxon terms</title>
+							<tree>true</tree>
+						</properties>
+						<children>
+							<element name="taxonID">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>true</required>
+									<title>Taxon ID</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:taxonID</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:taxonID</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="taxonRank">
+								<properties>
+									<type>select</type>
+									<access>true</access>
+									<required>TRUE</required>
+									<title>Taxon Rank (GBIF)</title>
+									<default_value>species</default_value>
+									<options>
+										<option key="kingdom">kingdom</option>
+										<option key="subkingdom">subkingdom</option>
+										<option key="division or phylum">division or phylum</option>
+										<option key="class">class</option>
+										<option key="subclass">subclass</option>
+										<option key="order">order</option>
+										<option key="suborder">suborder</option>
+										<option key="family">family</option>
+										<option key="tribe">tribe</option>
+										<option key="subtribe">subtribe</option>
+										<option key="genus">genus</option>
+										<option key="subgenus">subgenus</option>
+										<option key="section">section</option>
+										<option key="subsection">subsection</option>
+										<option key="series">series</option>
+										<option key="species">species</option>
+										<option key="subspecies">subspecies</option>
+										<option key="variety">variety</option>						
+										<option key="subvariety">subvariety</option>					
+										<option key="form">form</option>
+										<option key="subform">subform</option>					
+									</options>	
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:taxonRank</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:taxonRank</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="scientificName">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>true</required>
+									<title>Scientific Name</title>
+									<autocomplete_path>islandora/red_biodiversidad/autocomplete/scientificName</autocomplete_path>
+								    <executes_submit_callback>FALSE</executes_submit_callback>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:scientificName</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:scientificName</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="nomenclaturalCode">
+								<properties>
+									<type>select</type>
+									<access>true</access>
+									<required>true</required>
+									<title>Nomenclatural Code</title>
+									<options>
+										<option key="ICBN">International Code of Botanical Nomenclature</option>
+										<option key="ICNB">International Code of Nomenclature of Bacteria</option>
+										<option key="ICNCP">International Code of Nomenclature for Cultivated Plants</option>
+										<option key="ICZN">International Code of Zoological Nomenclature</option>
+										<option key="ICVCN">International Code of Virus Classifications and Nomenclature</option>
+									</options>	
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:nomenclaturalCode</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:nomenclaturalCode</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="taxonomicStatus">
+								<properties>
+									<type>select</type>
+									<access>true</access>
+									<required>FALSE</required>
+									<title>Taxonomic Status (GBIF)</title>
+									<options>
+										<option key="accepted">accepted (Botanical)</option>
+										<option key="valid">valid (zoologial)</option>
+										<option key="synonym">synonym (unknown if homo- or heterotypic)</option>
+										<option key="homotypic synonym">homotypic synonym (objective)</option>
+										<option key="heterotypic synonym">heterotypic synonym (subjective)</option>
+										<option key="proParteSynonym">proParteSynonym (some series members assigned to new type)</option>
+										<option key="misapplied">misapplied</option>
+									</options>	
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:taxonomicStatus</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:taxonomicStatus</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="reconciliate">
+								<properties>
+									<type>button</type>
+									<access>true</access>
+									<default_value>Reconciliar a partir de nombre Científico</default_value>
+									<required>false</required>
+									<executes_submit_callback>false</executes_submit_callback>
+									<title>Reconciliar Nombre Científico </title>
+									<ajax>
+										<callback>islandora_red_biodiversidad_validateandpopulateTaxon</callback>
+										<wrapper>edit-dwc-fields-taxon-reconciliate</wrapper>
+									</ajax>					
+								</properties>
+								<children/>
+							</element>
+							<element name="phylum">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Phylum</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:phylum</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:phylum</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="class">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Class</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:class</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:class</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="order">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Order</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:order</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:order</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="family">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Family</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:family</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:family</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="genus">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>true</required>
+									<title>genus</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:genus</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:genus</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="subgenus">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Subgenus</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:subgenus</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:subgenus</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="specificEpithet">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Specific Epithet</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:specificEpithet</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:specificEpithet</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="vernacularName">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Vernacular Name</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:vernacularName</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:vernacularName</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="taxonRemarks">
+								<properties>
+									<type>textarea</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Taxon Remarks</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:taxonRemarks</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:taxonRemarks</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+						</children>
+					</element>
+				</children>
+			</element>
+		</children>
+	</form>
+</definition>

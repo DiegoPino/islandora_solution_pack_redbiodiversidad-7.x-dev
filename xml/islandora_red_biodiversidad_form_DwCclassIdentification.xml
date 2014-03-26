@@ -1,0 +1,349 @@
+<?xml version="1.0"?>
+<definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3">
+	<properties>
+		<root_name>DarwinRecordSet</root_name>
+		<schema_uri/>
+		<namespaces default="http://rs.tdwg.org/dwc/dwcrecord/">
+			<namespace prefix="dwr">http://rs.tdwg.org/dwc/dwcrecord/</namespace>
+			<namespace prefix="xsi">http://www.w3.org/2001/XMLSchema-instance</namespace>
+			<namespace prefix="dwc">http://rs.tdwg.org/dwc/terms/</namespace>
+			<namespace prefix="dcterms">http://purl.org/dc/terms/</namespace>
+		</namespaces>
+	</properties>
+	<form>
+		<properties>
+			<type>form</type>
+			<access>TRUE</access>
+			<required>FALSE</required>
+			<tree>TRUE</tree>
+		</properties>
+		<children>
+			<element name="Identification">
+				<properties>
+					<type>markup</type>
+					<access>TRUE</access>
+					<required>FALSE</required>
+					<tree>TRUE</tree>
+					<actions>
+						<create>
+							<path>/dwr:DarwinRecordSet</path>
+							<context>document</context>
+							<schema/>
+							<type>element</type>
+							<prefix>dwc</prefix>
+							<value>dwc:Identification</value>
+						</create>
+						<read>
+							<path>/dwr:DarwinRecordSet/dwc:Identification</path>
+							<context>document</context>
+						</read>
+						<update>
+							<path>self::node()</path>
+							<context>self</context>
+						</update>
+						<delete>
+							<path>self::node()</path>
+							<context>self</context>
+						</delete>
+					</actions>
+				</properties>
+				<children>
+					<element name="dwc_fields_identification">
+						<properties>
+							<type>fieldset</type>
+							<access>true</access>
+							<required>false</required>
+							<title>Taxon terms</title>
+							<tree>true</tree>
+						</properties>
+						<children>
+							<element name="basisOfRecord">
+								<properties>
+									<type>select</type>
+									<access>TRUE</access>
+									<default_value>Identification</default_value>
+									<description>A descriptive term indicating whether the record 
+                                        represents an object or observation. Term definitions are 
+                                        available here: http://wiki.tdwg.org/twiki/bin/view/DarwinCore/BasisOfRecord</description>
+									<options>
+										<option key="Identification">Identification</option>
+									</options>
+									<required>TRUE</required>
+									<title>Basis of Record</title>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Identification</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:basisOfRecord</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Identification/dwc:basisOfRecord</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="identificationID">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>true</required>
+									<title>Identification ID</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Identification</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:identificationID</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Identification/dwc:identificationID</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="identifiedBy">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Identified By</title>
+									<description>
+										A list (concatenated and separated) of names of people, groups, or organizations who assigned the Taxon to the subject.
+										Examples: "James L. Patton", "Theodore Pappenfuss; Robert Macey". For discussion see http://code.google.com/p/darwincore/wiki/Identification
+									</description>	
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Identification</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:identifiedBy</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Identification/dwc:identifiedBy</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="dateIdentified">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Date Identified</title>
+									<tree>true</tree>
+									<description>
+										The date on which the subject was identified as representing the Taxon. Recommended best practice is to use an encoding scheme, such as ISO 8601:2004(E).
+										Examples: "1963-03-08T14:07-0600" is 8 Mar 1963 2:07pm in the time zone six hours earlier than UTC, "2009-02-20T08:40Z" is 20 Feb 2009 8:40am UTC, "1809-02-12" is 12 Feb 1809, "1906-06" is Jun 1906, "1971" is just that year, "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z" is the interval between 1 Mar 2007 1pm UTC and 11 May 2008 3:30pm UTC, "2007-11-13/15" is the interval between 13 Nov 2007 and 15 Nov 2007. For discussion see http://code.google.com/p/darwincore/wiki/Identification
+									</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Identification</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:dateIdentified</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Identification/dwc:dateIdentified</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="identificationReferences">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Identification References</title>
+									<tree>true</tree>
+									<description>
+										A list (concatenated and separated) of references (publication, global unique identifier, URI) used in the Identification.
+									Example: "Aves del Noroeste Patagonico. Christie et al. 2004.". For discussion see http://code.google.com/p/darwincore/wiki/Identification
+										</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Identification</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:identificationReferences</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Identification/dwc:identificationReferences</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="identificationRemarks">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Identification Remarks</title>
+									<description>Comments or notes about the Identification.
+									Example: "Distinguished between Anthus correndera and Anthus hellmayri based on the comparative lengths of the uñas.". For discussion see http://code.google.com/p/darwincore/wiki/Identification
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Identification</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:identificationRemarks</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Identification/dwc:identificationRemarks</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="identificationQualifier">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Identification Qualifier</title>
+									<description>A brief phrase or a standard term ("cf.", "aff.") to express the determiner's doubts about the Identification.
+									Examples: 1) For the determination "Quercus aff. agrifolia var. oxyadenia", identificationQualifier would be "aff. agrifolia var. oxyadenia" with accompanying values "Quercus" in genus, "agrifolia" in specificEpithet, "oxyadenia" in infraspecificEpithet, and "var." in rank. 2) For the determination "Quercus agrifolia cf. var. oxyadenia", identificationQualifier would be "cf. var. oxyadenia " with accompanying values "Quercus" in genus, "agrifolia" in specificEpithet, "oxyadenia" in infraspecificEpithet, and "var." in rank. For discussion see http://code.google.com/p/darwincore/wiki/Identification
+								   </description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Identification</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:identificationQualifier</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Identification/dwc:identificationQualifier</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="typeStatus">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Identification Qualifier</title>
+									<description>A list (concatenated and separated) of nomenclatural types (type status, typified scientific name, publication) applied to the subject. </description>
+									Example: "holotype of Ctenomys sociabilis. Pearson O. P., and M. I. Christie. 1985. Historia Natural, 5(37):388". For discussion see http://code.google.com/p/darwincore/wiki/Identification
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Identification</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:typeStatus</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Identification/dwc:typeStatus</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+						</children>
+					</element>
+				</children>
+			</element>
+		</children>
+	</form>
+</definition>

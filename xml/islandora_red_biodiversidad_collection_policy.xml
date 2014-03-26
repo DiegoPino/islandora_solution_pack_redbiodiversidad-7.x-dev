@@ -3,7 +3,13 @@
     xsi:schemaLocation="http://www.islandora.ca http://syn.lib.umanitoba.ca/collection_policy.xsd">
   <content_models>
 	  <content_model name="Islandora Collection Content Model" dsid="ISLANDORACM" namespace="islandora" pid="islandora:collectionCModel"/>
-      <content_model dsid="ISLANDORACM" name="New Specimen" namespace="islandora" pid="islandora:sp_red_biodiversidad"/>
+      <content_model dsid="ISLANDORACM" name="New Darwin Core Ocurrence" namespace="islandora:collection" pid="islandora:sp_red_biodiversidad_dwcclassoccurrence"/>
+      <content_model dsid="ISLANDORACM" name="New Darwin Core Event" namespace="islandora:collection" pid="islandora:sp_red_biodiversidad_dwcclassevent"/>
+      <content_model dsid="ISLANDORACM" name="New Darwin Core Location" namespace="islandora:collection" pid="islandora:sp_red_biodiversidad_dctermlocation"/>
+      <content_model dsid="ISLANDORACM" name="New Darwin Core Identification" namespace="islandora:collection" pid="islandora:sp_red_biodiversidad_dwcclassidentification"/>
+      <content_model dsid="ISLANDORACM" name="New Darwin Core Taxon" namespace="islandora:collection" pid="islandora:sp_red_biodiversidad_dwcclasstaxon"/>
+      <content_model dsid="ISLANDORACM" name="New Darwin Core Taxon" namespace="islandora:collection" pid="islandora:sp_red_biodiversidad_dwcclasssample"/>
+      <content_model dsid="ISLANDORACM" name="New Simple Darwin Core Record" namespace="islandora:collection" pid="islandora:sp_red_biodiversidad_simpledwc"/>   
   </content_models>
   <search_terms></search_terms>
   <staging_area></staging_area>

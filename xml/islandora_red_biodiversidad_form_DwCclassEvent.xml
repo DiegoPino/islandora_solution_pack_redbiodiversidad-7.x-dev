@@ -1,0 +1,501 @@
+<?xml version="1.0"?>
+<definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3">
+	<properties>
+		<root_name>DarwinRecordSet</root_name>
+		<schema_uri/>
+		<namespaces default="http://rs.tdwg.org/dwc/dwcrecord/">
+			<namespace prefix="dwr">http://rs.tdwg.org/dwc/dwcrecord/</namespace>
+			<namespace prefix="xsi">http://www.w3.org/2001/XMLSchema-instance</namespace>
+			<namespace prefix="dwc">http://rs.tdwg.org/dwc/terms/</namespace>
+			<namespace prefix="dcterms">http://purl.org/dc/terms/</namespace>
+		</namespaces>
+	</properties>
+	<form>
+		<properties>
+			<type>form</type>
+			<access>TRUE</access>
+			<required>FALSE</required>
+			<tree>TRUE</tree>
+		</properties>
+		<children>
+			<element name="Event">
+				<properties>
+					<type>markup</type>
+					<access>TRUE</access>
+					<required>FALSE</required>
+					<tree>TRUE</tree>
+					<actions>
+						<create>
+							<path>/dwr:DarwinRecordSet</path>
+							<context>document</context>
+							<schema/>
+							<type>element</type>
+							<prefix>dwc</prefix>
+							<value>dwc:Event</value>
+						</create>
+						<read>
+							<path>/dwr:DarwinRecordSet/dwc:Event</path>
+							<context>document</context>
+						</read>
+						<update>
+							<path>self::node()</path>
+							<context>self</context>
+						</update>
+						<delete>
+							<path>self::node()</path>
+							<context>self</context>
+						</delete>
+					</actions>
+				</properties>
+				<children>
+					<element name="record_level_terms">
+						<properties>
+							<type>fieldset</type>
+							<access>TRUE</access>
+							<required>FALSE</required>
+							<title>Record-level terms</title>
+							<tree>TRUE</tree>
+						</properties>
+						<children>
+							<element name="type">
+								<properties>
+									<type>select</type>
+									<access>TRUE</access>
+									<default_value>Event</default_value>
+									<description>The Darwin Core Type Vocabulary extends the DCMI Type Vocabulary and provides a list of approved values that 
+                                        may be used for the basisOfRecord term to identify the specific type of a resource. For term descriptions see: 
+										http://rs.tdwg.org/dwc/terms/type-vocabulary/index.htm</description>
+									<options>
+										<option key="Event">Event</option>
+									</options>
+									<required>TRUE</required>
+									<title>Type</title>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dcterms</prefix>
+											<value>dcterms:type</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dcterms:type</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="basisOfRecord">
+								<properties>
+									<type>select</type>
+									<access>TRUE</access>
+									<default_value>Event</default_value>
+									<description>A descriptive term indicating whether the record 
+                                        represents an object or observation. Term definitions are 
+                                        available here: http://wiki.tdwg.org/twiki/bin/view/DarwinCore/BasisOfRecord</description>
+									<options>
+										<option key="Event">Event</option>
+									</options>
+									<required>TRUE</required>
+									<title>Basis of Record</title>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:basisOfRecord</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:basisOfRecord</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="dynamicProperties">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<default_value>zool</default_value>
+									<required>FALSE</required>
+									<title>Dynamic Properties</title>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:dynamicProperties</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:dynamicProperties</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+						</children>
+					</element>
+					<element name="dwc_fields_event">
+						<properties>
+							<type>fieldset</type>
+							<access>TRUE</access>
+							<required>FALSE</required>
+							<title>Event terms</title>
+							<tree>TRUE</tree>
+						</properties>
+						<children>
+							<element name="eventID">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>TRUE</required>
+									<title>Event ID</title>
+									<description>An identifier for the set of information associated with an Event (something that occurs at a place and time). May be a global unique identifier or an identifier specific to the data set.</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:eventID</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:eventID</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="samplingProtocol">
+								<properties>
+									<type>textarea</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Sampling Protocol</title>
+									<description>The name of, reference to, or description of the method or protocol used during an Event. 
+									Examples: "UV light trap", "mist net", "bottom trawl", "ad hoc observation", "point count", "Penguins from space: faecal stains reveal the location of emperor penguin colonies, http://dx.doi.org/10.1111/j.1466-8238.2009.00467.x", "Takats et al. 2001. Guidelines for Nocturnal Owl Monitoring in North America. Beaverhill Bird Observatory and Bird Studies Canada, Edmonton, Alberta. 32 pp.", "http://www.bsc-eoc.org/download/Owl.pdf". For discussion see http://code.google.com/p/darwincore/wiki/Event
+								    </description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:samplingProtocol</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:samplingProtocol</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="samplingEffort">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Sampling Effort</title>
+									<description>The amount of effort expended during an Event. Examples: "40 trap-nights", "10 observer-hours; 10 km by foot; 30 km by car". For discussion see http://code.google.com/p/darwincore/wiki/Event</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:samplingEffort</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:samplingEffort</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="eventDate">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Event date</title>
+									<description>
+									The date-time or interval during which an Event occurred. For occurrences, this is the date-time when the event was recorded. Not suitable for a time in a geological context. Recommended best practice is to use an encoding scheme, such as ISO 8601:2004(E).	
+									Examples: "1963-03-08T14:07-0600" is 8 Mar 1963 2:07pm in the time zone six hours earlier than UTC, "2009-02-20T08:40Z" is 20 Feb 2009 8:40am UTC, "1809-02-12" is 12 Feb 1809, "1906-06" is Jun 1906, "1971" is just that year, "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z" is the interval between 1 Mar 2007 1pm UTC and 11 May 2008 3:30pm UTC, "2007-11-13/15" is the interval between 13 Nov 2007 and 15 Nov 2007. For discussion see http://code.google.com/p/darwincore/wiki/Event
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:eventDate</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:eventDate</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="verbatimEventDate">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Verbatim Event Date</title>
+									<description>
+										The verbatim original representation of the date and time information for an Event.Examples: "spring 1910", "Marzo 2002", "1999-03-XX", "17IV1934". For discussion see http://code.google.com/p/darwincore/wiki/Event
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:verbatimEventDate</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:verbatimEventDate</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="habitat">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Habitat</title>
+									<tree>TRUE</tree>
+									<description>
+										A category or description of the habitat in which the Event occurred.
+										Examples: "oak savanna", "pre-cordilleran steppe". For discussion see http://code.google.com/p/darwincore/wiki/Event
+									</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:habitat</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:habitat</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="fieldNumber">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Field Number</title>
+									<tree>TRUE</tree>
+									<description>An identifier given to the event in the field. Often serves as a link between field notes and the Event.
+									Example: "RV Sol 87-03-08". For discussion see http://code.google.com/p/darwincore/wiki/Event
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:fieldNumber</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:fieldNumber</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="fieldNotes">
+								<properties>
+									<type>textarea</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Field Notes</title>
+									<tree>TRUE</tree>
+									<description>One of a) an indicator of the existence of, b) a reference to (publication, URI), or c) the text of notes taken in the field about the Event.
+										Example: "notes available in Grinnell-Miller Library". For discussion see http://code.google.com/p/darwincore/wiki/Event
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:fieldNotes</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:fieldNotes</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="eventRemarks">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>eventRemarks</title>
+									<description>Comments or notes about the Event.
+									Example: "after the recent rains the river is nearly at flood stage". For discussion see http://code.google.com/p/darwincore/wiki/Event
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Event</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:eventRemarks</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Event/dwc:eventRemarks</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+						</children>
+					</element>
+				</children>
+			</element>
+		</children>
+	</form>
+</definition>

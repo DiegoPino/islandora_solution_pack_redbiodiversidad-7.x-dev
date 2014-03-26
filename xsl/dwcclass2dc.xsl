@@ -10,11 +10,13 @@ Information Science
     This XSLT transforms DarwinCore XML to Simple Dublin Core XML.
 
 Edited by dm ... DwC to OAI_DC June 2010.
+Edited by Diego Pino ... DwC complete class to OAI_DC March 2014.
 -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/terms/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
 
@@ -39,7 +41,7 @@ Edited by dm ... DwC to OAI_DC June 2010.
     </xsl:template>
 
     <!-- Source elemnts are Dublin Core. -->
-    <xsl:template match="dc:type">
+    <xsl:template match="dcterms:type">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if
@@ -59,8 +61,9 @@ source file. -->
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+	
 
-    <xsl:template match="dc:language">
+    <xsl:template match="dcterms:language">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if
@@ -104,6 +107,56 @@ source file. -->
         </xsl:choose>
     </xsl:template>
 
+    <xsl:template match="dwc:occurrenceID">
+        <xsl:choose>
+            <xsl:when test="normalize-space(.)">
+                <!-- Tests to see if
+normalized element is null.  If it is, does not output element to
+source file. -->
+				
+                <title xmlns="http://purl.org/dc/elements/1.1/">
+                    <xsl:apply-templates/>
+                </title>
+                <identifier xmlns="http://purl.org/dc/elements/1.1/">
+                    <xsl:apply-templates/>
+				</identifier>
+                <xsl:text> </xsl:text>
+                <xsl:comment> Source node is <xsl:value-of select="name()"/>
+                </xsl:comment>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- This is for when the element is null.
+-->
+                <xsl:comment> Node <xsl:value-of select="name()"/> had no content.</xsl:comment>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="dwc:eventID">
+        <xsl:choose>
+            <xsl:when test="normalize-space(.)">
+                <!-- Tests to see if
+normalized element is null.  If it is, does not output element to
+source file. -->
+				
+                <title xmlns="http://purl.org/dc/elements/1.1/">
+					<xsl:value-of select="concat('Event: ',.)"/>
+                    <xsl:apply-templates/>
+                </title>
+                <identifier xmlns="http://purl.org/dc/elements/1.1/">
+                    <xsl:apply-templates/>
+				</identifier>
+                <xsl:text> </xsl:text>
+                <xsl:comment> Source node is <xsl:value-of select="name()"/>
+                </xsl:comment>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- This is for when the element is null.
+-->
+                <xsl:comment> Node <xsl:value-of select="name()"/> had no content.</xsl:comment>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template match="dwc:scientificName">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
@@ -124,7 +177,6 @@ source file. -->
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-
     <xsl:template match="dwc:specificEpithet">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
@@ -328,7 +380,7 @@ source file. -->
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="dwc:occurrenceRemarks">
+    <xsl:template match="*[substring(name(), string-length() -8) = 'Remarks']">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
@@ -347,7 +399,7 @@ source file. -->
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="dwc:occurrenceID">
+    <xsl:template match="*[substring(name(), string-length() -3) = 'ID']">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if
@@ -432,7 +484,7 @@ source file. -->
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="dwc:recordedBy">
+    <xsl:template match="*[substring(name(), string-length() -3) = 'By']">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if
@@ -452,8 +504,48 @@ source file. -->
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-
+    <xsl:template match="dcterms:*[contains(name(), 'ights')]">
+        <xsl:choose>
+            <xsl:when test="normalize-space(.)">
+                <!-- Tests to see if
+normalized element is null.  If it is, does not output element to
+source file. -->
+                <rights xmlns="http://purl.org/dc/elements/1.1/">
+                    <xsl:apply-templates/>
+				</rights>
+                <xsl:text> </xsl:text>
+                <xsl:comment> Source node is <xsl:value-of select="name()"/>
+                </xsl:comment>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- This is for when the element is null.
+-->
+                <xsl:comment> Node <xsl:value-of select="name()"/> had no content.</xsl:comment>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
     <xsl:template match="dwc:eventDate">
+        <xsl:choose>
+            <xsl:when test="normalize-space(.)">
+                <!-- Tests to see if
+normalized element is null.  If it is, does not output element to
+source file. -->
+                <date xmlns="http://purl.org/dc/elements/1.1/">
+                    <xsl:apply-templates/>
+                </date>
+                <xsl:text> </xsl:text>
+                <xsl:comment> Source node is <xsl:value-of select="name()"/>
+                </xsl:comment>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- This is for when the element is null.
+-->
+                <xsl:comment> Node <xsl:value-of select="name()"/> had no content.</xsl:comment>
+            </xsl:otherwise>
+        </xsl:choose>
+
+    </xsl:template>
+    <xsl:template match="dwc:identificationDate">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if
@@ -479,15 +571,18 @@ source file. -->
 section should output a message and the element as a comment to the
 ouptput file. -->
     <!-- For Dublin Core elements. -->
-    <xsl:template match="dc:*">
+    <xsl:template match="dcterms:*">
         <xsl:choose>
-            <xsl:when test="dc:type | dc:language"> </xsl:when>
+            <xsl:when test="dcterms:type | dcterms:language"> </xsl:when>
             <xsl:otherwise>
                 <xsl:comment> Node <xsl:value-of select="name()"/> with content
                     "<xsl:apply-templates/>" was not matched.</xsl:comment>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
+    <!-- For Darwin Core elements. -->
+   
     <!-- End of Exception Handling section. -->
 
 </xsl:stylesheet>

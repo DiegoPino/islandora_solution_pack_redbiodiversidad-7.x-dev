@@ -1,0 +1,1374 @@
+<?xml version="1.0"?>
+<definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3">
+	<properties>
+		<root_name>DarwinRecordSet</root_name>
+		<schema_uri/>
+		<namespaces default="http://rs.tdwg.org/dwc/dwcrecord/">
+			<namespace prefix="dwr">http://rs.tdwg.org/dwc/dwcrecord/</namespace>
+			<namespace prefix="xsi">http://www.w3.org/2001/XMLSchema-instance</namespace>
+			<namespace prefix="dwc">http://rs.tdwg.org/dwc/terms/</namespace>
+			<namespace prefix="dcterms">http://purl.org/dc/terms/</namespace>
+		</namespaces>
+	</properties>
+	<form>
+		<properties>
+			<type>form</type>
+			<access>TRUE</access>
+			<required>FALSE</required>
+			<tree>TRUE</tree>
+		</properties>
+		<children>
+			<element name="Location">
+				<properties>
+					<type>markup</type>
+					<access>TRUE</access>
+					<required>FALSE</required>
+					<tree>TRUE</tree>
+					<actions>
+						<create>
+							<path>/dwr:DarwinRecordSet</path>
+							<context>document</context>
+							<schema/>
+							<type>element</type>
+							<prefix>dcterms</prefix>
+							<value>dcterms:Location</value>
+						</create>
+						<read>
+							<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+							<context>document</context>
+						</read>
+						<update>
+							<path>self::node()</path>
+							<context>self</context>
+						</update>
+						<delete>
+							<path>self::node()</path>
+							<context>self</context>
+						</delete>
+					</actions>
+				</properties>
+				<children>
+					<element name="dwc_fields_location">
+						<properties>
+							<type>fieldset</type>
+							<access>TRUE</access>
+							<required>FALSE</required>
+							<title>Record and Location terms</title>
+							<tree>TRUE</tree>
+						</properties>
+						<children>
+							<element name="basisOfRecord">
+								<properties>
+									<type>select</type>
+									<access>TRUE</access>
+									<default_value>Location</default_value>
+									<description>A resource describing an instance of the Location class.</description>
+									<options>
+										<option key="Location">Location</option>
+									</options>
+									<required>TRUE</required>
+									<title>Basis of Record</title>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:basisOfRecord</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:basisOfRecord</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="locationID">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>TRUE</required>
+									<title>Location ID</title>
+									<description>An identifier for the set of location information (data associated with dcterms:Location). May be a global unique identifier or an identifier specific to the data set.</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:locationID</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:locationID</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="locationAccordingTo">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Location According To</title>
+									<description>Information about the source of this Location information. Could be a publication (gazetteer), institution, or team of individuals.
+									Example: "under water since 2005". For discussion see http://code.google.com/p/darwincore/wiki/Location
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:locationAccordingTo</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:locationAccordingTo</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="locationRemarks">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Location Remarks</title>
+									<description>Comments or notes about the Location.
+									Example: "under water since 2005". For discussion see http://code.google.com/p/darwincore/wiki/Location
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:locationRemarks</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:locationRemarks</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+						</children>
+					</element>
+					<element name="dwc_geographic_terms">
+						<properties>
+							<type>fieldset</type>
+							<access>TRUE</access>
+							<required>FALSE</required>
+							<title>Geographic Terms</title>
+							<tree>TRUE</tree>
+						</properties>
+						<children>
+							<element name="higherGeographyID">
+								<properties>
+									<type>textarea</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Higher Geography ID</title>
+									<description>An identifier for the geographic region within which the Location occurred. Recommended best practice is to use an persistent identifier from a controlled vocabulary such as the Getty Thesaurus of Geographic Names.
+Example: "TGN: 1002002" for Prov. Tierra del Fuego, Argentina. For discussion see http://code.google.com/p/darwincore/wiki/Location
+								    </description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:higherGeographyID</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:higherGeographyID</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="higherGeography">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Higher Geography</title>
+									<description>A list (concatenated and separated) of geographic names less specific than the information captured in the locality term.
+									Example: "South America; Argentina; Patagonia; Parque Nacional Nahuel Huapi; Neuqu&#xE9;n; Los Lagos" with accompanying values "South America" in Continent, "Argentina" in Country, "Neuqu&#xE9;n" in StateProvince, and Los Lagos in County. For discussion see http://code.google.com/p/darwincore/wiki/Location
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:higherGeography</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:higherGeography</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="continent">
+								<properties>
+									<type>select</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Continent</title>
+									<default_value>South America</default_value>
+									<options>
+										<option key="South America">South America</option>
+										<option key="Antarctica">Antarctica</option>
+										<option key="Asia">Asia</option>
+										<option key="Europe">Europe</option>
+										<option key="North America">North America</option>
+										<option key="Oceania">Oceania</option>
+										<option key="Africa">Africa</option>
+									</options>
+									<description>
+									The name of the continent in which the Location occurs.
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:continent</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:continent</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="waterBody">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Water Body</title>
+									<description>
+										The name of the water body in which the Location occurs. Recommended best practice is to use a controlled vocabulary such as the Getty Thesaurus of Geographic Names.	
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:waterBody</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:waterBody</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="islandGroup">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Island Group</title>
+									<tree>TRUE</tree>
+									<description>
+										The name of the island group in which the Location occurs. Recommended best practice is to use a controlled vocabulary such as the Getty Thesaurus of Geographic Names.
+										Examples: "Alexander Archipelago", "Seychelles". For discussion see http://code.google.com/p/darwincore/wiki/Location
+									</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:islandGroup</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:islandGroup</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="island">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>island</title>
+									<tree>TRUE</tree>
+									<description>
+										The name of the island on or near which the Location occurs. Recommended best practice is to use a controlled vocabulary such as the Getty Thesaurus of Geographic Names.
+										Examples: "Isla Victoria", "Vancouver", "Viti Levu", "Zanzibar". For discussion see http://code.google.com/p/darwincore/wiki/Location
+									</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:island</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:island</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="country">
+								<properties>
+									<type>select</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>country</title>
+									<tree>TRUE</tree>
+									<default_value>Chile</default_value>
+									<options>
+										<option key="Chile">Chile</option>
+										<option key="Argentina">Argentina</option>
+										<option key="Per&#xFA;">Per&#xFA;</option>
+										<option key="Bolivia">Bolivia</option>
+									</options>
+									<description>The name of the country or major administrative unit in which the Location occurs.
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:country</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:country</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="countryCode">
+								<properties>
+									<type>select</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Country Code</title>
+									<tree>TRUE</tree>
+									<default_value>CL</default_value>
+									<options>
+										<option key="CL">CL - Chile</option>
+										<option key="AR">AR - Argentina</option>
+										<option key="PE">PE - Per&#xFA;</option>
+										<option key="BO">BO - Bolivia</option>
+									</options>
+									<description>The name of the country or major administrative unit in which the Location occurs.
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:countryCode</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:countryCode</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="stateProvince">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>State Province</title>
+									<tree>TRUE</tree>
+									<description>The name of the next smaller administrative region than country (state, province, canton, department, region, etc.) in which the Location occurs.
+										Examples: "Montana", "Minas Gerais", "C&#xF3;rdoba". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:stateProvince</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:stateProvince</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="county">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>County</title>
+									<tree>TRUE</tree>
+									<description>The full, unabbreviated name of the next smaller administrative region than stateProvince (county, shire, department, etc.) in which the Location occurs.
+										Examples: "Missoula", "Los Lagos", "Matar&#xF3;". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:county</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:county</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="municipality">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Municipality</title>
+									<tree>TRUE</tree>
+									<description>The full, unabbreviated name of the next smaller administrative region than county (city, municipality, etc.) in which the Location occurs. Do not use this term for a nearby named place that does not contain the actual location.
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:municipality</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:municipality</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="locality">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Locality</title>
+									<tree>TRUE</tree>
+									<description>The full, unabbreviated name of the next smaller administrative region than county (city, municipality, etc.) in which the Location occurs. Do not use this term for a nearby named place that does not contain the actual location.
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:locality</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:locality</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+						</children>	
+					</element>
+					
+					<element name="dwc_verbatim_coordinates_terms">
+						<properties>
+							<type>fieldset</type>
+							<access>TRUE</access>
+							<required>FALSE</required>
+							<title>Verbatim Terms</title>
+							<tree>TRUE</tree>
+						</properties>
+						<children>
+							<element name="verbatimLocality">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Verbatim Locality</title>
+									<tree>TRUE</tree>
+									<description>
+										The original textual description of the place.
+										Example: "25 km NNE Bariloche por R. Nac. 237". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:verbatimLocality</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:verbatimLocality</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="verbatimElevation">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Verbatim Elevation</title>
+									<tree>TRUE</tree>
+									<description>
+										The original description of the elevation (altitude, usually above sea level) of the Location.
+										Example: "100-200 m". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:verbatimElevation</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:verbatimElevation</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="verbatimDepth">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Verbatim Depth</title>
+									<tree>TRUE</tree>
+									<description>
+										The original description of the depth below the local surface.
+										Example: "100-200 m". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:verbatimDepth</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:verbatimDepth</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="verbatimCoordinates">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Verbatim Coordinates</title>
+									<description>
+										The verbatim original spatial coordinates of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem.
+									    Examples: "41 05 54S 121 05 34W", "17T 630000 4833400". For discussion see http://code.google.com/p/darwincore/wiki/Location
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:verbatimCoordinates</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:verbatimCoordinates</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="verbatimLatitude">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Verbatim Latitude</title>
+									<description>
+									The verbatim original latitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem.
+								Example: "41 05 54.03S". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:verbatimLatitude</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:verbatimLatitude</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="verbatimLongitude">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Verbatim Longitude</title>
+									<description>
+							    The verbatim original longitude of the Location. The coordinate ellipsoid, geodeticDatum, or full Spatial Reference System (SRS) for these coordinates should be stored in verbatimSRS and the coordinate system should be stored in verbatimCoordinateSystem.
+						        Example: "121d 10' 34" W". For discussion see http://code.google.com/p/darwincore/wiki/Location
+							   </description>
+							   		<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:verbatimLongitude</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:verbatimLongitude</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="verbatimCoordinateSystem">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Verbatim Coordinate System</title>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:verbatimCoordinateSystem</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:verbatimCoordinateSystem</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="verbatimSRS">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Verbatim Coordinate System</title>
+									<description>
+									The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is use the EPSG code as a controlled vocabulary to provide an SRS, if known. Otherwise use a controlled vocabulary for the name or code of the geodetic datum, if known. Otherwise use a controlled vocabulary for the name or code of the ellipsoid, if known. If none of these is known, use the value "unknown".
+								     Examples: "EPSG:4326", "WGS84", "NAD27", "Campo Inchauspe", "European 1950", "Clarke 1866". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								   </description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:verbatimSRS</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:verbatimSRS</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+						</children>	
+					</element>
+					<element name="dwc_georeference_terms">
+						<properties>
+							<type>fieldset</type>
+							<access>TRUE</access>
+							<required>FALSE</required>
+							<title>Georeference Terms</title>
+							<tree>TRUE</tree>
+						</properties>
+						<children>
+							<element name="minimumElevationInMeters">
+								<properties>
+									<type>textarea</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Minimum Elevation In Meters</title>
+									<tree>TRUE</tree>
+									<description>The lower limit of the range of elevation (altitude, usually above sea level), in meters.
+										Example: "100". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:minimumElevationInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:minimumElevationInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="maximumElevationInMeters">
+								<properties>
+									<type>textarea</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Maximum Elevation In Meters</title>
+									<tree>TRUE</tree>
+									<description>The upper limit of the range of elevation (altitude, usually above sea level), in meters.
+										Example: "200". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:maximumElevationInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:maximumElevationInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>						
+							<element name="minimumDepthInMeters">
+								<properties>
+									<type>textarea</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Minimum Depth In Meters</title>
+									<tree>TRUE</tree>
+									<description>The lesser depth of a range of depth below the local surface, in meters.
+										Example: "100". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:minimumDepthInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:minimumDepthInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="maximumDepthInMeters">
+								<properties>
+									<type>textarea</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Maximum Depth In Meters</title>
+									<tree>TRUE</tree>
+									<description>The greater depth of a range of depth below the local surface, in meters.
+										Example: "200". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:maximumDepthInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:maximumDepthInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="minimumDistanceAboveSurfaceInMeters">
+								<properties>
+									<type>textarea</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Minimum Distance Above Surface In Meters</title>
+									<tree>TRUE</tree>
+									<description>The lesser distance in a range of distance from a reference surface in the vertical direction, in meters. Use positive values for locations above the surface, negative values for locations below. If depth measures are given, the reference surface is the location given by the depth, otherwise the reference surface is the location given by the elevation.
+										Example: 1.5 meter sediment core from the bottom of a lake (at depth 20m) at 300m elevation; VerbatimElevation: "300m" MinimumElevationInMeters: "300", MaximumElevationInMeters: "300", VerbatimDepth: "20m", MinimumDepthInMeters: "20", MaximumDepthInMeters: "20", minimumDistanceAboveSurfaceInMeters: "0", maximumDistanceAboveSurfaceInMeters: "-1.5". For discussion see http://code.google.com/p/darwincore/wiki/Location
+									</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:minimumDistanceAboveSurfaceInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:minimumDistanceAboveSurfaceInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="maximumDistanceAboveSurfaceInMeters">
+								<properties>
+									<type>textarea</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Maximum Distance Above Surface In Meters</title>
+									<tree>TRUE</tree>
+									<description>
+									The greater distance in a range of distance from a reference surface in the vertical direction, in meters. Use positive values for locations above the surface, negative values for locations below. If depth measures are given, the reference surface is the location given by the depth, otherwise the reference surface is the location given by the elevation.
+									Example: 1.5 meter sediment core from the bottom of a lake (at depth 20m) at 300m elevation; VerbatimElevation: "300m" MinimumElevationInMeters: "300", MaximumElevationInMeters: "300", VerbatimDepth: "20m", MinimumDepthInMeters: "20", MaximumDepthInMeters: "20", minimumDistanceAboveSurfaceInMeters: "0", maximumDistanceAboveSurfaceInMeters: "-1.5". For discussion see http://code.google.com/p/darwincore/wiki/Location
+									</description>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:maximumDistanceAboveSurfaceInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:maximumDistanceAboveSurfaceInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="decimalLatitude">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>decimal Latitude</title>
+									<description>
+								The geographic latitude (in decimal degrees, using the spatial reference system given in geodeticDatum) of the geographic center of a Location. Positive values are north of the Equator, negative values are south of it. Legal values lie between -90 and 90, inclusive.
+							    Example: "-41.0983423". For discussion see http://code.google.com/p/darwincore/wiki/Location
+							  </description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:decimalLatitude</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:decimalLatitude</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="decimalLongitude">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>decimal Longitude</title>
+									<description>
+										The geographic longitude (in decimal degrees, using the spatial reference system given in geodeticDatum) of the geographic center of a Location. Positive values are east of the Greenwich Meridian, negative values are west of it. Legal values lie between -180 and 180, inclusive.
+										Example: "-121.1761111". For discussion see http://code.google.com/p/darwincore/wiki/Location	   </description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:decimalLongitude</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:decimalLongitude</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="geodeticDatum">
+								<properties>
+									<type>select</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<options>
+										<option key="EPSG:4326">WGS84</option>
+										<option key="EPSG:4269">NAD83</option>
+										<option key="EPSG:4267">NAD27</option>
+										<option key="unknown">Unknown</option>
+									</options>	
+									<title>Geodetic Datum</title>
+									<description>
+										Ideally one should use a standard European Petroleum Survey Group (EPSG) code to a Spatial Reference System as a value for this term. The recommended controlled vocabulary is to use a value consisting of the string "EPSG:" followed by a valid EPSG code corresponding to the spatial reference system used for the geographic coordinates in the terms decimalLatitude and decimalLongitude.
+
+										A good resource for determining the EPSG code from the Datum name can be found at http://spatialreference.org/.
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:geodeticDatum</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:geodeticDatum</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="georeferenceProtocol">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Georeference Protocol</title>
+									<description>
+										It is recommended to give a citation (publication or URL) to the resource describing the methods used to determine the georeference (coordinates AND uncertainty, or footprint).
+										Good resources on methods include:
+										1. Chapman, A.D. and J. Wieczorek (eds). 2006. Guide to Best Practices for Georeferencing. Copenhagen: Global Biodiversity Information Facility. Accessible from http://www.gbif.org/orc/?doc_id=1288
+										2. MaNIS/HerpNet/ORNIS Georeferencing Guidelines.(HTML) Accessible from http://manisnet.org/GeorefGuide.html
+										3. Georeferencing Quick Reference Guide. (PDF) Accessible from http://manisnet.org/GeoreferencingQuickReferenceGuide.pdf
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:georeferenceProtocol</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:georeferenceProtocol</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="georeferenceVerificationStatus">
+								<properties>
+									<type>select</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<options>
+										<option key="unverified">unverified</option>
+										<option key="verified by data custodian">verified by data custodian</option>
+										<option key="verified by contributor">verified by contributor</option>
+									</options>
+									<title>georeference Verification Status</title>
+									<description>
+										It is recommended to give a citation (publication or URL) to the resource describing the methods used to determine the georeference (coordinates AND uncertainty, or footprint).
+										Good resources on methods include:
+										1. Chapman, A.D. and J. Wieczorek (eds). 2006. Guide to Best Practices for Georeferencing. Copenhagen: Global Biodiversity Information Facility. Accessible from http://www.gbif.org/orc/?doc_id=1288
+										2. MaNIS/HerpNet/ORNIS Georeferencing Guidelines.(HTML) Accessible from http://manisnet.org/GeorefGuide.html
+										3. Georeferencing Quick Reference Guide. (PDF) Accessible from http://manisnet.org/GeoreferencingQuickReferenceGuide.pdf
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dcterms:Location</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:georeferenceVerificationStatus</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:georeferenceVerificationStatus</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+						</children>	
+					</element>
+				</children>
+			</element>
+		</children>
+	</form>
+</definition>
