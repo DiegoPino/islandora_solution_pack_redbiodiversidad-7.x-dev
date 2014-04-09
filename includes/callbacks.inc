@@ -66,11 +66,11 @@ function islandora_red_biodiversidad_autocomplete($type) {
   $mappings = array(
     'scientificName' => array(
       'cmodel' => 'islandora:sp_red_biodiversidad',
-      'title' => 'dw.scientificName',
+      'title' => 'dwc.scientificName_mt',
     ),
     'genus' => array(
       'cmodel' => 'islandora:sp_red_biodiversidad',
-      'title' => 'dw.genus',
+      'title' => 'dwc.genus_mt',
     ),
   );
  
@@ -95,7 +95,7 @@ function islandora_red_biodiversidad_autocomplete($type) {
   $query_processor->solrStart = 0;
   $query_processor->solrLimit = 100;
   $query_processor->solrParams = array(
-    'fl' => "$biodiversidad_query_field, PID",
+    'fl' => "$biodiversidad_query_field,PID",
     'fq' => format_string(
         '!content_model_field:"info:fedora/!content_model"', array(
           '!content_model_field' => $content_model_field,
@@ -114,12 +114,14 @@ function islandora_red_biodiversidad_autocomplete($type) {
     watchdog_exception('Islandora Red de Biodiversidad', $e, 'Got an exception while searching ScientificName in Solr for callback.', array(), WATCHDOG_ERROR);
   }
   $list = array();
+  
   foreach ($json['response']['docs'] as $choice) {
+	
     if (isset($choice[$mappings[$type]['title']])) {
-      $list[$choice[$mappings[$type]['title']]] = $choice[$mappings[$type]['title']];
+      $list[$choice[$mappings[$type]['title']][0]] = $choice[$mappings[$type]['title']][0];//Solr devuelve un arreglo. Verificar schema.xml
     }
   }
-
+ 
   drupal_json_output($list);
 }
 /*Esta función executa ajax commands en la forma de origen poblando datos desde GBIF */

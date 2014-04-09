@@ -1,11 +1,10 @@
 /*
-    Document   : islandora_basic_collection.theme
-    Created on : May 23, 2012, 11:23:56 AM
-    Description: The basic image page is a simple flexible layout page
-    that breaks down to two columns when 2 sidebars are visible
+    Document   : islandora_red_biodiversidad.theme
+    Created on : March 24, 2014, 
+   
 */
 
-.islandora-basic-image-content {
+.islandora-red-biodiversidad-content {
   background-color: #F2F2F2;
   border: 1px solid #ddd;
   -webkit-border-radius: 5px;
@@ -14,67 +13,51 @@
   padding: 15px;
 }
 
-.islandora-basic-image-content img {
+.islandora-red-biodiversidad-content img {
   margin: 0;
   display: block;
 }
 
-.islandora-basic-image-metadata {
+.islandora-red-biodiversidad-metadata {
   display: block;
   clear: both;
 }
 
 /* This is kept for legacy reasons */
-dl.islandora-basic-image-fields {
-  width:100%;
-}
 
 dl.islandora-metadata-fields {
   width:100%;
 }
 
-.islandora-basic-image-metadata dt {
+.islandora-red-biodiversidad dt {
   font-weight: normal;
-  text-align: right;
+  text-align: left;
   font-weight: bold;
   padding-right: 0;
 }
 
-.islandora-basic-image-metadata dd {
-  padding-left: 40px;
+.islandora-red-biodiversidad-metadata dd {
+  padding-left: 4em;
+  padding-top: 1em;
 }
 
 
-.islandora-basic-image-metadata dt,
-.islandora-basic-image-metadata dd {
+.islandora-red-biodiversidad-metadata dt,
+.islandora-red-biodiversidad-metadata dd {
   border-top:1px solid #e5e5e5;
 }
 
-.islandora-basic-image-metadata dt.first,
-.islandora-basic-image-metadata dd.first {
+.islandora-red-biodiversidad-metadata dt.first,
+.islandora-red-biodiversidad-metadata dd.first {
   border-top:0;
 }
-
-body.two-sidebars .islandora-basic-image-sidebar {
-    clear: both;
-    width: 100%;
+.islandora-red-biodiversidad-info
+{
+	display: inline-block;
+	width: auto;
+	margin-left: 5px;
+	
+	color: green;
+	
 }
 
-@media all and (min-width: 768px) {
-
-  body.no-sidebars .islandora-basic-image-content {
-    width: 65%;
-    float: left; /* LTR */
-  }
-
-  body.no-sidebars .islandora-basic-image-sidebar {
-    padding-left: 20px;
-  }
-
-  body.no-sidebars .islandora-basic-image-sidebar {
-    float: right; /* LTR */
-    width: 35%;
-    clear: none;
-  }
-
-}

@@ -1,8 +1,8 @@
-<?xml version="1.0"?>
-<definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3">
+<?xml version="1.0" ?>
+<definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2">
 	<properties>
-		<root_name>DarwinRecordSet</root_name>
-		<schema_uri/>
+		<root_name>dwr:DarwinRecordSet</root_name>
+		<schema_uri>http://rs.tdwg.org/dwc/xsd/tdwg_dwc_classes.xsd</schema_uri>
 		<namespaces default="http://rs.tdwg.org/dwc/dwcrecord/">
 			<namespace prefix="dwr">http://rs.tdwg.org/dwc/dwcrecord/</namespace>
 			<namespace prefix="xsi">http://www.w3.org/2001/XMLSchema-instance</namespace>
@@ -797,11 +797,8 @@ Examples: "skin; skull; skeleton", "whole animal (ETOH); tissue (EDTA)", "fossil
 									<options>
 										<option key="in collection">in collection</option>
 										<option key="missing">missing</option>
-										<option key="voucher ">introduced</option>
-										<option key="naturalised">naturalised</option>
-										<option key="invasive">invasive</option>
-										<option key="managed">managed</option>
-										<option key="undetermined">undetermined</option>
+										<option key="voucher elsewhere">voucher elsewhere</option>
+										<option key="duplicates elsewhere">duplicates elsewhere</option>
 									</options>
 									<empty_option>-none-</empty_option>
 									<actions>

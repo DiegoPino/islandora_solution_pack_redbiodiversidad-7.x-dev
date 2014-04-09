@@ -63,6 +63,15 @@ function islandora_red_biodiversidad_menu() {
     'access callback' => 'islandora_red_biodiversidad_access',
     'access arguments' => array(2),
   );
+  $items['islandora/object/%islandora_object/dwc_related'] = array(
+    'weight' => 4,
+    'title' => 'Related DwC',
+    'page callback' => 'islandora_red_biodiversidad_dw_related_display',
+    'page arguments' => array(2),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => 'islandora_red_biodiversidad_access',
+    'access arguments' => array(2),
+  );
   /*$items['islandora/object/%islandora_object/redbiodiversidad_collection_tab'] = array(
     'weight' => 4,
     'title' => 'Ficha Coleccion',
@@ -148,6 +157,11 @@ function islandora_red_biodiversidad_display($islandora_object) {
     array('islandora_object' => $islandora_object));
   return $output;
 }
+function islandora_red_biodiversidad_dw_related_display($islandora_object) {
+  $output = theme('islandora_dwc_related',
+    array('islandora_object' => $islandora_object));
+  return $output;
+}
 function islandora_red_biodiversidad_collection_display($islandora_object) {
   $output = theme('islandora_red_biodiversidad_collection',
     array('islandora_object' => $islandora_object));
@@ -166,6 +180,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_tab(
   $content = $islandora_object['OBJ']->content;
   $variables['red_biodiversidad_content_tab'] = $content;
 }
+
 function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_collection(array &$variables) {
   $islandora_object = $variables['islandora_object'];
   $content = $islandora_object['OBJ']->content;
@@ -180,10 +195,18 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_coll
 * This function is calling the theme function to
 * theme islandora_red_biodiversidad which also invokes
 * the islandora_red_biodiversidad_preprocessor
-*/
+**
+ * Implements hook_preprocess_theme().
+ *
+ * We have implemented several preprocessors in this module this one is
+ * for the piggyback tabbed view
+ *
+ * This is a Drupal hook, not supplied by islandora.
+ */
 
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_islandora_view_object($object, $page_number, $page_size) {
-  $output = theme('islandora_red_biodiversidad', array('islandora_object' => $object));
+
+function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_islandora_view_object($object,$page_number, $page_size) {  
+  $output = theme('islandora_dwc', array('islandora_object' => $object));
   return array('' => $output);
 }
 /**
@@ -196,7 +219,7 @@ function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_islandora_vi
 * theme islandora_red_biodiversidad which also invokes
 * the islandora_red_biodiversidad_preprocessor
 */
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_collection_islandora_view_object($object, $page_number, $page_size) {
+function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_collection_islandora_view_object($object) {
   $output = theme('islandora_red_biodiversidad', array('islandora_object' => $object));
   return array('' => $output);
 }
@@ -209,14 +232,10 @@ function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_collection_i
 */
 function islandora_red_biodiversidad_theme($existing, $type, $theme, $path) {
   return array(
-    'islandora_red_biodiversidad' => array(
-      'template' => 'theme/islandora-red-biodiversidad',
-      // We can add PIDs to the end of this pattern in our preprocess function
-      // and templates will be able to have have a pid appended to the
-      // template name to overide a template on a per object basis.
-      // An example template might be named:
-      // "islandora-red-biodiversidad-islandora-27.tpl.php".
-      'pattern' => 'islandora_red_biodiversidad__',
+    'islandora_dwc' => array(
+     'file' => 'theme/theme.inc',
+	  'template' => 'theme/islandora-red-biodiversidad',
+	   'pattern' => 'islandora_red_biodiversidad__',
       'variables' => array('islandora_object' => NULL),
     ),
     'islandora_red_biodiversidad_print' => array(
@@ -225,7 +244,13 @@ function islandora_red_biodiversidad_theme($existing, $type, $theme, $path) {
     ),
     // Themes the output of the  tab.
     'islandora_red_biodiversidad_tab' => array(
+	  'file' => 'theme/theme.inc',
       'template' => 'theme/islandora-red-biodiversidad-tab',
+      'variables' => array('islandora_object' => NULL),
+    ),
+    'islandora_dwc_related' => array(
+	  'file' => 'theme/theme.inc',
+      'template' => 'theme/islandora-red-biodiversidad-tab-related',
       'variables' => array('islandora_object' => NULL),
     ),
   );
@@ -336,29 +361,38 @@ function islandora_red_biodiversidad_islandora_required_objects(IslandoraTuque $
 /**
  * Implements hook_CMODEL_PID_islandora_object_ingested().
  */
+
+
 function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_simpledwc_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
+  islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
+ 
 }
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwclassoccurrence_islandora_object_ingested(AbstractObject $fedora_object) {
+function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwcclassoccurrence_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
+  islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
 }
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwclassevent_islandora_object_ingested(AbstractObject $fedora_object) {
+function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwcclassevent_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
+  islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
 }
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwclasstaxon_islandora_object_ingested(AbstractObject $fedora_object) {
+function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwcclasstaxon_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
+  islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
 }
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwclassidentification_islandora_object_ingested(AbstractObject $fedora_object) {
+function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwcclassidentification_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
+  islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
 }
 function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dctermlocation_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
+  islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
 }
 
 /**
@@ -428,6 +462,9 @@ function islandora_red_biodiversidad_xml_form_builder_get_transforms() {
   return array(
     'dwc2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwc2dc.xsl",
 	'dwcclass2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclass2dc.xsl",
+	'dwcclassevent2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclasstaxon2dc.xsl",
+	'dwcclassoccurrence2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassoccurrence2dc.xsl",
+	'dwcclassidentification2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassidentification2dc.xsl",
   );
 }
 
@@ -454,7 +491,7 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'form_name' => 'Darwin Core form Class: Occurrence',
       'dsid' => 'DwC',
       'title_field' => array('Occurrence','dwc_fields_occurrence','occurrenceID'),
-      'transform' => 'dwcclass2dc_redbiodiversidad.xsl',
+      'transform' => 'dwcclassoccurrence2dc_redbiodiversidad.xsl',
       'template' => FALSE,
     ),
     'islandora_red_biodiversidad_dwcclassevent_form' => array(
@@ -462,7 +499,7 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'form_name' => 'Darwin Core form Class: Event',
       'dsid' => 'DwC',
       'title_field' => array('Event','dwc_fields_event','eventID'),
-      'transform' => 'dwcclass2dc_redbiodiversidad.xsl',
+      'transform' => 'dwcclassevent2dc_redbiodiversidad.xsl',
       'template' => FALSE,
     ),
     'islandora_red_biodiversidad_dwcclasstaxon_form' => array(
@@ -470,7 +507,7 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'form_name' => 'Darwin Core form Class: Taxon',
       'dsid' => 'DwC',
       'title_field' => array('Taxon','dwc_fields_taxon','scientificName'),
-      'transform' => 'dwcclass2dc_redbiodiversidad.xsl',
+      'transform' => 'dwcclasstaxon2dc_redbiodiversidad.xsl',
       'template' => FALSE,
     ),
     'islandora_red_biodiversidad_dwcclassidentification_form' => array(
@@ -478,7 +515,7 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'form_name' => 'Darwin Core form Class: Identification',
       'dsid' => 'DwC',
       'title_field' => array('Identification','dwc_fields_identification','identificationID'),
-      'transform' => 'dwcclass2dc_redbiodiversidad.xsl',
+      'transform' => 'dwcclassidentification2dc_redbiodiversidad.xsl',
       'template' => FALSE,
     ),
     'islandora_red_biodiversidad_dctermsclasslocation_form' => array(
@@ -518,6 +555,8 @@ function islandora_red_biodiversidad_islandora_xml_form_builder_forms() {
     ),
   );
 }
+
+
 /* Esto altera los valores por defecto para algunos de los campos de esta forma 
 implements hook_form_alter
 We wan´t to alter the default form default values based on global configurations for a particular content 
@@ -545,40 +584,7 @@ function islandora_red_biodiversidad_form_alter(&$form, &$form_state, $form_id) 
 	}
 	
 	
-	
-	
-	
-/**
- * Implements hook_islandora_ingest_steps().
- */
-
-/*function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_islandora_ingest_steps() {
-  return array(
-    'islandora_red_biodiversidad' => array(
-      'weight' => 10,
-      'type' => 'form',
-      'form_id' => 'islandora_basic_image_image_upload_form',
-      'module' => 'islandora_basic_image',
-      'file' => 'includes/image_upload.form.inc',
-    ),
-  );
-}*/
-
-	/*
-function islandora_red_biodiversidad_islandora_sp_basic_image_islandora_derivative() {
-  return array(
-    array(
-      'source_dsid' => 'OBJ',
-      'destination_dsid' => 'TN',
-      'weight' => '0',
-      'function' => array(
-        'islandora_basic_image_create_thumbnail',
-      ),
-      'file' => drupal_get_path('module', 'islandora_basic_image') . '/includes/derivatives.inc',
-    ),
-  );
-}*/
-	function islandora_red_biodiversidad_validateandpopulateTaxon(&$form, &$form_state)
+function islandora_red_biodiversidad_validateandpopulateTaxon(&$form, &$form_state)
 	{        
 	
 		 //drupal_set_message(t('You just performed an ajax reload.'));
@@ -625,10 +631,6 @@ function islandora_red_biodiversidad_islandora_sp_basic_image_islandora_derivati
 				  	      return FALSE;
 				  	    }
 						 $data2 = drupal_json_decode($response2->data);
-						 if (array_key_exists('kingdom',$data2))
-							{
-						 	$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-kingdom','val',array($data2['kingdom']));	
-							}
 						 if (array_key_exists('phylum',$data2))
 						 	{
 						 	$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-phylum','val',array($data2['phylum']));	
@@ -708,10 +710,7 @@ function islandora_red_biodiversidad_validateandpopulate(&$form, &$form_state)
 			  	      return FALSE;
 			  	    }
 					 $data2 = drupal_json_decode($response2->data);
-					 if (array_key_exists('kingdom',$data2))
-						{
-					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-kingdom','val',array($data2['kingdom']));	
-						}
+					
 					 if (array_key_exists('phylum',$data2))
 					 	{
 					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-phylum','val',array($data2['phylum']));	

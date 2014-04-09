@@ -19,25 +19,15 @@ Edited by Diego Pino ... DwC complete class to OAI_DC March 2014.
 	xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-
     <xsl:output method="xml" indent="yes"/>
-
+    <xsl:template match="text()">
+    </xsl:template>   
     <xsl:template match="/">
-
-        <xsl:text> <!-- Used for formatting output file.  -->
-</xsl:text>
-
-        <xsl:text> <!-- Used for formatting output file.  -->
-</xsl:text>
-
         <oai_dc:dc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
             xsi:noNamespaceSchemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-
             <xsl:apply-templates/>
-
         </oai_dc:dc>
-
     </xsl:template>
 
     <!-- Source elemnts are Dublin Core. -->
@@ -48,7 +38,7 @@ Edited by Diego Pino ... DwC complete class to OAI_DC March 2014.
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <type xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                    <xsl:value-of select="normalize-space(.)"/>
                 </type>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -61,8 +51,6 @@ source file. -->
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-	
-
     <xsl:template match="dcterms:language">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
@@ -70,14 +58,16 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <language xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                    <xsl:value-of select="normalize-space(.)"/>
                 </language>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
                 </xsl:comment>
             </xsl:when>
             <xsl:otherwise>
-                <!-- This is for when the element is null.
+                <language xmlns="http://purl.org/dc/elements/1.1/">
+                    <xsl:text>EN</xsl:text>
+                </language>
 -->
                 <xsl:comment> Node <xsl:value-of select="name()"/> had no content.</xsl:comment>
             </xsl:otherwise>
@@ -93,7 +83,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <source xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                    <xsl:value-of select="normalize-space(.)"/>
                 </source>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -112,13 +102,12 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if
 normalized element is null.  If it is, does not output element to
-source file. -->
-				
+source file. -->		
                 <title xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                    <xsl:value-of select="normalize-space(.)"/>
                 </title>
                 <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                    <xsl:value-of select="normalize-space(.)"/>
 				</identifier>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -137,13 +126,11 @@ source file. -->
                 <!-- Tests to see if
 normalized element is null.  If it is, does not output element to
 source file. -->
-				
                 <title xmlns="http://purl.org/dc/elements/1.1/">
-					<xsl:value-of select="concat('Event: ',.)"/>
-                    <xsl:apply-templates/>
+                    <xsl:value-of select="concat('Event: ',normalize-space(.))"/>   
                 </title>
                 <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                    <xsl:value-of select="normalize-space(.)"/>
 				</identifier>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -164,7 +151,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <title xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </title>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -184,7 +171,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <subject xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </subject>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -205,7 +192,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <subject xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </subject>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -223,7 +210,7 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
                 <subject xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </subject>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -241,7 +228,7 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
                 <title xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </title>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -259,7 +246,7 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
                 <coverage xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </coverage>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -277,7 +264,7 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
                 <coverage xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </coverage>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -295,7 +282,7 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
                 <coverage xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </coverage>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -313,7 +300,7 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
                 <coverage xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </coverage>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -331,7 +318,7 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
                 <coverage xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </coverage>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -349,7 +336,7 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
                 <coverage xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </coverage>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -367,7 +354,7 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
                 <coverage xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </coverage>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -385,7 +372,7 @@ source file. -->
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if normalized element is null.  If it is, does not output element to source file. -->
                 <description xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </description>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -399,14 +386,14 @@ source file. -->
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="*[substring(name(), string-length() -3) = 'ID']">
+    <xsl:template match="*[substring(name(), string-length() -2) = 'ID']">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
                 <!-- Tests to see if
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </identifier>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -427,7 +414,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <publisher xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </publisher>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -449,7 +436,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </identifier>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -470,7 +457,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </identifier>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -491,7 +478,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <creator xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </creator>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -511,7 +498,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <rights xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
 				</rights>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -531,7 +518,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <date xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </date>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>
@@ -552,7 +539,7 @@ source file. -->
 normalized element is null.  If it is, does not output element to
 source file. -->
                 <date xmlns="http://purl.org/dc/elements/1.1/">
-                    <xsl:apply-templates/>
+                   <xsl:value-of select="normalize-space(.)"/>
                 </date>
                 <xsl:text> </xsl:text>
                 <xsl:comment> Source node is <xsl:value-of select="name()"/>

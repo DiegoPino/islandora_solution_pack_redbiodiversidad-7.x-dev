@@ -52,8 +52,9 @@
         <rdfs:comment>An entity whose existence depends on another entity. For example, Specimen depends on a collecting event (or, Collecting is the source of a Specimen)</rdfs:comment>
         <rdfs:seeAlso rdf:resource="http://biscicol.org/terms/index.html#depends_on"/>
 		<rdfs:label>depends_on</rdfs:label>
-    </owl:ObjectProperty>
     
+	</owl:ObjectProperty>
+	
 
 
     <!-- http://biscicol.org/terms/biscicol.owl#related_to -->

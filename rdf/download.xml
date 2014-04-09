@@ -1,0 +1,2148 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns="http://aims.fao.org/aos/v1.0/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:agrovoc="http://www.fao.org/aims/aos/agrovoc/"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://aims.fao.org/aos/v1.0/">
+  <owl:Ontology rdf:about="">
+    <rdfs:comment xml:lang="en">Last revised by KCEW 2008: set the correct namespaces for xmlns, xml:base, and owl:Ontology.</rdfs:comment>
+    <rdfs:comment xml:lang="en">Last revised by KCEW 20090730: added some relationshios for conversion from legacy database.</rdfs:comment>
+    <rdfs:comment xml:lang="en">Last revised by KCEW 20080508: removed all remaining instances.</rdfs:comment>
+    <rdfs:comment xml:lang="en">Last revised by KCEW 20091002: added all relationships by hand (no from conversion routine due to difficulties in the linkType table field linkabr).</rdfs:comment>
+    <rdfs:comment xml:lang="en">Last revised by KCEW 20090924: changed name of hasHistoryNote to haseditorialNote</rdfs:comment>
+    <rdfs:comment xml:lang="en">Last revised by KCEW 20090828: edited with protege 3.4 build 130</rdfs:comment>
+    <rdfs:comment xml:lang="en">Last revised by KCEW 20091021: completed relationships. Changed v01 to v1.0</rdfs:comment>
+    <rdfs:comment xml:lang="en">Last revised by KCEW 20090821: "/" URI instead of "#" URI.</rdfs:comment>
+    <rdfs:comment xml:lang="en">TODO: remove chemical and geographical concepts once the WB system do not hardcode anymore them.</rdfs:comment>
+    <rdfs:comment xml:lang="en">Last revised by KCEW 20090929: added hasSynonym. Checked relationships className as the 'linkabr' field of the db.</rdfs:comment>
+    <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >20091021</owl:versionInfo>
+  </owl:Ontology>
+  <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_category">
+    <rdfs:label xml:lang="it">Categoria</rdfs:label>
+    <rdfs:label xml:lang="en">Category</rdfs:label>
+    <rdfs:comment xml:lang="en">This class is used to group all domain categories and other domain concepts.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_definition">
+    <rdfs:label xml:lang="en">Definition</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_entity_annotation"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_classification_scheme">
+    <rdfs:label xml:lang="en">Classification scheme</rdfs:label>
+    <rdfs:comment xml:lang="en">This class groups all classifications schemes from AGROVOC (e.g. the AGRIS/CARIS Classification scheme.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_image">
+    <rdfs:label xml:lang="en">Image</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_entity_annotation"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_lexicalization">
+    <rdfs:label xml:lang="en">Lexicalization</rdfs:label>
+    <rdfs:comment xml:lang="en">This class is used to store all lexicalization of all languges for AGROVOC. All terms (descriptors and non-descriptors) are here created as instances.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_noun">
+    <rdfs:comment xml:lang="en">This class is used to store all lexicalization of type NOUN of all languges for AGROVOC. All terms (descriptors and non-descriptors) are here created as instances.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdfs:label xml:lang="fr">Nom</rdfs:label>
+    <rdfs:label xml:lang="it">Nome</rdfs:label>
+    <rdfs:label xml:lang="en">Noun</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_domain_concept">
+    <rdfs:comment xml:lang="en">This is used for all AGROVOC concepts.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:label xml:lang="it">Concetti di dominio</rdfs:label>
+    <rdfs:label xml:lang="en">Domain concept</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_entity_annotation">
+    <rdfs:comment xml:lang="en">This class is used to group all characteristics of concepts, such as definitions, images, etc.</rdfs:comment>
+    <rdfs:label xml:lang="en">Entity annotation</rdfs:label>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasParent">
+    <rdfs:label xml:lang="en">Has parent</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isParentOf"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPart">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPartOf"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Has part</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/partitiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">X &lt;hasPart&gt; Y. A composite entity X that can be identified as composed by one or more parts, between which Y. Use this relationship when none of the other partitivity relations (&lt;component&gt;, &lt;composedOf&gt;, &lt;portion&gt;, &lt;member&gt;, &lt;includesSubprocess&gt;) apply. E.g. in a plant ontology: {Taxonomic} &lt;hasPart&gt; {PartPlant};</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasControlMethod">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isControlMethodOf"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Has control method</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasComponent">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasPart"/>
+    <rdfs:label xml:lang="en">Has component</rdfs:label>
+    <rdfs:comment xml:lang="en">Y &lt;hasComponent&gt; X. An object X that is a part of a whole Y and has also an existence independently from Y. E.g. "engine" &lt;hasComponent&gt; "engine part"; "tree" &lt;hasComponent&gt; "leaf"; "cell" &lt;hasComponent&gt; "chromosome"; but NOT "blood" &lt;hasComponent&gt; "blood cell" (see &lt;composedOf&gt;).</rdfs:comment>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isComponentOf"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/performs">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPerformedBy"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Performs</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasInfectionPart">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isInfectedPartOf"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Has infection part</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isAGrowthEnvironmentFor">
+    <rdfs:comment xml:lang="en">Y &lt;isAGrowthEnvironmentFor&gt; X. An environment Y favorable to a taxon X. This is used as the inverse relationship of &lt;growsIn&gt;. Use this in a plant and related domain (e.g. fungi). E.g. "isarn region" &lt;isAGrowthEnvironmentFor&gt; "jasmine rice"; "moist soil" &lt;isAGrowthEnvironmentFor&gt; "rice";</rdfs:comment>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/growsln"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Is a growth environment for</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/spatiallyIncludes">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasPart"/>
+    <rdfs:comment xml:lang="en">X &lt;spatiallyIncludes&gt; Y. Part X is an inalienable part of Y (the spatial region occupied by Y is a  part of the spatial region occupied by X). E.g. "Africa" &lt;spatiallyIncludes&gt; "Congo"; "Asia" &lt;spatiallyIncludes&gt; "Southeast Asia"; "arm" &lt;spatiallyIncludes&gt; "hand".</rdfs:comment>
+    <rdfs:label xml:lang="en">Spatially includes</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isSpatiallyIncludedIn"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPropagationMaterial">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPropagationMaterialOf"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Has propagation material</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isAchievedByMeansOf">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasGoalOrProcess"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Is achieved by means of</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesSubspecies">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">Link Species to Subspecies.</rdfs:comment>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSpecies"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Species includes Subspecies</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPhysiologicalFunction">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPhysiologicalFunctionOf"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Has physiological function</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/controls">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Controls</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isControlledBy"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPartOf">
+    <rdfs:comment xml:lang="en">Y &lt;isPartOf&gt; X. A part Y that compose an entity X. Use this relationship when none of the other partitivity relations (&lt;component&gt;, &lt;composedOf&gt;, &lt;portion&gt;, &lt;member&gt;, &lt;includesSubprocess&gt;) apply. E.g. in a plant ontology: {PlantPart} &lt;isPartOf&gt; {Taxonomic};</rdfs:comment>
+    <rdfs:label xml:lang="en">Is part of</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/partitiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasPart"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasMappedDomainConcept">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/belongsToCategory"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    </rdfs:subPropertyOf>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <rdfs:comment xml:lang="en">to map domain concepts to any category in a classification scheme.</rdfs:comment>
+    <rdfs:label xml:lang="en">Has mapped domain concept</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasFamily">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesGenus"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Genus has family</rdfs:label>
+    <rdfs:comment xml:lang="en">Link genus to Family.</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/compose">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/isPartOf"/>
+    <rdfs:label xml:lang="en">Compose</rdfs:label>
+    <rdfs:comment xml:lang="en">Y &lt;compose&gt; X. A relation in which X composed of Y holds is one where Y consists of the material or substance of which X is made.  This relation also subsumes &lt;ingredientOf&gt; and &lt;substanceOf&gt; relations. E.g. "blood gas", "blood lipid", "blood protein", "blood cell" &lt;composes&gt; "blood"; "water", "yeast" &lt;compose&gt;  "beer".</rdfs:comment>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isComposedOf"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/typeOf">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasType"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Type of</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasWeed">
+    <rdfs:label xml:lang="en">Has weed</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isWeedOf"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasTransliteration">
+    <rdfs:label xml:lang="en">Has transliteration</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isTransliterationOf"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/prevents">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPreventedBy"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Prevents</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/measures">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isMeasuredBy"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/quantitativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Measures</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isNaturalEnemyOf">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is natural enemy of</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasNaturalEnemy"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSymbol">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has symbol</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isSymbolFor"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isComposedOf">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/compose"/>
+    <rdfs:comment xml:lang="en">X &lt;isComposedOf&gt; Y. A relation in which X composed of Y holds is one where Y consists of the material or substance of which X is made.  This relation also subsumes &lt;ingredientOf&gt; and &lt;substanceOf&gt; relations. E.g. "blood" &lt;composedOf&gt; "blood cell", ""blood gas", "blood lipid", "blood protein"; "beer" &lt;composedOf&gt;  "water", "yeast", (and by inheritance "hops" c.f. &lt;madeFrom&gt;).</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasPart"/>
+    <rdfs:label xml:lang="en">Is composed of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isMemberOf">
+    <rdfs:comment xml:lang="en">X &lt;isMemberOf&gt; Y. A social or political unit (group or individual) X belongs to a social or political group Y. E.g. "cow" &lt;isMemberOf&gt; "herd"; "Algeria", "Benin", "Burkina Faso", etc. &lt;isMemberOf&gt; "Francophone Africa".</rdfs:comment>
+    <rdfs:label xml:lang="en">Is member of</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasMember"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/partitiveRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isMeasuredBy">
+    <rdfs:label xml:lang="en">Is measured by</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/measures"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/quantitativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isProducedBy">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is produced by</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/produces"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/formerlyIncludes">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/formerlyIncludedIn"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includes"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Formerly includes</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCategory">
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_classification_scheme"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:label xml:lang="en">Has category</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/belongsToScheme"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isUseOf">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">Y &lt;isUseOf&gt; X. {Use} Y &lt;isUseOf&gt; {Taxon} X. Use this in a plant domain. - {use} Y &lt;isUseOf&gt; {chemical substance} X. Use this for chemical substance. E.g.: "fruit" &lt;isUseOf&gt; "apple"; "cleaner" &lt;isUseOf&gt; "alcohol"; "pesticide" &lt;isUseOf&gt; "ddt";</rdfs:comment>
+    <rdfs:label xml:lang="en">Is use of</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isUsedAs"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasClass">
+    <rdfs:label xml:lang="en">Order has class</rdfs:label>
+    <rdfs:comment xml:lang="en">Link order to class.</rdfs:comment>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesOrder"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPathogen">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPathogenOf"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Has pathogen</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isTermReferencedInScopenote">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasScopenoteRelatedToTerm"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Is term referenced in scope note</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/correspondsTo">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/sameAs"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Corresponds to</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPropagationMaterialOf">
+    <rdfs:label xml:lang="en">Is propagation material of</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasPropagationMaterial"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isDisorderOf">
+    <rdfs:label xml:lang="en">Is disorder of</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasDisorder"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasDialectalVariant">
+    <rdfs:label xml:lang="en">Has dialectal variant</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isDialectalVariantOf"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isObjectOfActivity">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is object of activity</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasObjectOfActivity"/>
+    </owl:inverseOf>
+    <rdfs:comment xml:lang="en">From CWR ontology.</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/usesProcess">
+    <rdfs:label xml:lang="en">Uses process</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isProcessFor"/>
+    </owl:inverseOf>
+    <rdfs:comment xml:lang="en">Y &lt;usesProcess&gt; X. One or more actions, activities, methods X that produce a change or development Y. E.g.: "fruit cleaning" &lt;usesProcess&gt; "sterilization".</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/isAchievedByMeansOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/growsln">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Grows in</rdfs:label>
+    <rdfs:comment xml:lang="en">X &lt;growsIn&gt; Y. A taxon X grows in an environment Y. Use this in a plant and related domain (e.g. fungi). E.g. "jasmine rice" &lt;growsIn&gt; "isarn region"; "rice" &lt;growsIn&gt; "moist soil";</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isAGrowthEnvironmentFor"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPhysiologicalFunctionOf">
+    <rdfs:label xml:lang="en">Is physiological function of</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasPhysiologicalFunction"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isUsedToMake">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isMadeFrom"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">Y &lt;isUsedToMake&gt; X. A substance or a product Y from which a product X can be mainly (in terms of importance) obtained. E.g. "cow milk" &lt;isUsedToMake&gt; "cheddar cheese"; "hops" &lt;isUsedToMake&gt; "beer" (see &lt;composedOf&gt;);</rdfs:comment>
+    <rdfs:label xml:lang="en">Is used to make</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isAffectedBy">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/affects"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Is affected by</rdfs:label>
+    <rdfs:comment xml:lang="en">Y &lt;isAffectedBy&gt; X. An object Y changes state or location because of an action of an agent X. E.g. "bacteria" &lt;isAffectedBy&gt; "sterilization"; "pest" &lt;isAffectedBy&gt; "pest control"; "agriculture" &lt;isAffectedBy&gt; "pollution of agriculture";</rdfs:comment>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasBreedingMethod">
+    <rdfs:label xml:lang="en">Has breeding method</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isBreedingMethodOf"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesGenus">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasFamily"/>
+    <rdfs:label xml:lang="en">Family includes genus</rdfs:label>
+    <rdfs:comment xml:lang="en">Link family to genus.</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isActedUponBy">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/actsUpon"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Is acted upon by</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasChemicalFormula">
+    <rdfs:label xml:lang="en">Has chemical formula</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isChemicalFormulaOf"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/productOf">
+    <rdfs:label xml:lang="en">Product of</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasProduct"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/belongsToScheme">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasCategory"/>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    </rdfs:subPropertyOf>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_classification_scheme"/>
+    <rdfs:label xml:lang="en">Belongs to scheme</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/sameAs">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/correspondsTo"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Same as</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isSourceOf">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isDerivedFrom"/>
+    </owl:inverseOf>
+    <rdfs:comment xml:lang="en">Y &lt;isSourceOf&gt; X. A source Y from which a substance or product X can be exclusively obtained, without any additional substance or product. E.g. "cow" &lt;isSourceOf&gt; "cow milk"; "plant" &lt;isSourceOf&gt; "plant oil"; "olive tree" &lt;isSourceOf&gt; "olive wood"; "chicken" &lt;isSourceOf&gt; "chicken meat"; but NOT "hops" &lt;isSourceOf&gt; "beer" (see &lt;usedToMake&gt;);</rdfs:comment>
+    <rdfs:label xml:lang="en">Is source of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasOldName">
+    <rdfs:label xml:lang="en">Has old name</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isOldNameOf"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isMadeFrom">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isUsedToMake"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is made from</rdfs:label>
+    <rdfs:comment xml:lang="en">X &lt;isMadeFrom&gt; Y. A product X obtained mainly (in terms of importance) from a substance or a product Y. E.g. "cheddar cheese" &lt;isMadeFrom&gt; "cow milk";  "beer" &lt;isMadeFrom&gt; "hops" (see &lt;composedOf&gt;);</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isAbbreviationOf">
+    <rdfs:label xml:lang="en">Is abbreviation of</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasAbbreviation"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/belongsToCategory">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasMappedDomainConcept"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <rdfs:label xml:lang="en">Belongs to category</rdfs:label>
+    <rdfs:comment xml:lang="en">To map any domain concept to any category of any classification scheme.</rdfs:comment>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/afflicts">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isAfflictedBy"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Afflicts</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/affects"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">X &lt;afflicts&gt; Y. The disease X could adversely affect the health of an organism Y. E.g. "BSE" &lt;afflicts&gt; "cows".</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSubOrder">
+    <rdfs:label xml:lang="en">Great Group has Sub Order</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">Link Great Group to Sub Order.</rdfs:comment>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesGreatGroup"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isCultivationProcessOf">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCultivationProcess"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is cultivation process of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasTradeName">
+    <rdfs:label xml:lang="en">Has trade name, has commercial name</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isTradeNameOf"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isTaxonomicLevelOf">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasTaxonomicLevel"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Is taxonomic level of</rdfs:label>
+    <rdfs:comment xml:lang="en">Specify that this taxonomic level apply to a concept.</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/pestOf">
+    <rdfs:comment xml:lang="en">X &lt;pestOf&gt; Y. An organism X causes harm to organism Y. E.g. "Bactrocera dorsalis" &lt;pestOf&gt; "Litchi chinensis".</rdfs:comment>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is a pest of</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPest"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasObjectOfActivity">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has object of activity</rdfs:label>
+    <rdfs:comment xml:lang="en">From CWR ontology.</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isObjectOfActivity"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isDefinitionOf">
+    <rdfs:label xml:lang="it">E' la definizione di</rdfs:label>
+    <rdfs:label xml:lang="en">Is definition of</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasDefinition"/>
+    </owl:inverseOf>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_definition"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isInputFor">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isOutputFrom"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Is input for</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasProperty">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">From CWR ontology.</rdfs:comment>
+    <rdfs:label xml:lang="en">Has property</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPropertyOf"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isOldNameOf">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasOldName"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is old name of, is a deprecated name for</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/usingValue">
+    <rdfs:comment xml:lang="en">A concept that make use of a specific value.</rdfs:comment>
+    <rdfs:label xml:lang="en">Using value</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/valueUsedIn"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/quantitativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasNarrowerSynonym">
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has narrower synonym</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasBroaderSynonym"/>
+    </owl:inverseOf>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPreventedBy">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is prevented by</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/prevents"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isTradeNameOf">
+    <rdfs:label xml:lang="en">Is a trade name of</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasTradeName"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasType">
+    <rdfs:label xml:lang="en">Has type</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/typeOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isStudiedBy">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/study"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/bibliographicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is studied by</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isParentOf">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasParent"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is parent of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasProduct">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/productOf"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has product</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/study">
+    <rdfs:label xml:lang="en">Study</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isStudiedBy"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/bibliographicRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCultivationProcess">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isCultivationProcessOf"/>
+    <rdfs:label xml:lang="en">Has cultivation process</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPest">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/pestOf"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">Y &lt;hasPest&gt; X. An organism Y in which the organism X causes harm. E.g. "Litchi chinensis" &lt;hasPest&gt; "Bactrocera dorsalis".</rdfs:comment>
+    <rdfs:label xml:lang="en">Has pest</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasScientificName">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/scientificNameOf"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Has scientific name</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isBeneficialFor">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">X &lt;isBeneficialFor&gt; Y. Agent X behaves in a way that produces some result Y that is advantageous to some beneficiary. A means X through which a consequence Y can be achieved. E.g. "biological control arthropods" &lt;isBeneficialFor&gt; "biological control"; "pest control" &lt;isBeneficialFor&gt; "plant health";</rdfs:comment>
+    <rdfs:label xml:lang="en">Is beneficial for</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/benefitsFrom"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isBiologicalControlAgentOf">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasBiologicalControlAgent"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is biological control agent of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isIncludedIn">
+    <rdfs:label xml:lang="en">Included in</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/partitiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includes"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSymptom">
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">X &lt;hasSymptom&gt; Y. A disease X presents disease characteristic Y in an organism. E.g. "BSE" &lt;hasSymptom&gt; "anorexia".</rdfs:comment>
+    <rdfs:label xml:lang="en">Has symptom</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/indicates"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSpecies">
+    <rdfs:label xml:lang="en">Subspecies has Species</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">Link Subspecies to Species.</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/includesSubspecies"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isCausedBy">
+    <rdfs:label xml:lang="en">Is caused by</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">Y &lt;isCausedBy&gt; X. A result Y occurred because of an agent X (animate or inanimate). E.g.: "BSE" &lt;isCausedBy&gt; "prions"; "water erosion" &lt;isCausedBy&gt; "water";</rdfs:comment>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/causes"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasAcronym">
+    <rdfs:label xml:lang="en">Has acronym</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isAcronymOf"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasAbbreviation"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isInfluencedBy">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is influenced by or Depends on</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/influences"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesSubGroup">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasGreatGroup"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">Link Great Group to Sub Group.</rdfs:comment>
+    <rdfs:label xml:lang="en">Great Group includes Sub Group</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPathogenOf">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is pathogen of</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasPathogen"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPracticeFor">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is practice for</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPractice"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/produces">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Produces</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isProducedBy"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasBroaderSynonym">
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has broader synonym</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasNarrowerSynonym"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isChemicalFormulaOf">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasChemicalFormula"/>
+    <rdfs:label xml:lang="en">Is chemical formula of</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesFamily">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasOrder"/>
+    </owl:inverseOf>
+    <rdfs:comment xml:lang="en">Link order to family.</rdfs:comment>
+    <rdfs:label xml:lang="en">Order includes family</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isMeansFor">
+    <rdfs:label xml:lang="en">Is means for</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPerformedByMeansOf"/>
+    </owl:inverseOf>
+    <rdfs:comment xml:lang="en">X &lt;isMeansFor&gt; Y. An object or process X mainly used to perform a process Y. See also &lt;usedAs&gt;. E.g. "curry paste grinding" &lt;performedWithInstrument&gt; "curry paste grinding machine"; "weapon" &lt;instrumentFor&gt; "killing"; "fishing pole" &lt;instrumentFor&gt; "fishing"; "alcohol" &lt;instrumentFor&gt; "cleaning"; Ploughs &lt;isMeansFor&gt; Ploughing ;but NOT "knives" &lt;instrumentFor&gt; "felling" (because knives are not primarily used for cutting down trees);</rdfs:comment>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/indicates">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasSymptom"/>
+    <rdfs:comment xml:lang="en">Y &lt;indicates&gt; X. A disease characteristic Y in an organism indicates disease X. E.g. "anorexia" &lt;indicates&gt; "BSE".</rdfs:comment>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Indicates</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/greaterThan">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/quantitativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/smallerThan"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Greater than</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPortionOf">
+    <rdfs:label xml:lang="en">Is portion of</rdfs:label>
+    <rdfs:comment xml:lang="en">Y &lt;isPortionOf&gt; X. Relation between a mass X and a piece Y taken from the mass. E.g. "cutting" &lt;isPortionOf&gt; "plant"; "chicken skin" &lt;isPortionOf&gt; "chicken"; "a slice" &lt;isPortionOf&gt; "a loaf of bread";</rdfs:comment>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPortion"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/isPartOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isSymbolFor">
+    <rdfs:label xml:lang="en">Is symbol for</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasSymbol"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasTaxonomicLevel">
+    <rdfs:comment xml:lang="en">Identify the taxonomic level of a concept.</rdfs:comment>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has taxonomic level</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isTaxonomicLevelOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isThemeOf">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasTheme"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is theme of</rdfs:label>
+    <rdfs:comment xml:lang="en">From CWR ontology.</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isLocalNameOf">
+    <rdfs:label xml:lang="en">Is a local name of</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasLocalName"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasAbbreviation">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdfs:label xml:lang="en">Has abbreviation</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isAbbreviationOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCropingSystem">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has croping system</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isCropingSystemOf"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPropagationProcessOf">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPropagationProcess"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is propagation process of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPropagationProcess">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has Propagation process</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isPropagationProcessOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedType">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has a related type</rdfs:label>
+    <rdfs:comment xml:lang="en">From CWR ontology.</rdfs:comment>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isRelatedTypeOf"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isDerivedFrom">
+    <rdfs:comment xml:lang="en">X &lt;isDerivedFrom&gt; Y. A substance or product X obtained exclusively from source Y without any additional substance or product. E.g. "cow milk" &lt;isDerivedFrom&gt; "cow"; "plant oil" &lt;isDerivedFrom&gt; "plant"; "olive wood" &lt;isDerivedFrom&gt; "olive tree"; "chicken meat" &lt;isDerivedFrom&gt; "chicken"; but NOT "beer" &lt;isDerivedFrom&gt; "hops" (see &lt;madeFrom&gt;);</rdfs:comment>
+    <rdfs:label xml:lang="en">Is derived from</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isSourceOf"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isHostFor">
+    <rdfs:label xml:lang="en">Has vector  or  Is host for</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasHost"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/makeUseOf">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Make use of</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isUsedIn"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPublishedBy">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/bibliographicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is published by</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/publishes"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isProcessFor">
+    <rdfs:comment xml:lang="en">X &lt;isProcessFor&gt; Y. One or more actions, activities, methods X that produce a change or development Y. E.g.: "sterilization" &lt;isProcessFor&gt; "fruit cleaning".</rdfs:comment>
+    <rdfs:label xml:lang="en">Is process for</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/usesProcess"/>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasGoalOrProcess"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/WBObjectProperty">
+    <rdfs:label xml:lang="en">Object Property</rdfs:label>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Root Property for all object properties. Introduced in order to make querying and organization of properties easier.</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isAcronymOf">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/isAbbreviationOf"/>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasAcronym"/>
+    <rdfs:label xml:lang="en">Is acronym of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPractice">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isPracticeFor"/>
+    <rdfs:label xml:lang="en">Has practice</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isDiseaseFor">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasDisease"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is disease for</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isTransliterationOf">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasTransliteration"/>
+    <rdfs:label xml:lang="en">Is a transliteration of</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesSpecies">
+    <rdfs:comment xml:lang="en">Link genus to species.</rdfs:comment>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasGenus"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Genus includes species</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesSubprocess">
+    <rdfs:comment xml:lang="en">X &lt;includesSubprocess&gt; Y. Process X naturally or conventionally realized at the minimum through process Y. Equivalent to &lt;stageOf&gt;. E.g. "milk production" &lt;includesSubprocess&gt; "pasteurization";</rdfs:comment>
+    <rdfs:label xml:lang="en">Includes subprocess</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isSubprocessOf"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includes"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isSubprocessOf">
+    <rdfs:label xml:lang="en">Is subprocess of</rdfs:label>
+    <rdfs:comment xml:lang="en">Y &lt;isSubprocessOf&gt; X. Y is one of one or more processes naturally or conventionally associated with the realization of process X. E.g. "pasteurization" &lt;isSubprocessOf&gt; "milk production";</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/includesSubprocess"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/isIncludedIn"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isSpatiallyIncludedIn">
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/spatiallyIncludes"/>
+    <rdfs:label xml:lang="en">Is spatially included in</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/isPartOf"/>
+    <rdfs:comment xml:lang="en">Y &lt;isSpatiallyIncludedIn&gt; X. Part X is an inalienable part of Y. E.g. "Congo" &lt;isSpatiallyIncludedIn&gt; "Africa"; "Southeast Asia" &lt;isSpatiallyIncludedIn&gt; "Asia"; "hand" &lt;isSpatiallyIncludedIn&gt; "arm".</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isUsedAs">
+    <rdfs:comment xml:lang="en">X &lt;isUsedAs&gt; Y. {Taxon} X &lt;isUsedAs&gt; {use} Y. Use this in a plant domain. - {chemical substance} X &lt;isUsedAs&gt; {use} Y. Use this for chemical substance. E.g.: "apple" &lt;isUsedAs&gt; "fruit"; "alcohol" &lt;isUsedAs&gt; "cleaner"; "ddt" &lt;isUsedAs&gt; "pesticide";</rdfs:comment>
+    <rdfs:label xml:lang="en">Is used as</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isUseOf"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isBreedingMethodOf">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasBreedingMethod"/>
+    <rdfs:label xml:lang="en">Is breeding method of</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isCropingSystemOf">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasCropingSystem"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is croping system of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesGreatGroup">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasSubOrder"/>
+    <rdfs:label xml:lang="en">Sub Order includes Great Group</rdfs:label>
+    <rdfs:comment xml:lang="en">Link Sub Order to Great Group.</rdfs:comment>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/valueUsedIn">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/quantitativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Value used in</rdfs:label>
+    <rdfs:comment xml:lang="en">A measure or other value used in a specific activity or methods or for any purpose.</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/usingValue"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/influences">
+    <rdfs:label xml:lang="en">Influences</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isInfluencedBy"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasComposition">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isCompositionOf"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/partitiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has composition</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasGenus">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">link species to genus.</rdfs:comment>
+    <rdfs:label xml:lang="en">Species has genus</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/includesSpecies"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isReferencedInConceptScopenote">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is referenced in concept scopenote</rdfs:label>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasScopenoteRelatedToConcept"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/causes">
+    <rdfs:label xml:lang="en">Causes</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isCausedBy"/>
+    <rdfs:comment xml:lang="en">X &lt;causes&gt; Y. Agent X (animate or inanimate) brings about a result Y. Examples: "prions" &lt;causes&gt; "BSE"; "water" &lt;causes&gt; "water erosion";</rdfs:comment>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasTheme">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">From CWR ontology.</rdfs:comment>
+    <rdfs:label xml:lang="en">Has theme</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isThemeOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/surrounds">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/surroundedBy"/>
+    </owl:inverseOf>
+    <rdfs:comment xml:lang="en">Y &lt;surrounds&gt; X. The object Y is physically surrounding object X. E.g., an ocean is surrounding an island. Or plasma surrounds cells. The surrounds relationship is used only for the terms that are physically immediately adjacent to each other.</rdfs:comment>
+    <rdfs:label xml:lang="en">Surrounds</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/spatialRelationships"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isOutputFrom">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isInputFor"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is output from</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPostProductionPracticeFor">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/isPracticeFor"/>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPostProductionPractice"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Is post-production practice for</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPropertyOf">
+    <rdfs:comment xml:lang="en">From CWR ontology.</rdfs:comment>
+    <rdfs:label xml:lang="en">Is property of</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasProperty"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isAfflictedBy">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/afflicts"/>
+    <rdfs:label xml:lang="en">Is afflicted by</rdfs:label>
+    <rdfs:comment xml:lang="en">Y &lt;isAfflictedBy&gt; X. The health of an organism Y could adversely be affected by the disease X. E.g. "cows" &lt;isAfflictedBy&gt; "BSE".</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/isAffectedBy"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isComponentOf">
+    <rdfs:label xml:lang="en">Is component of</rdfs:label>
+    <rdfs:comment xml:lang="en">X &lt;isComponentOf&gt; Y. An object X that is a part of a whole Y and has also an existence independently from Y. E.g. "engine part" &lt;isComponentOf&gt; "engine"; "leaf" &lt;isComponentOf&gt; "tree"; "chromosome" &lt;isComponentOf&gt; "cell"; but NOT "blood cell" &lt;isComponentOf&gt; "blood" (see &lt;composes&gt;).</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/isPartOf"/>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasComponent"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasNaturalEnemy">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isNaturalEnemyOf"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has natural enemy</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/scientificNameOf">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasScientificName"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Scientific name of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isInfectedPartOf">
+    <rdfs:label xml:lang="en">Is infected part of</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasInfectionPart"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/affects">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">X &lt;affects&gt; Y. Agent X acts on object Y in such a way that Y changes state or location. E.g. "sterilization" &lt;affects&gt; "bacteria"; "pest control" &lt;affects&gt; "pest"; "pollution of agriculture" &lt;affects&gt; "agriculture";</rdfs:comment>
+    <rdfs:label xml:lang="en">Affects</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isAffectedBy"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isControlMethodOf">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasControlMethod"/>
+    <rdfs:label xml:lang="en">Is control method of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPostProductionPractice">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isPostProductionPracticeFor"/>
+    <rdfs:label xml:lang="en">Has post-production practice</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasPractice"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasOrder">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Family has order</rdfs:label>
+    <rdfs:comment xml:lang="en">Link family to order.</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/includesFamily"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasDisease">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isDiseaseFor"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has disease</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasBiologicalControlAgent">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has biological control agent</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isBiologicalControlAgentOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasHost">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isHostFor"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has host or Is vector for</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasDisorder">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has disorder</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isDisorderOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includes">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isIncludedIn"/>
+    <rdfs:label xml:lang="en">Includes</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/partitiveRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isWeedOf">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasWeed"/>
+    <rdfs:label xml:lang="en">Is weed of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isImageOf">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasImage"/>
+    </owl:inverseOf>
+    <rdfs:label xml:lang="en">Is image of</rdfs:label>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_image"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPerformedBy">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/performs"/>
+    <rdfs:label xml:lang="en">Is performed by</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isDialectalVariantOf">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasDialectalVariant"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is a dialectal variant of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasDefinition">
+    <rdfs:label xml:lang="it">Definizione</rdfs:label>
+    <rdfs:label xml:lang="en">Definition</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isDefinitionOf"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_definition"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isRelatedTypeOf">
+    <rdfs:label xml:lang="en">Is a related type of</rdfs:label>
+    <rdfs:comment xml:lang="en">From CWR ontology.</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedType"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isPerformedByMeansOf">
+    <rdfs:label xml:lang="en">Is performed by means of</rdfs:label>
+    <rdfs:comment xml:lang="en">Y &lt;isPerformedByMeansOf&gt; X. An object or process X mainly used to perform a process Y. See also &lt;usedAs&gt;. E.g. "curry paste grinding" &lt;isPerformedByMeansOf&gt; "curry paste grinding machine"; "weapon" &lt;meansFor&gt; "killing"; "fishing pole" &lt;meansFor&gt; "fishing"; "alcohol" &lt;meansFor&gt; "cleaning"; but NOT "knives" &lt;meansFor&gt; "felling" (because knives are not primarily used for cutting down trees);</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isMeansFor"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasGreatGroup">
+    <rdfs:comment xml:lang="en">Link Sub Group to Great Group.</rdfs:comment>
+    <rdfs:label xml:lang="en">Sub Group has Great Group</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/includesSubGroup"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/surroundedBy">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/spatialRelationships"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">X &lt;surroundedBy&gt; Y. The object X is physically surrounded by object Y. E.g., an island is surrounded by ocean. Or a cell membrane is surrounded by plasma. The surroundedBy relationship is used only for the terms that are physically immediately adjacent to each other.</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/surrounds"/>
+    <rdfs:label xml:lang="en">Surrounded by</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/formerlyIncludedIn">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/isIncludedIn"/>
+    <rdfs:label xml:lang="en">Formerly included in</rdfs:label>
+    <rdfs:comment xml:lang="en">An inclusion that was valid in the past but currently is not valid anymore.</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/formerlyIncludes"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isControlledBy">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/controls"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    ></rdfs:comment>
+    <rdfs:label xml:lang="en">Is controlled by</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/benefitsFrom">
+    <rdfs:comment xml:lang="en">Y &lt;benefitsFrom&gt; X. A result Y  that is advantageous to some beneficiary, produced by the behaviour of an agent X. A consequence Y achieved through a means X. E.g. "biological control" &lt;benefitsFrom&gt; "biological control arthropods"; "plant health" &lt;benefitsFrom&gt; "pest control";</rdfs:comment>
+    <rdfs:label xml:lang="en">Benefits from</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isBeneficialFor"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/actsUpon">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Acts upon</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isActedUponBy"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasMember">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isMemberOf"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/partitiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">Y &lt;hasMember&gt; X. A social or political group Y consists of one or more subsidiary social or political units (group or individual) X. E.g. "herd" &lt;hasMember&gt; "cow"; "Francophone Africa" &lt;hasMember&gt; "Algeria", "Benin", "Burkina Faso", etc.;</rdfs:comment>
+    <rdfs:label xml:lang="en">Has member</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasLocalName">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has local name</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isLocalNameOf"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPortion">
+    <rdfs:label xml:lang="en">Has portion</rdfs:label>
+    <rdfs:comment xml:lang="en">X &lt;hasPortion&gt; Y. A mass X from which a piece Y can be taken. E.g. "plant" &lt;hasPortion&gt; "cutting"; "chicken" &lt;hasPortion&gt; "chicken skin"; "a loaf of bread" &lt;hasPortion&gt; "a slice";</rdfs:comment>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isPortionOf"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasPart"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasGoalOrProcess">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isAchievedByMeansOf"/>
+    <rdfs:label xml:lang="en">Has goal or process</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasScopenoteRelatedToConcept">
+    <rdfs:label xml:lang="en">Has scopenote related to concept</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isReferencedInConceptScopenote"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/smallerThan">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/quantitativeRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Smaller than</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/greaterThan"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/publishes">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/bibliographicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Publishes</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isPublishedBy"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isCompositionOf">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/partitiveRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is composition of</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasComposition"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/isUsedIn">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/makeUseOf"/>
+    <rdfs:label xml:lang="en">Is used in</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/includesOrder">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasClass"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">Link class to order.</rdfs:comment>
+    <rdfs:label xml:lang="en">Class includes order</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasScopenoteRelatedToTerm">
+    <rdfs:label xml:lang="en">Has scope note related to term</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isTermReferencedInScopenote"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://aims.fao.org/aos/v1.0/hasImage">
+    <rdfs:label xml:lang="en">Has image</rdfs:label>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_image"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isImageOf"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/hasImageDescription">
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_image"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:subPropertyOf>
+      <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+    </rdfs:subPropertyOf>
+    <rdfs:comment xml:lang="en">To provide a description of what can be seen on the image.</rdfs:comment>
+    <rdfs:label xml:lang="en">Has description</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCode">
+    <rdfs:label xml:lang="en">Codes</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/termEditorialDatatypeProperty"/>
+    </rdfs:subPropertyOf>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/conceptEditorialDatatypeProperty">
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_category"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:subPropertyOf>
+      <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Concept editorial datatype property</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/isSpatiallyIncludedInState">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:subPropertyOf>
+      <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/conceptDomainDatatypeProperty"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is spatially included in state</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/termEditorialDatatypeProperty">
+    <rdfs:label xml:lang="en">Term editorial datatype property</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+    </rdfs:subPropertyOf>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/hasEditorialNote">
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/conceptEditorialDatatypeProperty"/>
+    <rdfs:comment xml:lang="en">This property was originally called hasChangeHistory (from the traditional agrovoc thesaurus)</rdfs:comment>
+    <rdfs:label xml:lang="en">Editorial note</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/isSpatiallyIncludedInCity">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:subPropertyOf>
+      <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/conceptDomainDatatypeProperty"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Is spatially included in city</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/WBDatatypeProperty">
+    <rdfs:label xml:lang="en">Datatype Properties customized for the WB system.</rdfs:label>
+    <rdfs:comment xml:lang="en">Root Property for all datatype properties. Introduced in order to make querying and organization of properties easier.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSpellingVariant">
+    <rdfs:subPropertyOf>
+      <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/hasTermVariant"/>
+    </rdfs:subPropertyOf>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Has spelling variant</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/conceptDomainDatatypeProperty">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+    <rdfs:label xml:lang="en">Concept domain datatype property</rdfs:label>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/hasScopeNote">
+    <rdfs:label xml:lang="en">Scope note</rdfs:label>
+    <rdfs:comment xml:lang="en">Any notes for concepts or categories to clarify its use.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/conceptEditorialDatatypeProperty"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/hasImageSource">
+    <rdfs:comment xml:lang="en">The source of an image is the institution, web site, etc. where the image has been taken from.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_image"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+    <rdfs:label xml:lang="en">Source for the image</rdfs:label>
+    <rdfs:label xml:lang="en">Has image source</rdfs:label>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/hasDate">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/conceptDomainDatatypeProperty"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <rdfs:label xml:lang="en">Has date</rdfs:label>
+    <rdfs:comment xml:lang="en">This field can contain a date or a range of dates.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/termDomainDatatypeProperty">
+    <rdfs:label xml:lang="en">Term domain datatype property</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/hasTermVariant">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/termEditorialDatatypeProperty"/>
+    <rdfs:label xml:lang="en">Spelling variations</rdfs:label>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="http://aims.fao.org/aos/v1.0/hasImageName">
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_image"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="en">Has image name</rdfs:label>
+    <rdfs:comment xml:lang="en">Each image should be assigned a name.</rdfs:comment>
+  </owl:DatatypeProperty>
+  <owl:TransitiveProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSubCategory">
+    <owl:inverseOf>
+      <owl:TransitiveProperty rdf:about="http://aims.fao.org/aos/v1.0/isSubCategoryOf"/>
+    </owl:inverseOf>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:label xml:lang="en">Has sub category</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+  </owl:TransitiveProperty>
+  <owl:TransitiveProperty rdf:about="http://aims.fao.org/aos/v1.0/precedes">
+    <rdfs:comment xml:lang="en">"Be the predecessor of" or "be earlier in time".</rdfs:comment>
+    <rdfs:label xml:lang="en">Precedes</rdfs:label>
+    <owl:inverseOf>
+      <owl:TransitiveProperty rdf:about="http://aims.fao.org/aos/v1.0/follows"/>
+    </owl:inverseOf>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/temporalRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:TransitiveProperty>
+  <owl:TransitiveProperty rdf:about="http://aims.fao.org/aos/v1.0/developsInto">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/temporalRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">Develops into</rdfs:label>
+    <owl:inverseOf>
+      <owl:TransitiveProperty rdf:about="http://aims.fao.org/aos/v1.0/developsFrom"/>
+    </owl:inverseOf>
+  </owl:TransitiveProperty>
+  <owl:TransitiveProperty rdf:about="http://aims.fao.org/aos/v1.0/isSubCategoryOf">
+    <rdfs:comment xml:lang="en">Relationship that is used in order to model the hierarchy of a classification scheme. A category can be in different positions in the hierarchy depending on the classification scheme you are looking at. Therefore, this relationship should not be instantiated directly to create the hierarchy, but rather a sub property specifically created for a particular classification scheme.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    <rdfs:label xml:lang="en">Is sub category of</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasSubCategory"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+  </owl:TransitiveProperty>
+  <owl:TransitiveProperty rdf:about="http://aims.fao.org/aos/v1.0/follows">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/precedes"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/temporalRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">Follows</rdfs:label>
+    <rdfs:comment xml:lang="en">Immediately following in time or order.</rdfs:comment>
+  </owl:TransitiveProperty>
+  <owl:TransitiveProperty rdf:about="http://aims.fao.org/aos/v1.0/developsFrom">
+    <rdfs:label xml:lang="en">Develops from</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/developsInto"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/temporalRelationship"/>
+    </rdfs:subPropertyOf>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:TransitiveProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasVariety">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasVariety"/>
+    <rdfs:comment xml:lang="en">Simmetric relationship indicating that two concepts are variety each other.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">Has variety</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    </rdfs:subPropertyOf>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasTranslation">
+    <rdfs:label xml:lang="en">Has translation</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    </rdfs:subPropertyOf>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasTranslation"/>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedTerm">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">Has related term</rdfs:label>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/causativeRelationship">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/causativeRelationship"/>
+    <rdfs:label xml:lang="en">Causative relationship</rdfs:label>
+    <rdfs:comment xml:lang="en">All relationships producing an effect or being the effect of something. An expression of an agent causing or forcing a patient to perform an action (or to be in a certain condition). Functioning as an agent or cause.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    </rdfs:subPropertyOf>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/taxonomicRelationship">
+    <rdfs:comment xml:lang="en">Relationships linking concepts which are related in the scientifical sense in a bilogical taxonomy (e.g. species, families, etc.). To relate concepts taxonomically.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/taxonomicRelationship"/>
+    <rdfs:label xml:lang="en">Taxonomic relationship</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    </rdfs:subPropertyOf>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasAntonym">
+    <rdfs:label xml:lang="en">Has antonym or Has opposite</rdfs:label>
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    </rdfs:subPropertyOf>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasAntonym"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasRelatedConcept">
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <rdfs:label xml:lang="en">Has related concept</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    <rdfs:comment xml:lang="en">The most generic relationship to relate two domain concepts. This is used if two concepts are related and none of the more speciifc relationships can be applied. It is also used for backward compatibility to thesauri, i.e. all the more specific relationships can be resolved to this relationship and will translate to the &amp;lt;related term&amp;gt; or RT thesaurus relationship.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/essiveRelationship">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    <rdfs:comment xml:lang="en">Indicates existence in a state or capacity. Carries the meaning of a temporary state of being, often equivalent to the English "as a...".</rdfs:comment>
+    <rdfs:label xml:lang="en">Essive relations</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/instrumentalRelationship">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/instrumentalRelationship"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    <rdfs:label xml:lang="en">Instrumental relations</rdfs:label>
+    <rdfs:comment xml:lang="en">Indicates all relationships serving or acting as a means or aid. By means of an instrument or an agent. The means whereby some act is accomplished.</rdfs:comment>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/quantitativeRelationship">
+    <rdfs:comment xml:lang="en">All relationships involving a quantity or a measure.</rdfs:comment>
+    <rdfs:label xml:lang="en">Quantitative relationship</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/quantitativeRelationship"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/partitiveRelationship">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    <rdfs:comment xml:lang="en">All partitive relationships.</rdfs:comment>
+    <rdfs:label xml:lang="en">Partitive relations</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/partitiveRelationship"/>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasNearSynonym">
+    <rdfs:subPropertyOf>
+      <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    </rdfs:subPropertyOf>
+    <rdfs:label xml:lang="en">Has near synonym</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasNearSynonym"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/temporalRelationship">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">Temporal relations</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/temporalRelationship"/>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/spatialRelationships">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="en">Spatial relations</rdfs:label>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/spatialRelationships"/>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSynonym">
+    <rdfs:label xml:lang="en">Has Synonym</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedTerm"/>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/hasSynonym"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:SymmetricProperty>
+  <owl:SymmetricProperty rdf:about="http://aims.fao.org/aos/v1.0/bibliographicRelationship">
+    <rdfs:label xml:lang="en">Bibliographic relations</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasRelatedConcept"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/bibliographicRelationship"/>
+  </owl:SymmetricProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/takenFromSource">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:range>
+      <owl:DataRange>
+        <owl:oneOf rdf:parseType="Resource">
+          <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+          >Dictionary</rdf:first>
+          <rdf:rest rdf:parseType="Resource">
+            <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Book</rdf:first>
+            <rdf:rest rdf:parseType="Resource">
+              <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+              >AGROVOC</rdf:first>
+              <rdf:rest rdf:parseType="Resource">
+                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >FAOTERM</rdf:first>
+                <rdf:rest rdf:parseType="Resource">
+                  <rdf:rest rdf:parseType="Resource">
+                    <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                    >Other</rdf:first>
+                    <rdf:rest rdf:parseType="Resource">
+                      <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                      >Wikipedia</rdf:first>
+                      <rdf:rest rdf:parseType="Resource">
+                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                        >CABI</rdf:first>
+                        <rdf:rest rdf:parseType="Resource">
+                          <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                          >Wordnet</rdf:first>
+                          <rdf:rest rdf:parseType="Resource">
+                            <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                            <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                            >Journal Article</rdf:first>
+                          </rdf:rest>
+                        </rdf:rest>
+                      </rdf:rest>
+                    </rdf:rest>
+                  </rdf:rest>
+                  <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                  >NAL</rdf:first>
+                </rdf:rest>
+              </rdf:rest>
+            </rdf:rest>
+          </rdf:rest>
+        </owl:oneOf>
+      </owl:DataRange>
+    </rdfs:range>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_definition"/>
+    <rdfs:label xml:lang="en">Taken from source</rdfs:label>
+    <rdfs:comment xml:lang="en">The source (website, dictionary, thesaurus, classification scheme, terminology system, etc.) where the definition has been taken from.</rdfs:comment>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCodeAsc">
+    <rdfs:label xml:lang="en">Has ASC code</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasCode"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSingular">
+    <rdfs:label xml:lang="en">Has singular</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasTermVariant"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/isMainLabel">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">Is preferred term.</rdfs:label>
+    <rdfs:label xml:lang="en">Is a main label for this concept</rdfs:label>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCodeFishery3Alpha">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasCode"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">Has fishery 3 alpha code</rdfs:label>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/isLexicalizationOf">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:label xml:lang="it">E' la rappresentazione lessicale di</rdfs:label>
+    <rdfs:label xml:lang="en">Is a lexicalization of</rdfs:label>
+    <rdfs:label xml:lang="it">E' una lessicalizzazione di</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    <owl:inverseOf>
+      <owl:InverseFunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasLexicalization"/>
+    </owl:inverseOf>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCodeAgrovoc">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasCode"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">Has AGROVOC term code</rdfs:label>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasStemmedForm">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasTermVariant"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment xml:lang="en">This relationship is used to enter the stemmed form of term.</rdfs:comment>
+    <rdfs:label xml:lang="en">Has stemmed form</rdfs:label>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCodeAsfa">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasCode"/>
+    <rdfs:label xml:lang="en">Has ASFA code</rdfs:label>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasTermType">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">Has term type</rdfs:label>
+    <rdfs:range>
+      <owl:DataRange>
+        <owl:oneOf rdf:parseType="Resource">
+          <rdf:rest rdf:parseType="Resource">
+            <rdf:rest rdf:parseType="Resource">
+              <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+              >Common name for bacteria</rdf:first>
+              <rdf:rest rdf:parseType="Resource">
+                <rdf:rest rdf:parseType="Resource">
+                  <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                  >Common name for plants</rdf:first>
+                  <rdf:rest rdf:parseType="Resource">
+                    <rdf:rest rdf:parseType="Resource">
+                      <rdf:rest rdf:parseType="Resource">
+                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                        >Taxonomic terms for bacteria</rdf:first>
+                        <rdf:rest rdf:parseType="Resource">
+                          <rdf:rest rdf:parseType="Resource">
+                            <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                            >Taxonomic terms for plants</rdf:first>
+                            <rdf:rest rdf:parseType="Resource">
+                              <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                              <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                              >Taxonomic terms for viruses</rdf:first>
+                            </rdf:rest>
+                          </rdf:rest>
+                          <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                          >Taxonomic terms for fungi</rdf:first>
+                        </rdf:rest>
+                      </rdf:rest>
+                      <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                      >Taxonomic terms for animals</rdf:first>
+                    </rdf:rest>
+                    <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                    >Common name for viruses</rdf:first>
+                  </rdf:rest>
+                </rdf:rest>
+                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Common name for fungi</rdf:first>
+              </rdf:rest>
+            </rdf:rest>
+            <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Common name for animals</rdf:first>
+          </rdf:rest>
+          <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+          >Acronym</rdf:first>
+        </owl:oneOf>
+      </owl:DataRange>
+    </rdfs:range>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/termDomainDatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCodeISO3Country">
+    <rdfs:label xml:lang="en">Has ISO 3 country code</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasCode"/>
+    <rdfs:comment xml:lang="en">Code from the ISO standard for country names.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasStatus">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">Has status</rdfs:label>
+    <rdfs:range>
+      <owl:DataRange>
+        <owl:oneOf rdf:parseType="Resource">
+          <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+          >Revised</rdf:first>
+          <rdf:rest rdf:parseType="Resource">
+            <rdf:rest rdf:parseType="Resource">
+              <rdf:rest rdf:parseType="Resource">
+                <rdf:rest rdf:parseType="Resource">
+                  <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                  >Proposed deprecated</rdf:first>
+                  <rdf:rest rdf:parseType="Resource">
+                    <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                    >Proposed</rdf:first>
+                    <rdf:rest rdf:parseType="Resource">
+                      <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                      >Deprecated</rdf:first>
+                      <rdf:rest rdf:parseType="Resource">
+                        <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                        >Revised by guest</rdf:first>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                      </rdf:rest>
+                    </rdf:rest>
+                  </rdf:rest>
+                </rdf:rest>
+                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Validated</rdf:first>
+              </rdf:rest>
+              <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+              >Published</rdf:first>
+            </rdf:rest>
+            <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Proposed by guest</rdf:first>
+          </rdf:rest>
+        </owl:oneOf>
+      </owl:DataRange>
+    </rdfs:range>
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_category"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasNumber">
+    <rdfs:comment xml:lang="en">Values can be Project code, Conference no etc.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">Has number</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/conceptDomainDatatypeProperty"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCodeTaxonomic">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">Has taxonomic code</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasCode"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCodeFaoterm">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasCode"/>
+    <rdfs:label xml:lang="en">Has FAO term code</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasCodeFaoPa">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasCode"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">Has code in the schema FAO Priority Area</rdfs:label>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasSourceLink">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_definition"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+    <rdfs:label xml:lang="en">Source for the URL link</rdfs:label>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasPlural">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/hasTermVariant"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">Has plural</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasImageLink">
+    <rdfs:comment xml:lang="en">The link to the physical image, for example the URL, where the image is available.</rdfs:comment>
+    <rdfs:label xml:lang="en">URL link for the image</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_image"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasDateLastUpdated">
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_category"/>
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_entity_annotation"/>
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_classification_scheme"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:label xml:lang="en">Has been lastly updated on</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasDateCreated">
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBDatatypeProperty"/>
+    <rdfs:label xml:lang="en">Has creation date</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
+    <rdfs:domain>
+      <owl:Class>
+        <owl:unionOf rdf:parseType="Collection">
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_category"/>
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_classification_scheme"/>
+          <owl:Class rdf:about="http://aims.fao.org/aos/v1.0/c_entity_annotation"/>
+        </owl:unionOf>
+      </owl:Class>
+    </rdfs:domain>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/isPartOfSubvocabulary">
+    <rdfs:range>
+      <owl:DataRange>
+        <owl:oneOf rdf:parseType="Resource">
+          <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+          >Geographical below country level</rdf:first>
+          <rdf:rest rdf:parseType="Resource">
+            <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >Geographical above country level</rdf:first>
+            <rdf:rest rdf:parseType="Resource">
+              <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+              >Geographical country level</rdf:first>
+              <rdf:rest rdf:parseType="Resource">
+                <rdf:first rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+                >Chemicals</rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+              </rdf:rest>
+            </rdf:rest>
+          </rdf:rest>
+        </owl:oneOf>
+      </owl:DataRange>
+    </rdfs:range>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_domain_concept"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/conceptDomainDatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:label xml:lang="en">Is part of subvocabulary</rdfs:label>
+  </owl:FunctionalProperty>
+  <owl:InverseFunctionalProperty rdf:about="http://aims.fao.org/aos/v1.0/hasLexicalization">
+    <owl:inverseOf rdf:resource="http://aims.fao.org/aos/v1.0/isLexicalizationOf"/>
+    <rdfs:label xml:lang="it">Ha rappresentazione lessicale</rdfs:label>
+    <rdfs:label xml:lang="en">Has lexicalization</rdfs:label>
+    <rdfs:domain rdf:resource="http://aims.fao.org/aos/v1.0/c_category"/>
+    <rdfs:range rdf:resource="http://aims.fao.org/aos/v1.0/c_lexicalization"/>
+    <rdfs:subPropertyOf rdf:resource="http://aims.fao.org/aos/v1.0/WBObjectProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:InverseFunctionalProperty>
+</rdf:RDF>
+
+<!-- Created with Protege (with OWL Plugin 3.4, Build 130)  http://protege.stanford.edu -->

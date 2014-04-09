@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3">
+<definition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2">
 	<properties>
-		<root_name>DarwinRecordSet</root_name>
+		<root_name>dwr:DarwinRecordSet</root_name>
 		<schema_uri/>
 		<namespaces default="http://rs.tdwg.org/dwc/dwcrecord/">
 			<namespace prefix="dwr">http://rs.tdwg.org/dwc/dwcrecord/</namespace>
@@ -61,7 +61,7 @@
 								<properties>
 									<type>textfield</type>
 									<access>true</access>
-									<required>true</required>
+									<required>TRUE</required>
 									<title>Taxon ID</title>
 									<tree>true</tree>
 									<actions>
@@ -95,7 +95,9 @@
 									<access>true</access>
 									<required>TRUE</required>
 									<title>Taxon Rank (GBIF)</title>
+									<executes_submit_callback>FALSE</executes_submit_callback>
 									<default_value>species</default_value>
+									<tree>true</tree>
 									<options>
 										<option key="kingdom">kingdom</option>
 										<option key="subkingdom">subkingdom</option>
@@ -119,7 +121,6 @@
 										<option key="form">form</option>
 										<option key="subform">subform</option>					
 									</options>	
-									<tree>true</tree>
 									<actions>
 										<create>
 											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
@@ -185,6 +186,8 @@
 									<access>true</access>
 									<required>true</required>
 									<title>Nomenclatural Code</title>
+									<tree>true</tree>
+									<executes_submit_callback>FALSE</executes_submit_callback>
 									<options>
 										<option key="ICBN">International Code of Botanical Nomenclature</option>
 										<option key="ICNB">International Code of Nomenclature of Bacteria</option>
@@ -192,7 +195,6 @@
 										<option key="ICZN">International Code of Zoological Nomenclature</option>
 										<option key="ICVCN">International Code of Virus Classifications and Nomenclature</option>
 									</options>	
-									<tree>true</tree>
 									<actions>
 										<create>
 											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
@@ -223,7 +225,9 @@
 									<type>select</type>
 									<access>true</access>
 									<required>FALSE</required>
+									<executes_submit_callback>FALSE</executes_submit_callback>
 									<title>Taxonomic Status (GBIF)</title>
+									<tree>true</tree>
 									<options>
 										<option key="accepted">accepted (Botanical)</option>
 										<option key="valid">valid (zoologial)</option>
@@ -232,8 +236,7 @@
 										<option key="heterotypic synonym">heterotypic synonym (subjective)</option>
 										<option key="proParteSynonym">proParteSynonym (some series members assigned to new type)</option>
 										<option key="misapplied">misapplied</option>
-									</options>	
-									<tree>true</tree>
+									</options>										
 									<actions>
 										<create>
 											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
@@ -267,6 +270,7 @@
 									<required>false</required>
 									<executes_submit_callback>false</executes_submit_callback>
 									<title>Reconciliar Nombre Científico </title>
+									<tree>true</tree>
 									<ajax>
 										<callback>islandora_red_biodiversidad_validateandpopulateTaxon</callback>
 										<wrapper>edit-dwc-fields-taxon-reconciliate</wrapper>
@@ -406,8 +410,8 @@
 								<properties>
 									<type>textfield</type>
 									<access>true</access>
-									<required>true</required>
-									<title>genus</title>
+									<required>FALSE</required>
+									<title>Genus</title>
 									<tree>true</tree>
 									<actions>
 										<create>
