@@ -3,10 +3,8 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:foxml="info:fedora/fedora-system:def/foxml#"
-xmlns:dcterms="http://purl.org/dc/terms/"
+xmlns:dcterms="http://purl.org/dc/terms/"  xmlns:dwr="http://rs.tdwg.org/dwc/xsd/simpledarwincore/"
 xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:noNamespaceSchemaLocation="http://rs.tdwg.org/dwc/xsd/simpledarwincore/"
      exclude-result-prefixes="dwc foxml">
 
 	<xsl:template match="foxml:datastream[@ID='DwC']/foxml:datastreamVersion[last()]" name="index_DWC">
@@ -28,7 +26,7 @@ xsi:noNamespaceSchemaLocation="http://rs.tdwg.org/dwc/xsd/simpledarwincore/"
 	            </xsl:attribute>
 			    <xsl:value-of select="normalize-space(text())" />
 		    </field>
-	    </xsl:for-each>
+	    </xsl:for-each>+
 	<xsl:for-each select="$content//dwc:Identification/*">
                     <field>
                             <xsl:attribute name="name">
@@ -101,9 +99,24 @@ xsi:noNamespaceSchemaLocation="http://rs.tdwg.org/dwc/xsd/simpledarwincore/"
 
 
 
- <xsl:for-each select="$content//dcterms:Location/dwc:*">
-                    <field>
-                            <xsl:attribute name="name">
+ <xsl:for-each select="$content//dcterms:Location/*">
+                    <xsl:choose>
+			<xsl:when test="name()='dwc:decimalLongitude'">
+<field> 
+<xsl:attribute name="name">
+<xsl:value-of select="concat($prefix, 'latlong','_coordinatefull')"/>
+</xsl:attribute>
+<xsl:attribute name="type">
+<xsl:value-of select="'location'"/>
+</xsl:attribute>			
+	<xsl:value-of select="../dwc:decimalLatitude"/>
+				<xsl:text>, </xsl:text>
+			<xsl:value-of select="normalize-space(text())" />
+</field>
+			</xsl:when>
+			<xsl:otherwise>
+<field>                    
+        <xsl:attribute name="name">
     <xsl:choose><xsl:when test="(substring-before(name(),':')='dwc')">
                         <xsl:value-of select="concat($prefix, substring-after(name(),':'),$suffix)"/>
                         </xsl:when>
@@ -112,10 +125,16 @@ xsi:noNamespaceSchemaLocation="http://rs.tdwg.org/dwc/xsd/simpledarwincore/"
                         </xsl:otherwise></xsl:choose>
                     </xsl:attribute>
                             <xsl:value-of select="normalize-space(text())" />
-                    </field>
-            </xsl:for-each>
+                    
+			</field>
+            </xsl:otherwise>
+</xsl:choose>            
+</xsl:for-each>
 
-		<xsl:for-each select="$content//SimpleDarwinRecord/*">
+
+
+
+		<xsl:for-each select="$content//dwr:SimpleDarwinRecordSet[1]/dwr:SimpleDarwinRecord[1]/*">
                     <field>
                             <xsl:attribute name="name">
   <xsl:choose><xsl:when test="(substring-before(name(),':')='dwc')">
