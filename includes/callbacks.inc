@@ -124,6 +124,7 @@ function islandora_red_biodiversidad_autocomplete($type) {
  
   drupal_json_output($list);
 }
+
 /*Esta función executa ajax commands en la forma de origen poblando datos desde GBIF */
 
 

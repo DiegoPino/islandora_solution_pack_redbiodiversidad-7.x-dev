@@ -74,7 +74,7 @@ function  islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model(Abstrac
 	    $fedora_object->ingestDatastream($datastream);
 	   return;
     }
-	elseif (array_intersect(array('islandora:sp_red_biodiversidad_dctermslocation'), $models)) {
+	elseif (array_intersect(array('islandora:sp_red_biodiversidad_dctermlocation'), $models)) {
 	    $datastream =  $fedora_object->constructDatastream('TN', 'M');
 	    $datastream->label = 'ICON';
 	    $datastream->mimetype = 'image/png';
@@ -134,7 +134,7 @@ function  islandora_red_biodiversidad_content_model_tohuman(AbstractObject $fedo
 	    $model_label="dwc:Event";
 	    return($model_label);
     }
-	elseif (array_intersect(array('islandora:sp_red_biodiversidad_dctermslocation'), $models)) {
+	elseif (array_intersect(array('islandora:sp_red_biodiversidad_dctermlocation'), $models)) {
 	     $model_label="dcterms:Location";
 	    return($model_label);
     }

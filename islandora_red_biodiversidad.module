@@ -56,8 +56,8 @@ function islandora_red_biodiversidad_menu() {
   
   $items['islandora/object/%islandora_object/redbiodiversidadtab'] = array(
     'weight' => 3,
-    'title' => 'Ficha Item',
-    'page callback' => 'islandora_red_biodiversidad_display',
+    'title' => 'Map',
+    'page callback' => 'islandora_red_biodiversidad_map_display',
     'page arguments' => array(2),
     'type' => MENU_LOCAL_TASK,
     'access callback' => 'islandora_red_biodiversidad_access',
@@ -152,9 +152,10 @@ function islandora_red_biodiversidad_collection_access($islandora_object) {
  * @return string
  *   the rendered output
  */
-function islandora_red_biodiversidad_display($islandora_object) {
-  $output = theme('islandora_red_biodiversidad_tab',
-    array('islandora_object' => $islandora_object));
+
+function islandora_red_biodiversidad_map_display($islandora_object) {
+  $output = theme('islandora_red_biodiversidad_map',
+    array('islandora_object' => $islandora_object,'results'=>NULL));
   return $output;
 }
 function islandora_red_biodiversidad_dw_related_display($islandora_object) {
@@ -175,11 +176,6 @@ function islandora_red_biodiversidad_collection_display($islandora_object) {
  *
  * This is a Drupal hook, not supplied by islandora.
  */
-function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_tab(array &$variables) {
-  $islandora_object = $variables['islandora_object'];
-  $content = $islandora_object['OBJ']->content;
-  $variables['red_biodiversidad_content_tab'] = $content;
-}
 
 function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_collection(array &$variables) {
   $islandora_object = $variables['islandora_object'];
@@ -243,10 +239,10 @@ function islandora_red_biodiversidad_theme($existing, $type, $theme, $path) {
       'variables' => array('islandora_content' => NULL),
     ),
     // Themes the output of the  tab.
-    'islandora_red_biodiversidad_tab' => array(
+    'islandora_red_biodiversidad_map' => array(
 	  'file' => 'theme/theme.inc',
-      'template' => 'theme/islandora-red-biodiversidad-tab',
-      'variables' => array('islandora_object' => NULL),
+      'template' => 'theme/islandora-red-biodiversidad-map',
+      'variables' => array('islandora_object' => NULL,'results'=>NULL),
     ),
     'islandora_dwc_related' => array(
 	  'file' => 'theme/theme.inc',
@@ -741,4 +737,23 @@ function islandora_red_biodiversidad_validateandpopulate(&$form, &$form_state)
 			return array('#type' => 'ajax', '#commands' => $commands);
 		
 }
-	
+class IslandoraRedBiodiversidadMapObjectLocation {
+  /**
+   * Constructor for the helper map object.
+   *
+   * @param NULL|string $marker_color
+   *   The color of the marker or NULL if we are not specifying one.
+   * @param NULL|string $lat
+   *   The latitude of the co-ordinate we are rendering or NULL.
+   * @param NULL|string $long
+   *   The longitude of the co-ordinate we are rendering or NULL.
+   * @param NULL|string $balloon_text
+   *   The markup for the balloon or NULL.
+   */
+  public function __construct($marker_color = NULL, $lat = NULL, $long = NULL, $balloon_text = '') {
+    $this->marker_color = $marker_color;
+    $this->latitude = $lat;
+    $this->longitude = $long;
+    $this->balloon_text = $balloon_text;
+  }
+}	
