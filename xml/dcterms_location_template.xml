@@ -1,4 +1,40 @@
 <?xml version="1.0"?>
-<DarwinRecordSet xmlns="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:dwr="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwc="http://rs.tdwg.org/dwc/terms/" xmlns:dcterms="http://purl.org/dc/terms/">
-  <dcterms:Location><dwc:basisOfRecord>Location</dwc:basisOfRecord><dwc:locationID>LOCACION:0001</dwc:locationID><dwc:locationAccordingTo>Krayon</dwc:locationAccordingTo><dwc:locationRemarks>Igual que siempre</dwc:locationRemarks><dwc:higherGeographyID></dwc:higherGeographyID><dwc:higherGeography>South America; Northern Chile</dwc:higherGeography><dwc:continent>South America</dwc:continent><dwc:waterBody></dwc:waterBody><dwc:islandGroup></dwc:islandGroup><dwc:island></dwc:island><dwc:country>Chile</dwc:country><dwc:countryCode>CL</dwc:countryCode><dwc:stateProvince></dwc:stateProvince><dwc:county></dwc:county><dwc:municipality></dwc:municipality><dwc:locality>Puc&#xF3;n</dwc:locality><dwc:verbatimLocality></dwc:verbatimLocality><dwc:verbatimElevation></dwc:verbatimElevation><dwc:verbatimDepth></dwc:verbatimDepth><dwc:verbatimCoordinates></dwc:verbatimCoordinates><dwc:verbatimLatitude></dwc:verbatimLatitude><dwc:verbatimLongitude></dwc:verbatimLongitude><dwc:verbatimCoordinateSystem></dwc:verbatimCoordinateSystem><dwc:verbatimSRS></dwc:verbatimSRS><dwc:minimumElevationInMeters></dwc:minimumElevationInMeters><dwc:maximumElevationInMeters></dwc:maximumElevationInMeters><dwc:minimumDepthInMeters></dwc:minimumDepthInMeters><dwc:maximumDepthInMeters></dwc:maximumDepthInMeters><dwc:minimumDistanceAboveSurfaceInMeters></dwc:minimumDistanceAboveSurfaceInMeters><dwc:maximumDistanceAboveSurfaceInMeters></dwc:maximumDistanceAboveSurfaceInMeters><dwc:decimalLatitude>-41.0983423</dwc:decimalLatitude><dwc:decimalLongitude>-121.1761111</dwc:decimalLongitude><dwc:geodeticDatum>EPSG:4326</dwc:geodeticDatum><dwc:georeferenceProtocol></dwc:georeferenceProtocol><dwc:georeferenceVerificationStatus>verified by contributor</dwc:georeferenceVerificationStatus></dcterms:Location>
-</DarwinRecordSet>
+<dwr:DarwinRecordSet xmlns="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:dwr="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwc="http://rs.tdwg.org/dwc/terms/" xmlns:dcterms="http://purl.org/dc/terms/">
+	<dcterms:Location>
+		<dwc:basisOfRecord>Location</dwc:basisOfRecord>
+		<dwc:locationID></dwc:locationID>
+		<dwc:locationAccordingTo></dwc:locationAccordingTo>
+		<dwc:locationRemarks></dwc:locationRemarks>
+		<dwc:higherGeographyID/>
+		<dwc:higherGeography></dwc:higherGeography>
+		<dwc:continent></dwc:continent>
+		<dwc:waterBody/>
+		<dwc:islandGroup/>
+		<dwc:island/>
+		<dwc:country></dwc:country>
+		<dwc:countryCode></dwc:countryCode>
+		<dwc:stateProvince/>
+		<dwc:county/>
+		<dwc:municipality/>
+		<dwc:locality></dwc:locality>
+		<dwc:verbatimLocality/>
+		<dwc:verbatimElevation/>
+		<dwc:verbatimDepth/>
+		<dwc:verbatimCoordinates/>
+		<dwc:verbatimLatitude/>
+		<dwc:verbatimLongitude/>
+		<dwc:verbatimCoordinateSystem/>
+		<dwc:verbatimSRS/>
+		<dwc:minimumElevationInMeters/>
+		<dwc:maximumElevationInMeters/>
+		<dwc:minimumDepthInMeters/>
+		<dwc:maximumDepthInMeters/>
+		<dwc:minimumDistanceAboveSurfaceInMeters/>
+		<dwc:maximumDistanceAboveSurfaceInMeters/>
+		<dwc:decimalLatitude></dwc:decimalLatitude>
+		<dwc:decimalLongitude></dwc:decimalLongitude>
+		<dwc:geodeticDatum></dwc:geodeticDatum>
+		<dwc:georeferenceProtocol/>
+		<dwc:georeferenceVerificationStatus>v</dwc:georeferenceVerificationStatus>
+	</dcterms:Location>
+</dwr:DarwinRecordSet>

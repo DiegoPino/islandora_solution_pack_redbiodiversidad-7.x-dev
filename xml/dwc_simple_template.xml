@@ -6,12 +6,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://rs.tdwg.org/dwc/xsd/simpledarwincore/ http://rs.tdwg.org/dwc/xsd/tdwg_dwc_simple.xsd">
 		<SimpleDarwinRecord>
-			<dc:type>PreservedSpecimen</dc:type>
-			<dc:language>English</dc:language>
+			<dc:type></dc:type>
+			<dc:language></dc:language>
 			<dc:rights>This material is provided for research, education, and private use only.</dc:rights>
-			<dc:rightsHolder>Universidad Cat&#xF3;lica del Norte de Chile</dc:rightsHolder>
+			<dc:rightsHolder></dc:rightsHolder>
 			<dc:accessRights>Creative Commons Attribution-NonCommercial- NoDerivs 2.5 License</dc:accessRights>
-			<dwc:institutionCode>UCN</dwc:institutionCode>
+			<dwc:institutionCode></dwc:institutionCode>
 			<dwc:collectionCode></dwc:collectionCode>
 			<dwc:basisOfRecord></dwc:basisOfRecord>
 			<dwc:occurrenceID></dwc:occurrenceID>
@@ -26,9 +26,9 @@
 			<dwc:fieldNumber></dwc:fieldNumber>
 			<dwc:fieldNotes></dwc:fieldNotes>
 			<dwc:eventRemarks></dwc:eventRemarks>
-			<dwc:continent>South America</dwc:continent>
-			<dwc:country>Chile</dwc:country>
-			<dwc:countryCode>CL</dwc:countryCode>
+			<dwc:continent></dwc:continent>
+			<dwc:country></dwc:country>
+			<dwc:countryCode></dwc:countryCode>
 			<dwc:stateProvince></dwc:stateProvince>
 			<dwc:county></dwc:county>
 			<dwc:municipality></dwc:municipality>

@@ -1,4 +1,30 @@
 <?xml version="1.0"?>
 <dwr:DarwinRecordSet xmlns:dwr="http://rs.tdwg.org/dwc/dwcrecord/" xmlns="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwc="http://rs.tdwg.org/dwc/terms/" xmlns:dcterms="http://purl.org/dc/terms/">
-  <dwc:Occurrence><dcterms:type>PhysicalObject</dcterms:type><dcterms:language>English</dcterms:language><dcterms:rights>This material is provided for research,education, and private use only.</dcterms:rights><dcterms:rightsHolder>Red de Biodiversidad Chile</dcterms:rightsHolder><dwc:institutionCode>CBUCN</dwc:institutionCode><dwc:collectionCode>zool</dwc:collectionCode><dwc:basisOfRecord>PreservedSpecimen</dwc:basisOfRecord><dwc:dynamicProperties>zool</dwc:dynamicProperties><dwc:occurrenceID>zool:001</dwc:occurrenceID><dwc:catalogNumber>zool:001</dwc:catalogNumber><dwc:recordedBy>Diego Pino Navarro</dwc:recordedBy><dwc:recordNumber>001</dwc:recordNumber><dwc:individualID></dwc:individualID><dwc:sex>female</dwc:sex><dwc:lifeStage>zygote</dwc:lifeStage><dwc:reproductiveCondition>in bloom</dwc:reproductiveCondition><dwc:behavior></dwc:behavior><dwc:establishmentMeans>introduced</dwc:establishmentMeans><dwc:preparations></dwc:preparations><dwc:disposition>in collection</dwc:disposition><dwc:occurrenceStatus>present</dwc:occurrenceStatus><dwc:previousIdentifications></dwc:previousIdentifications><dwc:associatedReferences></dwc:associatedReferences><dwc:associatedSequences></dwc:associatedSequences><dcterms:accessRights>http://creativecommons.org/licenses/by-sa/3.0/cl/</dcterms:accessRights></dwc:Occurrence>
+	<dwc:Occurrence>
+		<dcterms:type>PhysicalObject</dcterms:type>
+		<dcterms:language></dcterms:language>
+		<dcterms:rights>This material is provided for research,education, and private use only.</dcterms:rights>
+		<dcterms:rightsHolder></dcterms:rightsHolder>
+		<dwc:institutionCode></dwc:institutionCode>
+		<dwc:collectionCode></dwc:collectionCode>
+		<dwc:basisOfRecord></dwc:basisOfRecord>
+		<dwc:dynamicProperties></dwc:dynamicProperties>
+		<dwc:occurrenceID></dwc:occurrenceID>
+		<dwc:catalogNumber></dwc:catalogNumber>
+		<dwc:recordedBy></dwc:recordedBy>
+		<dwc:recordNumber></dwc:recordNumber>
+		<dwc:individualID/>
+		<dwc:sex></dwc:sex>
+		<dwc:lifeStage></dwc:lifeStage>
+		<dwc:reproductiveCondition></dwc:reproductiveCondition>
+		<dwc:behavior/>
+		<dwc:establishmentMeans></dwc:establishmentMeans>
+		<dwc:preparations/>
+		<dwc:disposition></dwc:disposition>
+		<dwc:occurrenceStatus></dwc:occurrenceStatus>
+		<dwc:previousIdentifications/>
+		<dwc:associatedReferences/>
+		<dwc:associatedSequences/>
+		<dcterms:accessRights>http://creativecommons.org/licenses/by-sa/3.0/cl/</dcterms:accessRights>
+	</dwc:Occurrence>
 </dwr:DarwinRecordSet>

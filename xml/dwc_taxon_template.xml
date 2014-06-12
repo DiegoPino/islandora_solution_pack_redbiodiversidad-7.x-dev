@@ -1,4 +1,19 @@
 <?xml version="1.0"?>
 <dwr:DarwinRecordSet xmlns:dwr="http://rs.tdwg.org/dwc/dwcrecord/" xmlns="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwc="http://rs.tdwg.org/dwc/terms/" xmlns:dcterms="http://purl.org/dc/terms/">
-  <dwc:Taxon><dwc:taxonID>http://www.gbif.org/species/2753786</dwc:taxonID><dwc:taxonRank>species</dwc:taxonRank><dwc:scientificName>Alstroemeria aurea Graham</dwc:scientificName><dwc:nomenclaturalCode>ICBN</dwc:nomenclaturalCode><dwc:taxonomicStatus>accepted</dwc:taxonomicStatus><dwc:phylum>Magnoliophyta</dwc:phylum><dwc:class>Liliopsida</dwc:class><dwc:order>Liliales</dwc:order><dwc:family>Alstroemeriaceae</dwc:family><dwc:genus>Alstroemeria</dwc:genus><dwc:subgenus></dwc:subgenus><dwc:specificEpithet></dwc:specificEpithet><dwc:vernacularName></dwc:vernacularName><dwc:taxonRemarks>More remarks 2</dwc:taxonRemarks></dwc:Taxon>
+	<dwc:Taxon>
+		<dwc:taxonID></dwc:taxonID>
+		<dwc:taxonRank></dwc:taxonRank>
+		<dwc:scientificName></dwc:scientificName>
+		<dwc:nomenclaturalCode></dwc:nomenclaturalCode>
+		<dwc:taxonomicStatus></dwc:taxonomicStatus>
+		<dwc:phylum></dwc:phylum>
+		<dwc:class></dwc:class>
+		<dwc:order></dwc:order>
+		<dwc:family></dwc:family>
+		<dwc:genus></dwc:genus>
+		<dwc:subgenus/>
+		<dwc:specificEpithet/>
+		<dwc:vernacularName/>
+		<dwc:taxonRemarks></dwc:taxonRemarks>
+	</dwc:Taxon>
 </dwr:DarwinRecordSet>

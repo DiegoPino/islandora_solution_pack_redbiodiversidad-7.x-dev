@@ -438,7 +438,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 					{	
 					foreach($camposdwcexistentes2 as $itemdwc)
 						{
-						$itemdwc->nodeValue=$valuedw;
+						if(empty($itemdwc->nodeValue)){$itemdwc->nodeValue=$valuedw;}//preserve de defaults of the templates, @todo, ask in the input form
 						}
 					}
 				}
