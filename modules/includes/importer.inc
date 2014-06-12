@@ -301,7 +301,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 						$datoscombinados=array_combine($cmheaders,array_intersect_key($rowData[0],$cmheaders));//We first get only the data possible to this contenmodel from the row,then we combine the headernames(keys) with the data.
 						if (sizeof($datoscombinados)>0)
 							{
-								$info[$objectcount]=array('excelrow'=>$fila,'data'=>$datoscombinados,'cmodel'=>$cmodel);
+								$info[$objectcount]=array('data'=>$datoscombinados,'cmodel'=>$cmodel);
 							}
 						//So we store the desired cmodel and the data in one place...nice.$file aka row is used to keep track fom where the data came in the excel to make
 						$objectcount++;
@@ -350,7 +350,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 		$object->id=$this->getIdentifier($this->connection, $this->parameters['namespace']);
         //$object->object_info=$item;//Solo pasaremos el objeto actual...esto está mal en la implementación parent!
 		$this->addToDatabase($object, $object->getResources());
-		if ($internal_setID_counter==5)//Diego Pino, Excel files can be large. Set group of 5 records to a batch set so we don´t run out of memory in Drupal or get PDO errors
+		if ($internal_setID_counter==50)//Diego Pino, Excel files can be large. Set group of 5 records to a batch set so we don´t run out of memory in Drupal or get PDO errors
 			{
 			
 			$this->setId++;
@@ -375,6 +375,9 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  protected $title =  NULL;
 	  protected $dwc = NULL;
 	  protected static $DC2MODS;
+	  protected static $DWC2DC;
+	  protected static $DWCTEMPLATE;
+	  protected static $TITLEFIELD;
 	 
       
 	  /**
@@ -402,12 +405,14 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	      'pid_namespace' => $info['pid_namespace'],
 	      'file' => $info['file'],
 	      'content_model' => $info['object_info'][$key]['cmodel'],
-	      'content_model_process_info'=> $info['content_model'][$info['object_info'][$key]['cmodel']],//template and transform data	
+	     
 		);
 		
 		//$info['object_info'] has $key for every object, second key for the corresponding row, and third key for the contentmodel...clever!
 		//$info['object_info'][objectcuont]=array('excelrow'=>$fila,'data'=>$datoscombinados,'cmodel'=>$cmodel);
-	    $record['object_info'] = $info['processed_objects'][$key] = $info['object_info'][$key];//we pass the whole stuff
+		self::$DWC2DC=$info['content_model'][$info['object_info'][$key]['cmodel']]['dwc2dc'];
+	    self::$DWCTEMPLATE=$info['content_model'][$info['object_info'][$key]['cmodel']]['template'];
+		self::$TITLEFIELD=$info['content_model'][$info['object_info'][$key]['cmodel']]['title'];
 	    unset($info['object_info'][$key]);
 	    return (empty($record) ? FALSE : new static($record));
 		
@@ -419,11 +424,12 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  	{
 	  	if ($this->dwc === NULL) {
 			$dom= new DOMDocument;
-			error_log(var_export($this->source['content_model_process_info']['template'],true),0);
-			$dom->load($this->source['content_model_process_info']['template']);
+			
+			$dom->load(self::$DWCTEMPLATE);
 			$dwc_xpath = new DOMXPath($dom);
 			$dwc_xpath->preserveWhiteSpace = false;
 			$dwc_xpath->registerNamespace('dwc', 'http://rs.tdwg.org/dwc/terms/');
+			error_log(var_export($this->source['object_info']['data'],true),0);
 			$datosexcel=$this->source['object_info']['data'];//data
 			
 			if (sizeof($datosexcel)>0)
@@ -438,7 +444,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 					{	
 					foreach($camposdwcexistentes2 as $itemdwc)
 						{
-						if(empty($itemdwc->nodeValue)){$itemdwc->nodeValue=$valuedw;}//preserve de defaults of the templates, @todo, ask in the input form
+						if(empty($itemdwc->nodeValue)){$itemdwc->nodeValue=$valuedw;}//preserve the defaults of the templates, @todo, ask in the input form
 						}
 					}
 				}
@@ -614,7 +620,7 @@ EOXML;
 				}
   		  	 if ($this->isDwC($xml)) {//verifico si el DwC quedo bien hecho
 				error_log(var_export($this->source['content_model_process_info'],true),0);	
-  	 	        $this->dc = static::runXSLTransform(array('input' => $xml, 'xsl' => $this->source['content_model_process_info']['dwc2dc']));
+  	 	        $this->dc = static::runXSLTransform(array('input' => $xml, 'xsl' => self::$DWC2DC));
 	 	        
   			 }
    	         if (empty($this->dc)) {
