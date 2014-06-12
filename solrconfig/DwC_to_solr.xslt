@@ -26,7 +26,7 @@ xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
 	            </xsl:attribute>
 			    <xsl:value-of select="normalize-space(text())" />
 		    </field>
-	    </xsl:for-each>+
+	    </xsl:for-each>
 	<xsl:for-each select="$content//dwc:Identification/*">
                     <field>
                             <xsl:attribute name="name">

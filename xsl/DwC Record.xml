@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<DarwinRecordSet xmlns="http://rs.tdwg.org/dwc/dwcrecord/"
+  xmlns:dwr="http://rs.tdwg.org/dwc/dwcrecord/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+  <dwc:Event>
+    <dcterms:type>Event</dcterms:type>
+    <dwc:basisOfRecord>Event</dwc:basisOfRecord>
+    <dwc:dynamicProperties>zool</dwc:dynamicProperties>
+    <dwc:eventID>Ide</dwc:eventID>
+    <dwc:samplingProtocol>protocolo</dwc:samplingProtocol>
+    <dwc:samplingEffort>esfuerzo</dwc:samplingEffort>
+    <dwc:eventDate>fecha</dwc:eventDate>
+    <dwc:verbatimEventDate>otra fecha</dwc:verbatimEventDate>
+    <dwc:habitat>habitat</dwc:habitat>
+    <dwc:fieldNumber>numero de campo</dwc:fieldNumber>
+    <dwc:fieldNotes>Notas de campo</dwc:fieldNotes>
+    <dwc:eventRemarks>REmarks</dwc:eventRemarks>
+  </dwc:Event>
+</DarwinRecordSet>

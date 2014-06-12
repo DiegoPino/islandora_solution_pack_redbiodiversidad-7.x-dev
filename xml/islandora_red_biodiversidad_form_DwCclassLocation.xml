@@ -1187,6 +1187,9 @@ Example: "TGN: 1002002" for Prov. Tierra del Fuego, Argentina. For discussion se
 											<type>element</type>
 											<prefix>dwc</prefix>
 											<value>dwc:decimalLatitude</value>
+											<element_validate>
+												<index key="0">islandora_red_biodiversidad_lat_validate</index>												
+											</element_validate>
 										</create>
 										<read>
 											<path>/dwr:DarwinRecordSet/dcterms:Location/dwc:decimalLatitude</path>
@@ -1333,11 +1336,7 @@ Example: "TGN: 1002002" for Prov. Tierra del Fuego, Argentina. For discussion se
 									</options>
 									<title>georeference Verification Status</title>
 									<description>
-										It is recommended to give a citation (publication or URL) to the resource describing the methods used to determine the georeference (coordinates AND uncertainty, or footprint).
-										Good resources on methods include:
-										1. Chapman, A.D. and J. Wieczorek (eds). 2006. Guide to Best Practices for Georeferencing. Copenhagen: Global Biodiversity Information Facility. Accessible from http://www.gbif.org/orc/?doc_id=1288
-										2. MaNIS/HerpNet/ORNIS Georeferencing Guidelines.(HTML) Accessible from http://manisnet.org/GeorefGuide.html
-										3. Georeferencing Quick Reference Guide. (PDF) Accessible from http://manisnet.org/GeoreferencingQuickReferenceGuide.pdf
+										
 									</description>
 									<tree>TRUE</tree>
 									<actions>

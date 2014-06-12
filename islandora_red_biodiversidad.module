@@ -2,30 +2,29 @@
 
 /**
  * @file
- * Handles the creation and display of basic image objects.
+ * Handles Biodiversity data and relations using Darwin Core Classes(types)
+ * This solution Pack provides Content Models based en Darwin Core Types, terms and Formats(DWCA) 
+ * It relies on islandora_ontologies_solution_pack to relate dwc objects
  */
+
+// Permissions.
+define('ISLANDORA_RED_BIODVIERSIDAD_ADMINISTER_PERMISSION', 'administer islandora red_biodiversidad');
 
 /**
- * Implements hook_islandora_view_print_object().
+ * Implements hook_permission().
  */
-/*
-function islandora_red_biodiversidad_islandora_view_print_object($object) {
-  $output = array();
-  if (in_array('islandora:sp_red_biodiversidad', $object->models)) {
-    $resource_url = url("islandora/object/{$object->id}/datastream/OBJ/view");
-    $params = array(
-      'title' => $object->label,
-      'path' => $resource_url,
-    );
-	//Diego Pino Febrero 2014, Revisar
-    // Theme the image seperatly.
-    $variables['islandora_img'] = theme('image', $params);
-    $output = theme('islandora_red_biodiversidad_print', array(
-    'islandora_content' => $variables['islandora_img']));
-  }
-
-  return $output;
+function islandora_red_biodiversidad_permission() {
+  return array(
+    ISLANDORA_RED_BIODVIERSIDAD_ADMINISTER_PERMISSION => array(
+      'title' => t('Administer Islandora Red Biodiversidad'),
+      'description' => t('Access Islandora Red Biodiversidad administration page.'),
+    ),
+  );
 }
+
+
+
+
 
 /**
  * Implements hook_menu().
@@ -33,7 +32,15 @@ function islandora_red_biodiversidad_islandora_view_print_object($object) {
  * See https://api.drupal.org/api/drupal/modules!system!system.api.php/function/hook_menu/7
  */
 function islandora_red_biodiversidad_menu() {
-  $items = array();
+  $items['admin/islandora/solution_pack_config/red_biodiversidad'] = array(
+    'title' => 'Islandora Red Biodiversidad',
+    'description' => 'Configure the Red Biodiversidad solution pack.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_red_biodiversidad_admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'includes/admin.form.inc',
+    'access arguments' => array(ISLANDORA_RED_BIODVIERSIDAD_ADMINISTER_PERMISSION),
+  );
   $items['islandora/red_biodiversidad/autocomplete/%'] = array(
     'title' => 'Form Callbacks',
 	'description' => 'Autocomplete a Field from DwC',
@@ -43,15 +50,6 @@ function islandora_red_biodiversidad_menu() {
     'file' => 'includes/callbacks.inc',
     'access arguments' => array('search islandora solr'),
   );
-  /*$items['islandora/red_biodiversidad/validate/%'] = array(
-    'title' => 'Form Validate and Populate Callbacks',
-	'description' => 'Validate and populates related Species info from AJAX to form',
-    'page callback' => 'islandora_red_biodiversidad_validateandpopulate',
-    'page arguments' => array(3),
-    'type' => MENU_CALLBACK,
-    'file' => 'includes/callbacks.inc',
-     'access arguments' => array('access content'),
-  );*/
   
   
   $items['islandora/object/%islandora_object/redbiodiversidadtab'] = array(
@@ -72,28 +70,7 @@ function islandora_red_biodiversidad_menu() {
     'access callback' => 'islandora_red_biodiversidad_access',
     'access arguments' => array(2),
   );
-  /*$items['islandora/object/%islandora_object/redbiodiversidad_collection_tab'] = array(
-    'weight' => 4,
-    'title' => 'Ficha Coleccion',
-    'page callback' => 'islandora_red_biodiversidad_collection_display',
-    'page arguments' => array(2),
-    'type' => MENU_LOCAL_TASK,
-    'access callback' => 'islandora_red_biodiversidad_collection_access',
-    'access arguments' => array(2),
-  );*/
-   //Esto se movio a un modulo de islandora_import @see modules/
-  /*$items['islandora/object/%islandora_object/manage/object/redbiodiversidad_excelform'] = array(
-	  'weight' => 2,
-      'title' => 'Importar Excel a esta coleccion',
-	  'description' => 'Esto permite poblar una coleccion con datos GBIF desde excel',
-      'page callback' => 'drupal_get_form',
-	  'page arguments' => array('red_biodiversidad_excelform',2),
-	  'type' => MENU_LOCAL_ACTION,
-	  'file' =>'includes/biodiversidad_import.admin.inc',
-	  'access callback' => 'islandora_red_biodiversidad_collection_access',
-	  'access arguments' => array(2),
-  );*/
-  
+
   return $items;
 }
 /**
@@ -103,7 +80,7 @@ function islandora_red_biodiversidad_menu() {
  *
  * We check it's cmodel here so that we do not try to display this tab for all
  * objects.  We could also call other functions from here to help us determine
- * if we are allowed to show the tab
+ * if we are allowed to show the tabbiodiversity:biodiversityCModel
  *
  * @param IslandoraObject $islandora_object
  *   An Islandora object
@@ -116,7 +93,7 @@ function islandora_red_biodiversidad_access($islandora_object) {
     return FALSE;
   }
   $models = $islandora_object->models;
-  if (array_intersect(array('islandora:sp_red_biodiversidad'), $models)) {
+  if (array_intersect(array('biodiversity:biodiversityCModel'), $models)) {
     return TRUE;
   }
   return FALSE;
@@ -132,8 +109,8 @@ function islandora_red_biodiversidad_collection_access($islandora_object) {
 	    $policy = new CollectionPolicy($islandora_object['COLLECTION_POLICY']->content);
 	    $policy_content_models = $policy->getContentModels();//Entrega los modelos de contenido que permite esta coleccion
 		
-	    if (array_intersect(array('islandora:sp_red_biodiversidad'), array_keys($policy_content_models)) && array_intersect(array('islandora:collectionCModel'), $models)) {
-	      return TRUE; //Es decir es coleccion y sus hijos pueden ser de modelo sp_red_biodiversidad
+	    if (array_intersect(array('biodiversity:biodiversityCModel'), array_keys($policy_content_models)) && array_intersect(array('islandora:collectionCModel'), $models)) {
+	      return TRUE; //Es decir es coleccion y sus hijos pueden ser de modelo biodiversity:biodiversityCModel
 	    }
   	}
  
@@ -186,7 +163,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_coll
 * Implements hook_CMODEL_PID_islandora_view_object().
 *
 * this function will be called everytime islandora loads an object with a
-* cmodel of islandora:sp_red_biodiversidad.
+* cmodel of biodiversity:biodiversityCModel.
 *
 * This function is calling the theme function to
 * theme islandora_red_biodiversidad which also invokes
@@ -201,7 +178,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_coll
  */
 
 
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_islandora_view_object($object,$page_number, $page_size) {  
+function islandora_red_biodiversidad_biodiversity_biodiversityCModel_islandora_view_object($object,$page_number, $page_size) {  
   $output = theme('islandora_dwc', array('islandora_object' => $object));
   return array('' => $output);
 }
@@ -209,13 +186,13 @@ function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_islandora_vi
 * Implements hook_CMODEL_PID_islandora_view_object().
 *
 * this function will be called everytime islandora loads an object with a
-* cmodel of islandora:sp_red_biodiversidad_collection.
+* cmodel of biodiversity:biodiversityCModel_collection.
 *
 * This function is calling the theme function to
 * theme islandora_red_biodiversidad which also invokes
 * the islandora_red_biodiversidad_preprocessor
 */
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_collection_islandora_view_object($object) {
+function islandora_red_biodiversidad_biodiversity_biodiversityCModel_collection_islandora_view_object($object) {
   $output = theme('islandora_red_biodiversidad', array('islandora_object' => $object));
   return array('' => $output);
 }
@@ -260,67 +237,89 @@ function islandora_red_biodiversidad_islandora_required_objects(IslandoraTuque $
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   
   // Biodiversidad Content Model , we will use this as additional content model for every other model in this module
-  $biodiversidad_content_model = $connection->repository->constructObject('islandora:sp_red_biodiversidad');
+  $biodiversidad_content_model = $connection->repository->constructObject('biodiversity:biodiversityCModel');
   $biodiversidad_content_model->owner = 'fedoraAdmin';
-  $biodiversidad_content_model->label = 'Islandora Red Biodiversidad Content Model';
+  $biodiversidad_content_model->label = 'Biodiversity Content Model';
   $biodiversidad_content_model->models = 'fedora-system:ContentModel-3.0';
   // DS-COMPOSITE-MODEL Datastream.
   islandora_red_biodiversidad_ingest__red_biodiversidad_ds_composite_datastream($biodiversidad_content_model);
   
   
+ /* DWCA Content Model, used for sharing datasets as a Package with GBIF. Objects of this type will(could) be created using a processor that parses Objects belonging to CMODELS of this solution pack and their relations to other, contained in a Collection.
+ */
+  $biodiversidad_content_model_dwca = $connection->repository->constructObject('biodiversity:DWCACModel');
+  $biodiversidad_content_model_dwca->owner = 'fedoraAdmin';
+  $biodiversidad_content_model_dwca->label = 'Darwin Core Archive Content Model';
+  $biodiversidad_content_model_dwca->models = 'fedora-system:ContentModel-3.0';
+  // DS-COMPOSITE-MODEL Datastream.
+  /* @TODO this composite stream is different, must consider a ZIP file, Metadata.xml, EML, etc */ 
+  $ds_composite_datastream_dwca = $biodiversidad_content_model_dwca->constructDatastream('DS-COMPOSITE-MODEL', 'X');
+  $ds_composite_datastream_dwca->label = 'DS-COMPOSITE-MODEL';
+  $ds_composite_datastream_dwca->mimetype = 'text/xml';
+  $ds_composite_datastream_dwca->setContentFromFile("$module_path/xml/islandora_red_biodiversidad_dwca_ds_composite_model.xml", FALSE);
+  $biodiversidad_content_model_dwca->ingestDatastream($ds_composite_datastream_dwca);
+  
+  
   // Biodiversidad Content Model Simple Darwin Core
-  $biodiversidad_content_model_simpledwc = $connection->repository->constructObject('islandora:sp_red_biodiversidad_simpledwc');
+  $biodiversidad_content_model_simpledwc = $connection->repository->constructObject('biodiversity:SimpledwcCModel');
   $biodiversidad_content_model_simpledwc->owner = 'fedoraAdmin';
-  $biodiversidad_content_model_simpledwc->label = 'Islandora Red Biodiversidad Content Model Simple Darwin Core';
+  $biodiversidad_content_model_simpledwc->label = 'Simple Darwin Core Content Model';
   $biodiversidad_content_model_simpledwc->models = 'fedora-system:ContentModel-3.0';
   // DS-COMPOSITE-MODEL Datastream.
   islandora_red_biodiversidad_ingest__red_biodiversidad_ds_composite_datastream($biodiversidad_content_model_simpledwc);
   // Biodiversidad Content Model Darwin Core Class Occurrence
-  $biodiversidad_content_model_occurrencedwc = $connection->repository->constructObject('islandora:sp_red_biodiversidad_dwcclassoccurrence');
+  $biodiversidad_content_model_occurrencedwc = $connection->repository->constructObject('biodiversity:OccurrenceCModel');
   $biodiversidad_content_model_occurrencedwc->owner = 'fedoraAdmin';
-  $biodiversidad_content_model_occurrencedwc->label = 'Islandora Red Biodiversidad Content Model Darwin Core Class:Occurrence';
+  $biodiversidad_content_model_occurrencedwc->label = 'Darwin Core Class Occurrence Content Model';
   $biodiversidad_content_model_occurrencedwc->models = 'fedora-system:ContentModel-3.0';
   // DS-COMPOSITE-MODEL Datastream.
   islandora_red_biodiversidad_ingest__red_biodiversidad_ds_composite_datastream($biodiversidad_content_model_occurrencedwc);
   // Biodiversidad Content Model Darwin Core Class Event
-  $biodiversidad_content_model_eventdwc = $connection->repository->constructObject('islandora:sp_red_biodiversidad_dwcclassevent');
+  $biodiversidad_content_model_eventdwc = $connection->repository->constructObject('biodiversity:EventCModel');
   $biodiversidad_content_model_eventdwc->owner = 'fedoraAdmin';
-  $biodiversidad_content_model_eventdwc->label = 'Islandora Red Biodiversidad Content Model Darwin Core Class:Event';
+  $biodiversidad_content_model_eventdwc->label = 'Darwin Core Class Event Content Model';
   $biodiversidad_content_model_eventdwc->models = 'fedora-system:ContentModel-3.0';
   // DS-COMPOSITE-MODEL Datastream.
    islandora_red_biodiversidad_ingest__red_biodiversidad_ds_composite_datastream($biodiversidad_content_model_eventdwc);
   // Biodiversidad Content Model Darwin Core Class Identification
-  $biodiversidad_content_model_identificationdwc = $connection->repository->constructObject('islandora:sp_red_biodiversidad_dwcclassidentification');
+  $biodiversidad_content_model_identificationdwc = $connection->repository->constructObject('biodiversity:IdentificationCModel');
   $biodiversidad_content_model_identificationdwc->owner = 'fedoraAdmin';
-  $biodiversidad_content_model_identificationdwc->label = 'Islandora Red Biodiversidad Content Model Darwin Core Class:Identification';
+  $biodiversidad_content_model_identificationdwc->label = 'Darwin Core Class Identification Content Model ';
   $biodiversidad_content_model_identificationdwc->models = 'fedora-system:ContentModel-3.0';
   // DS-COMPOSITE-MODEL Datastream.
    islandora_red_biodiversidad_ingest__red_biodiversidad_ds_composite_datastream($biodiversidad_content_model_identificationdwc);
   // Biodiversidad Content Model Darwin Core Class dcterm:Location
-  $biodiversidad_content_model_locationdwc = $connection->repository->constructObject('islandora:sp_red_biodiversidad_dctermlocation');
+  $biodiversidad_content_model_locationdwc = $connection->repository->constructObject('biodiversity:LocationCModel');
   $biodiversidad_content_model_locationdwc->owner = 'fedoraAdmin';
-  $biodiversidad_content_model_locationdwc->label = 'Islandora Red Biodiversidad Content Model Darwin Core Class:dcterms:Location';
+  $biodiversidad_content_model_locationdwc->label = 'Darwin Core Class Location Content Model';
   $biodiversidad_content_model_locationdwc->models = 'fedora-system:ContentModel-3.0';
   // DS-COMPOSITE-MODEL Datastream.
   islandora_red_biodiversidad_ingest__red_biodiversidad_ds_composite_datastream($biodiversidad_content_model_locationdwc);
   // Biodiversidad Content Model Darwin Core Class:Taxon
-  $biodiversidad_content_model_taxondwc = $connection->repository->constructObject('islandora:sp_red_biodiversidad_dwcclasstaxon');
+  $biodiversidad_content_model_taxondwc = $connection->repository->constructObject('biodiversity:TaxonCModel');
   $biodiversidad_content_model_taxondwc->owner = 'fedoraAdmin';
-  $biodiversidad_content_model_taxondwc->label = 'Islandora Red Biodiversidad Content Model Darwin Core Class:Taxon';
+  $biodiversidad_content_model_taxondwc->label = 'Darwin Core Class Taxon Content Model ';
   $biodiversidad_content_model_taxondwc->models = 'fedora-system:ContentModel-3.0';
   // DS-COMPOSITE-MODEL Datastream.
   islandora_red_biodiversidad_ingest__red_biodiversidad_ds_composite_datastream($biodiversidad_content_model_taxondwc);
   // Biodiversidad Content Model Darwin Core Class:MaterialSample
-  $biodiversidad_content_model_materialsampledwc = $connection->repository->constructObject('islandora:sp_red_biodiversidad_dwcclasssample');
+  $biodiversidad_content_model_materialsampledwc = $connection->repository->constructObject('biodiversity:MaterialSampleCModel');
   $biodiversidad_content_model_materialsampledwc->owner = 'fedoraAdmin';
-  $biodiversidad_content_model_materialsampledwc->label = 'Islandora Red Biodiversidad Content Model Darwin Core Class:Sample';
+  $biodiversidad_content_model_materialsampledwc->label = 'Darwin Core Class MaterialSample Content Model ';
   $biodiversidad_content_model_materialsampledwc->models = 'fedora-system:ContentModel-3.0';
   // DS-COMPOSITE-MODEL Datastream.
   islandora_red_biodiversidad_ingest__red_biodiversidad_ds_composite_datastream($biodiversidad_content_model_materialsampledwc);
+  // Biodiversidad Content Model Darwin Core Class:GeologicalContext
+   $biodiversidad_content_model_geologicalcontextdwc = $connection->repository->constructObject('biodiversity:GeologicalContextCModel');
+   $biodiversidad_content_model_geologicalcontextdwc->owner = 'fedoraAdmin';
+   $biodiversidad_content_model_geologicalcontextdwc->label = 'Darwin Core Class GeologicalContext Content Model ';
+   $biodiversidad_content_model_geologicalcontextdwc->models = 'fedora-system:ContentModel-3.0';
+   // DS-COMPOSITE-MODEL Datastream.
+   islandora_red_biodiversidad_ingest__red_biodiversidad_ds_composite_datastream($biodiversidad_content_model_geologicalcontextdwc);
   
     
   // Biodiversidad Collection.
-  $biodiversidad_collection = $connection->repository->constructObject('islandora:sp_red_biodiversidad_collection');
+  $biodiversidad_collection = $connection->repository->constructObject('biodiversity:biodiversity_collection');
   $biodiversidad_collection->owner = 'fedoraAdmin';
   $biodiversidad_collection->label = 'Red Biodiversidad Collection';
   $biodiversidad_collection->models = 'islandora:collectionCModel';
@@ -341,6 +340,7 @@ function islandora_red_biodiversidad_islandora_required_objects(IslandoraTuque $
     'islandora_red_biodiversidad' => array(
       'title' => 'Islandora Red Biodiversidad',
       'objects' => array(
+		$biodiversidad_content_model_dwca,
 		$biodiversidad_content_model,
 		$biodiversidad_content_model_simpledwc,
 		$biodiversidad_content_model_occurrencedwc,
@@ -349,6 +349,7 @@ function islandora_red_biodiversidad_islandora_required_objects(IslandoraTuque $
 		$biodiversidad_content_model_locationdwc,
 		$biodiversidad_content_model_taxondwc,
 		$biodiversidad_content_model_materialsampledwc,
+		$biodiversidad_content_model_geologicalcontextdwc,
         $biodiversidad_collection,
       ),
     ),
@@ -358,34 +359,50 @@ function islandora_red_biodiversidad_islandora_required_objects(IslandoraTuque $
  * Implements hook_CMODEL_PID_islandora_object_ingested().
  */
 
-
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_simpledwc_islandora_object_ingested(AbstractObject $fedora_object) {
+function islandora_red_biodiversidad_biodiversity_DWCACModel_islandora_object_ingested(AbstractObject $fedora_object) {
+  module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+  islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
+  islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
+ /* @TODO add Derivative ZIP based on metadata content of defined associated Collection */
+ 
+}
+function islandora_red_biodiversidad_biodiversity_SimpledwcCModel_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
   islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
  
 }
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwcclassoccurrence_islandora_object_ingested(AbstractObject $fedora_object) {
+function islandora_red_biodiversidad_biodiversity_OccurrenceCModel_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
   islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
 }
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwcclassevent_islandora_object_ingested(AbstractObject $fedora_object) {
+function islandora_red_biodiversidad_biodiversity_EventCModel_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
   islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
 }
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwcclasstaxon_islandora_object_ingested(AbstractObject $fedora_object) {
+function islandora_red_biodiversidad_biodiversity_TaxonCModel_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
   islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
 }
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dwcclassidentification_islandora_object_ingested(AbstractObject $fedora_object) {
+function islandora_red_biodiversidad_biodiversity_IdentificationCModel_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
   islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
 }
-function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dctermlocation_islandora_object_ingested(AbstractObject $fedora_object) {
+function islandora_red_biodiversidad_biodiversity_LocationCModel_islandora_object_ingested(AbstractObject $fedora_object) {
+  module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+  islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
+  islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
+}
+function islandora_red_biodiversidad_biodiversity_MaterialSampleCModel_islandora_object_ingested(AbstractObject $fedora_object) {
+  module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+  islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
+  islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
+}
+function islandora_red_biodiversidad_biodiversity_GeologicalContextCModel_islandora_object_ingested(AbstractObject $fedora_object) {
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   islandora_red_biodiversidad_add_red_biodiversidad_content_model($fedora_object);
   islandora_red_biodiversidad_add_thumbnail_icon_bycontent_model($fedora_object);
@@ -393,10 +410,7 @@ function islandora_red_biodiversidad_islandora_sp_red_biodiversidad_dctermlocati
 
 /**
  * Implements hook_preprocess_theme().
- Diego Pino, Febrero 2014
- TODO:Acá debemos integrar todos los preprocesos de este modelo de contenido
- El actual, el de thumbnails nos puede servir, aunque seria mejor manera las imágenes como objetos aparte y asociados
- incluimos Transformaciones para Darwin Core
+
  */
 function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad(array &$variables) {
   drupal_add_js('misc/form.js');
@@ -450,20 +464,35 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad(arra
 }
 /**
  * Implements hook_xml_form_builder_get_transforms().
- *Diego Pino Navarro, Febrero 2014
- *Este hook implementa la asociación de Formas HTML con el modelo de datos
+ *Diego Pino Navarro, Febr. 2014
  */
 function islandora_red_biodiversidad_xml_form_builder_get_transforms() {
   $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
   return array(
     'dwc2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwc2dc.xsl",
 	'dwcclass2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclass2dc.xsl",
-	'dwcclassevent2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclasstaxon2dc.xsl",
+	'dwcclassevent2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassevent2dc.xsl",
+	'dwcclasstaxon2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclasstaxon2dc.xsl",
 	'dwcclassoccurrence2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassoccurrence2dc.xsl",
+	'dctermsclasslocation2dc_redbiodiversidad.xsl' => "$module_path/xsl/dctermsclasslocation2dc.xsl",
 	'dwcclassidentification2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassidentification2dc.xsl",
+	'dwcclassgeologicalcontext2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassgeologicalcontext2dc.xsl",
+	'dwcclassmaterialsample2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassmaterialsample2dc.xsl",
+	'eml2dc.xsl' => "$module_path/xsl/invalid_eml211toDublinCore.xsl",
+	
   );
 }
+/** Implements hook_xml_form_builder_get_self_transforms().
+ * We are also adding a self transform 'emlself.xsl' for EML form in DWCACmodel(Darwin Core Archive Model). EML defines elements inside root <eml:eml> as unqualified, 
+ * but XMLFORMS uses default namespace prefix por all elements(or i'm doing someting very wrong!), so i always get prefix eml: appended to all elements
+ * solution: Dont´ use eml prefix for root element at all. Add it later using a selftransform. It's quicker to add only to the root elements, insteado of removing every appender prefix.
+ * @TODO fix it without self_transform: i need a <eml:eml> root with <dataset> etc elements without prefix. How? Please.
+*/
 
+function islandora_red_biodiversidad_xml_form_builder_get_self_transforms() {
+  $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
+   return array('emlself.xsl' => "$module_path/xsl/emlself.xsl",);
+}
 
 
 
@@ -475,7 +504,7 @@ function islandora_red_biodiversidad_xml_form_builder_get_transforms() {
 function islandora_red_biodiversidad_islandora_content_model_forms_form_associations() {
   return array(
     'islandora_red_biodiversidad_dwc_form' => array(
-      'content_model' => 'islandora:sp_red_biodiversidad_simpledwc',
+      'content_model' => 'biodiversity:simpledwcCModel',
       'form_name' => 'Simple Darwin Core form',
       'dsid' => 'DwC',
       'title_field' => array('SimpleDarwinRecord','dwc_fields_taxon','scientificName'),
@@ -483,7 +512,7 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'template' => FALSE,
     ),
     'islandora_red_biodiversidad_dwcclassoccurrence_form' => array(
-      'content_model' => 'islandora:sp_red_biodiversidad_dwcclassoccurrence',
+      'content_model' => 'biodiversity:OccurrenceCModel',
       'form_name' => 'Darwin Core form Class: Occurrence',
       'dsid' => 'DwC',
       'title_field' => array('Occurrence','dwc_fields_occurrence','occurrenceID'),
@@ -491,7 +520,7 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'template' => FALSE,
     ),
     'islandora_red_biodiversidad_dwcclassevent_form' => array(
-      'content_model' => 'islandora:sp_red_biodiversidad_dwcclassevent',
+      'content_model' => 'biodiversity:EventCModel',
       'form_name' => 'Darwin Core form Class: Event',
       'dsid' => 'DwC',
       'title_field' => array('Event','dwc_fields_event','eventID'),
@@ -499,7 +528,7 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'template' => FALSE,
     ),
     'islandora_red_biodiversidad_dwcclasstaxon_form' => array(
-      'content_model' => 'islandora:sp_red_biodiversidad_dwcclasstaxon',
+      'content_model' => 'biodiversity:TaxonCModel',
       'form_name' => 'Darwin Core form Class: Taxon',
       'dsid' => 'DwC',
       'title_field' => array('Taxon','dwc_fields_taxon','scientificName'),
@@ -507,7 +536,7 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'template' => FALSE,
     ),
     'islandora_red_biodiversidad_dwcclassidentification_form' => array(
-      'content_model' => 'islandora:sp_red_biodiversidad_dwcclassidentification',
+      'content_model' => 'biodiversity:IdentificationCModel',
       'form_name' => 'Darwin Core form Class: Identification',
       'dsid' => 'DwC',
       'title_field' => array('Identification','dwc_fields_identification','identificationID'),
@@ -515,11 +544,37 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'template' => FALSE,
     ),
     'islandora_red_biodiversidad_dctermsclasslocation_form' => array(
-      'content_model' => 'islandora:sp_red_biodiversidad_dctermlocation',
+      'content_model' => 'biodiversity:LocationCModel',
       'form_name' => 'Darwin Core form Class: Location',
       'dsid' => 'DwC',
       'title_field' => array('Location','dwc_fields_location','locationID'),
-      'transform' => 'dwcclass2dc_redbiodiversidad.xsl',
+      'transform' => 'dctermsclasslocation2dc_redbiodiversidad.xsl',
+      'template' => FALSE,
+    ),
+	/*
+    'islandora_red_biodiversidad_dwcclassmaterialsample_form' => array(
+      'content_model' => 'biodiversity:MaterialSampleCModel',
+      'form_name' => 'Darwin Core form Class: MaterialSample',
+      'dsid' => 'DwC',
+      'title_field' => array('Location','dwc_fields_location','locationID'),
+      'transform' => 'dctermsclassmaterialsample2dc_redbiodiversidad.xsl',
+      'template' => FALSE,
+    ),
+    'islandora_red_biodiversidad_dwcclassgeologicalcontext_form' => array(
+      'content_model' => 'biodiversity:GeologicalContextCModel',
+      'form_name' => 'Darwin Core form Class: GeologicalContext',
+      'dsid' => 'DwC',
+      'title_field' => array('Location','dwc_fields_location','locationID'),
+      'transform' => 'dctermsclassgeologicalcontext2dc_redbiodiversidad.xsl',
+      'template' => FALSE,
+    ),*/
+	'islandora_red_biodiversidad_dwcaeml_form' => array(
+      'content_model' => 'biodiversity:DWCACModel',
+      'form_name' => 'Darwin Core Archive EML form',
+      'dsid' => 'EML',
+      'title_field' => array('dataset','title'),
+      'transform' => 'eml2dc.xsl',
+	  'self_transform' => 'emlself.xsl',
       'template' => FALSE,
     ),
   );
@@ -549,14 +604,43 @@ function islandora_red_biodiversidad_islandora_xml_form_builder_forms() {
     'Darwin Core form Class: Location' => array(
       'form_file' => "$module_path/xml/islandora_red_biodiversidad_form_DwCclassLocation.xml",
     ),
+    'Darwin Core Archive EML form' => array(
+      'form_file' => "$module_path/xml/islandora_red_biodiversidad_form_GBIF_EML.xml",
+    ),
+    /*'Darwin Core form Class: MaterialSample' => array(
+      'form_file' => "$module_path/xml/islandora_red_biodiversidad_form_DwCclassMaterialSample.xml",
+    ),
+    'Darwin Core form Class: GeologicalContext' => array(
+      'form_file' => "$module_path/xml/islandora_red_biodiversidad_form_DwCclassGeologicalContext.xml",
+    ),*/
   );
 }
 
 
-/* Esto altera los valores por defecto para algunos de los campos de esta forma 
-implements hook_form_alter
-We wan´t to alter the default form default values based on global configurations for a particular content 
-model but xml forms do not get an unique FORM ID(all id`s are islandora_ingest_form) so we must check for content model and step id
+
+
+function islandora_red_biodiversidad_biodiversity_DWCACModel_islandora_ingest_steps(array $form_state) {
+  return array(
+    'islandora_red_biodiversidad_source_collection_form' => array(
+      'weight' => 2,
+      'type' => 'form',
+      'form_id' => 'islandora_red_biodiversidad_source_collection_form',
+      'module' => 'islandora_red_biodiversidad',
+      'file' => 'includes/source_collection.form.inc',
+    ),
+  );
+}
+
+
+
+
+
+
+/**
+ * implements hook_form_alter
+ * We want to alter the metadatasetp form values based on global configurations for a particular content 
+ * model but xml forms do not get an unique FORM ID?(all id`s are islandora_ingest_form) so we must check for content model and step id
+ * @note there is other way but for now stick to this method beacuse it works! 
 */
 
 function islandora_red_biodiversidad_form_alter(&$form, &$form_state, $form_id) {
@@ -567,10 +651,27 @@ function islandora_red_biodiversidad_form_alter(&$form, &$form_state, $form_id) 
 			{
 			switch($form_state['islandora']['shared_storage']['models'][0])
 				{
-				case 'islandora:sp_red_biodiversidad_dwcclassoccurrence':
+				case 'biodiversity:OccurrenceCModel':
+				case 'biodiversity:simpledwcCModel':
 				if (isset($form['Occurrence']['record_level_terms']['institutionCode']))//First check if it´s still there!
 					{
-					$form['Occurrence']['record_level_terms']['institutionCode']['#default_value']='CBUCN'; //@TODO we will get this and other values from a global configuration value	
+					$institutioncode = variable_get('islandora_red_biodiversidad_setting_institution_code', 'CBUCN');
+					$form['Occurrence']['record_level_terms']['institutionCode']['#default_value']=$institutioncode; //@TODO we will get this and other values from a global configuration value	
+					}
+				if (isset($form['Occurrence']['dwc_fields_occurrence']['occurrenceID']))//First check if it´s still there!	
+					{
+					module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+					$lastid=islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr('biodiversity:OccurrenceCModel');
+					if (sizeof($lastid)>0)
+						{
+						$form['Occurrence']['dwc_fields_occurrence']['occurrenceID']['#default_value']=++$lastid[1];	
+						}
+					}
+				break;
+				case 'biodiversity:DWCACModel':
+				if (isset($form['eml_packageid']))//First check if it´s still there!
+					{
+					$form['eml_packageid']['#value']='system'; //@TODO we will get this and other values from a global configuration value	
 					}
 				}
 			}
@@ -579,6 +680,68 @@ function islandora_red_biodiversidad_form_alter(&$form, &$form_state, $form_id) 
 	
 	}
 	
+/* 
+ * This are Validation Functions used in our Ingest Forms
+*/
+	function islandora_red_biodiversidad_lat_validate(&$element, &$form_state)
+		{
+			if (!preg_match('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', $element['#value']))
+			{
+			form_error($element, t('You must enter a valid Decimal Latitud'));	
+			}
+		
+		}
+	function islandora_red_biodiversidad_long_validate(&$element, &$form_state)
+		{
+		if (!preg_match('/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', $element['#value']))
+		{
+		form_error($element, t('You must enter a valid Decimal Longitud'));	
+		}
+		}
+function islandora_red_biodiversidad_leaflet_map_info() {
+		  return array(
+		    'islandora_red_biodiversidad' => array(
+		      'label' => 'islandoraredbiodiversidad',
+		      'description' => t('Leaflet Map style for islandora red biodiversidad module'),
+		      'settings' => array(
+		        'zoom' => 4,
+		        'minZoom' => 1,
+		        'maxZoom' => 18,
+		        'dragging' => TRUE,
+		        'touchZoom' => TRUE,
+		        'scrollWheelZoom' => TRUE,
+		        'doubleClickZoom' => TRUE,
+		        'zoomControl' => TRUE,
+		        'attributionControl' => TRUE,
+		        'trackResize' => TRUE,
+		        'fadeAnimation' => TRUE,
+		        'zoomAnimation' => TRUE,
+		        'closePopupOnClick' => TRUE,
+				'singleMarkerMode'=> TRUE,
+				'zoomToBoundsOnClick' => TRUE,
+				'showCoverageOnHover' => TRUE,
+				'spiderfyOnMaxZoom' => TRUE,
+				'disableClusteringAtZoom' => FALSE,
+			    'maxClusterRadius' => 80,
+			    'addRegionToolTips' => TRUE,
+		      ),
+		      'attribution' => array(
+		        'prefix' => '',
+		      ),
+		      'layers' => array(
+		        'earth' => array(
+		          'type' => 'foobar',
+		          'urlTemplate' => 'http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png',
+		          'options' => array(
+		            'attribution' => NULL,
+		            'noWrap' => TRUE,
+		          ),
+		        ),
+		      ),
+		    ),
+		  );
+		}		
+
 	
 function islandora_red_biodiversidad_validateandpopulateTaxon(&$form, &$form_state)
 	{        
@@ -737,23 +900,46 @@ function islandora_red_biodiversidad_validateandpopulate(&$form, &$form_state)
 			return array('#type' => 'ajax', '#commands' => $commands);
 		
 }
-class IslandoraRedBiodiversidadMapObjectLocation {
-  /**
-   * Constructor for the helper map object.
-   *
-   * @param NULL|string $marker_color
-   *   The color of the marker or NULL if we are not specifying one.
-   * @param NULL|string $lat
-   *   The latitude of the co-ordinate we are rendering or NULL.
-   * @param NULL|string $long
-   *   The longitude of the co-ordinate we are rendering or NULL.
-   * @param NULL|string $balloon_text
-   *   The markup for the balloon or NULL.
-   */
-  public function __construct($marker_color = NULL, $lat = NULL, $long = NULL, $balloon_text = '') {
-    $this->marker_color = $marker_color;
-    $this->latitude = $lat;
-    $this->longitude = $long;
-    $this->balloon_text = $balloon_text;
-  }
-}	
+/**
+ * Implements hook_islandora_datastream_alter().
+ * We need to alter the  data for the  biodiversity:DWCACModel from the ingested EML stream. We don´t have the Object ID prior to ingesting and we need this value in the EML!
+ */
+function islandora_red_biodiversidad_biodiversity_DWCACModel_EML_islandora_datastream_alter(AbstractObject $object, AbstractDatastream $datastream, array &$context) {
+	
+  $modified=false;
+  switch ($context['action']) {
+    case 'ingest':
+	case 'modify':
+	//EML
+	
+	if (sizeof($context['params']['dsString'])>0)
+		{
+		$dom= new DOMDocument;
+		$dom->loadXML($context['params']['dsString']);
+		$dom->preserveWhiteSpace = false;
+		$emlnode=$dom->getElementsByTagName('eml');
+		foreach ($emlnode as $item) {
+			if ($item->getAttribute('packageId')=='system')//system - Our super secret word for "just replace this value with the objects ID"
+				{
+				$link = url("", array('absolute' => TRUE)).'islandora/'.urlencode($object->id);
+				$item->setAttribute('packageId', $object->id);
+				$alternateid=$dom->getElementsByTagName('alternateIdentifier');
+				foreach($alternateid as $item2)
+					{
+					$item2->nodeValue=$link;
+					}
+				$modifiedEML=$dom->saveXML();
+				$modified=TRUE;
+				}
+		}
+	if 	($modified)
+		{
+		$context['params']['dsString']=$modifiedEML;
+		//$datastream->setContentFromFile('public://eml'.$object->id.'.xml');
+		}
+	}
+      break;
+
+   
+  		}
+}

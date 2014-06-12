@@ -8,7 +8,9 @@
 /**
  * Implements hook_preprocess().
 * Allmost the same as islandora_solr_geo module
-* @See islandora_solr_geo
+* @see islandora_solr_geo
+* Map requires a latlong solr field. Using XSL we combined decimal latitud and longitud from Darwin Core dcterms:Location type schema into one named dwc.latlong_coordinatefull ot latlong type(so we can make spatial queries to solr)
+* @see solrconfig/DwC_to_solr.xslt and solrconfig/schema.xml
  */
 function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(array &$variables)
 	{
@@ -16,7 +18,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	    module_load_include('inc', 'islandora_solr_search', 'includes/utilities');
 	    $mappings = array(
 	      'location' => array(
-	        'cmodel' => 'islandora:sp_red_biodiversidad_dctermlocation',
+	        'cmodel' => 'biodiversity:LocationCModel',
 	        'latlong' => 'dwc.latlong_coordinatefull',
 	      ),
     
@@ -41,7 +43,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	    $query_processor->solrStart = 0;
 	    $query_processor->solrLimit = 1000;
 	    $query_processor->solrParams = array(
-	      'fl' => "$biodiversidad_query_field,PID,fgs_label_ms",
+	      'fl' => "$biodiversidad_query_field,PID,fgs_label_mt",
 	      'fq' => format_string(
 	          '!content_model_field:"info:fedora/!content_model"', array(
 	            '!content_model_field' => $content_model_field,
@@ -63,31 +65,43 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	    $locations = array();
 	    $mapa_variables = array();
 		$lati_long = array();
-	    foreach ($json['response']['docs'] as $choice) {
-	
-	      if (isset($choice[$mappings['location']['latlong']])) {
-		      $coords = explode(",", $choice[$mappings['location']['latlong']][0]);
-		      array_push($lati_long, array($coords[0], $coords[1]));
-		      $balloon_variables = array();
-		      //$balloon_variables['solr_result'] = $result;
-		      //$balloon_markup = theme('islandora_solr_geo_balloon', $balloon_variables);
-		      $location = new IslandoraRedBiodiversidadMapObjectLocation(NULL, $coords[0], $coords[1], '<span>'.$choice['fgs_label_ms'][0].'</span>');
-		      array_push($locations, $location);		
+	    foreach ($json['response']['docs'] as $key=>$choice) {
+			
+			//dpm($choice);
+	      
+		  if (isset($choice[$mappings['location']['latlong']])) {
+		  $coords = explode(",", $choice[$mappings['location']['latlong']][0]);
+		   $point=array(
+		  'type' => 'point',
+		  'lat' => (float) $coords[0],
+		  'lon' => (float) $coords[1],
+		  'leaflet_id' => 'point-'.$key,
+		  'popup' => l($choice['fgs_label_mt'][0], 'islandora/object/'.$choice['PID']),
+		 
+		 );
+			  
+			  
+		      array_push($locations, $point);	
+
 			//$list[$choice['PID']] = array('latlong'=>$choice[$mappings['location']['latlong']],'label'=>$choice['fgs_label_ms']);
 	      }
 	    }
-	    $mapa_variables['locations'] = $locations;
-	    $mapa_variables['map_options'] = '{"mapTypeId":"roadmap", "zoom":50}';
-	    $mapa_variables['map_style'] = "height: 550px; width:100%;";
+		
 		
 		//$locations = $variables['locations'];
 	    //$map_options = $variables['map_options'];
 	    //$map_style = $variables['map_style'];
-	    $variables['results'] = theme('islandora_mapping_map_multi_item',$mapa_variables);	  
+		if (!empty($locations)) {
+		  $styles = module_invoke_all('leaflet_map_info'); 
+		 //dpm($styles);
+		 //dpm(leaflet_render_map($styles['islandora_red_biodiversidad'], $locations, '500px'));
+		
+	   $variables['results'] =leaflet_render_map($styles['islandora_red_biodiversidad'], $locations, '500px');	
+	   }  
 	
 	}
 
-
+/* Here we transform Darwin Core to HTML using XLST for displaying */
 function islandora_red_biodiversidad_preprocess_islandora_dwc(array &$variables) {
     drupal_add_js('misc/form.js');
     drupal_add_js('misc/collapse.js');
@@ -123,6 +137,10 @@ function islandora_red_biodiversidad_preprocess_islandora_dwc(array &$variables)
   
   
 }
+/*
+having an Ontology defined, we display related objects on a tab for every Object belonging to his solution pack provided CMODELS
+*/
+
 function islandora_red_biodiversidad_preprocess_islandora_dwc_related(array &$variables) {
  $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
@@ -144,7 +162,7 @@ foreach ($rels as $key => $rel) {
      } 
   }
 }
-/**/
+/*@TODO read(and parse) the ontology OWL file directly from the content model*/
   
  
   $pid=$islandora_object->id;
@@ -157,10 +175,9 @@ PREFIX islandora-rels-ext: <http://islandora.ca/ontology/relsext#>
 SELECT ?object 
 FROM <#ri>
 WHERE {{
-  ?object <fedora-model:hasModel> <info:fedora/islandora:sp_red_biodiversidad>. 
+  ?object <fedora-model:hasModel> <info:fedora/biodiversity:biodiversityCModel>. 
   ?object  biscicol:depends_on+ <info:fedora/$pid>.}UNION{
   ?object  bioscicol:related_to+ ?pid.}.
- 
  
   }
 

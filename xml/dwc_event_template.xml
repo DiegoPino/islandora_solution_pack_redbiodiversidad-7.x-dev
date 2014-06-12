@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<DarwinRecordSet xmlns="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:dwr="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwc="http://rs.tdwg.org/dwc/terms/" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dwc:Event><dcterms:type>Event</dcterms:type><dwc:basisOfRecord>Event</dwc:basisOfRecord><dwc:dynamicProperties>zool</dwc:dynamicProperties><dwc:eventID>Evento:001</dwc:eventID><dwc:samplingProtocol></dwc:samplingProtocol><dwc:samplingEffort></dwc:samplingEffort><dwc:eventDate></dwc:eventDate><dwc:verbatimEventDate></dwc:verbatimEventDate><dwc:habitat></dwc:habitat><dwc:fieldNumber></dwc:fieldNumber><dwc:fieldNotes></dwc:fieldNotes><dwc:eventRemarks></dwc:eventRemarks></dwc:Event>
+</DarwinRecordSet>

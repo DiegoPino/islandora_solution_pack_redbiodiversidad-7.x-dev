@@ -269,12 +269,17 @@
 									<default_value>Reconciliar a partir de nombre Científico</default_value>
 									<required>false</required>
 									<executes_submit_callback>false</executes_submit_callback>
+									
 									<title>Reconciliar Nombre Científico </title>
 									<tree>true</tree>
 									<ajax>
 										<callback>islandora_red_biodiversidad_validateandpopulateTaxon</callback>
 										<wrapper>edit-dwc-fields-taxon-reconciliate</wrapper>
-									</ajax>					
+										<event>click</event>,
+										<prevent>submit click mousedown</prevent>
+									</ajax>		
+									<limit_validation_errors>NULL</limit_validation_errors>
+									<submit>NULL</submit>
 								</properties>
 								<children/>
 							</element>

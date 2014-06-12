@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<dwr:DarwinRecordSet xmlns:dwr="http://rs.tdwg.org/dwc/dwcrecord/" xmlns="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwc="http://rs.tdwg.org/dwc/terms/" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dwc:Identification><dwc:basisOfRecord>Identification</dwc:basisOfRecord><dwc:identificationID>ID:00002</dwc:identificationID><dwc:identifiedBy>Diego Pino</dwc:identifiedBy><dwc:dateIdentified>2007-03-01T13:00:00Z/2008-05-11T15:30:00Z</dwc:dateIdentified><dwc:identificationReferences>Muchos Libros</dwc:identificationReferences><dwc:identificationRemarks>Identificado y bien</dwc:identificationRemarks><dwc:identificationQualifier>Quercus aff. agrifolia var. oxyadenia</dwc:identificationQualifier><dwc:typeStatus>holotype of Ctenomys sociabilis. Pearson O. P., and M. I. Christie. 1985. Historia Natural, 5(37):388</dwc:typeStatus></dwc:Identification>
+</dwr:DarwinRecordSet>

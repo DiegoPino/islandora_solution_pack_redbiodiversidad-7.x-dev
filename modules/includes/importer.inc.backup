@@ -39,7 +39,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
   
     
 	     return count($this->file['object_info']); //Devuelve el numero de registros totales
-	     dpm("total objectos",count($this->file['object_info']));
+	   
   }
 
   /**
@@ -69,10 +69,6 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
           $cm_namespace = $info['namespace'];
           $cm_namespace = explode(':', $info['namespace']);
           $namespace = trim($cm_namespace[0]);
-		  if (empty($namespace))
-			  {
-			  	$namespace="islandora";
-			  } //?¿Still empty???
           $ns_options[$namespace] = $namespace;
         }
       }
@@ -100,10 +96,6 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
             '#multiple' => TRUE,
             '#options' => $cm_options,
           ),
-		  'extrainfo'=>array(
-              '#type' => 'markup',
-              '#value' =>'<div><em>Note:</em>The excel File must contain a sheet named "Occurrence". Every column named different as a DWC XML schema field will be included as comma separated pair "columnheader=value" inside dwc:dynamicProperties xml field</div>',
-		  ),
         ),
         'namespace' => array(
           '#type' => 'select',
@@ -149,63 +141,15 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
     // Grab the content models.
     // Cast to an array, in case there are none?
     $content_models = array_filter((array) $form_state['values']['content_model']);
-    //We will define all the transform data here, in case we must deal with separate content models inside a same excel row!
-    
-	$red_biodiversidad_transform_path = drupal_get_path('module', 'islandora_red_biodiversidad') . '/xsl';
-	$transform_path = drupal_get_path('module', 'gbifexcel_importer') . '/xsl';
-	$red_biodiversidad_template_path = drupal_get_path('module', 'islandora_red_biodiversidad') . '/xml';
-    $contentmodels_xml_proccessing_data=array(
-        'biodiversity:OccurrenceCModel' => array(
-          'title' => 'dwc:occurrenceID',
-		  'template' => $red_biodiversidad_template_path.'/dwc_occurrence_template.xml',
-		  'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassoccurrence2dc.xsl',
-        ),
-        'biodiversity:LocationCModel' => array(
-          'title' => 'dwc:locationID',
-		  'template' => $red_biodiversidad_template_path.'/dwc_location_template.xml',
-		  'dwc2dc' => $red_biodiversidad_transform_path.'/dctermsclasslocation2dc.xsl',
-        ),
-        'biodiversity:IdentificationCModel' => array(
-           'title' => 'dwc:identificationID',
-		   'template' => $red_biodiversidad_template_path.'/dwc_identification_template.xml',
-		   'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassidentification2dc.xsl',
-        ),
-        'biodiversity:EventCModel' => array(
-           'title' => 'dwc:eventID',
-		   'template' => $red_biodiversidad_template_path.'/dwc_event_template.xml',
-		   'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassevent2dc.xsl',
-        ),
-        'biodiversity:SimpledwcCModel' => array(
-            'title' => 'dwc:occurrenceID', //Sames as OccurrenceCModel
-		    'template' => $red_biodiversidad_template_path.'/dwc_simple_template.xml',
-		    'dwc2dc' => $red_biodiversidad_transform_path.'/dwc2dc.xsl',
-        ),
-        'biodiversity:TaxonCModel' => array(
-          'title' => 'dwc:scientificName',	
-		  'template' => $red_biodiversidad_template_path.'/dwc_taxon_template.xml',
-		  'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclasstaxon2dc.xsl',
-    ),
-);
-	foreach($content_models as $content_model)
-		{
-		$content_models_with_processing_info[$content_model]=$contentmodels_xml_proccessing_data[$content_model];	
-		}
-		
-    
-	
-	
-	
-	$object_realinfo=static::getIngestInfo($file,$content_models_with_processing_info); 
-   
-	$info = array(
+
+    $info = array(
       'file' => $file,
       'pid_namespace' => $form_state['values']['namespace'],
-      'content_model' => $content_models_with_processing_info,
-      'object_info' => $object_realinfo,
+      'content_model' => $content_models,
+      'object_info' => static::getIngestInfo($file),
       'processed_objects' => array(),
     );
     return $info;
-	
   }
 
  
@@ -215,109 +159,37 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
    * @return array
    *   The ingest info.
    */
-  protected static function getIngestInfo($file,$content_models_with_processing_info) {
+  protected static function getIngestInfo($file) {
 	  try {
 	    	    $inputFileType = PHPExcel_IOFactory::identify(drupal_realpath($file->uri));
 	    	    $objReader = PHPExcel_IOFactory::createReader($inputFileType);
 	    	    $objPHPExcel = $objReader->load(drupal_realpath($file->uri));
 	    	} catch(Exception $e) {
 	    		drupal_set_message(t('No se ha podido leer el archivo @filename con error @error', array('@filename' => $this->file->filename,'@error'=>$e->getMessage())));
-	    		
-				return;
+	    		return;
 			}	
 	    	$sheet = $objPHPExcel->getSheetByName('Occurrence'); 
 	    	$highestRow = $sheet->getHighestRow(); 
 	    	$highestColumn = $sheet->getHighestColumn();
-			$dwc_fields=array();
-			//First get all the xml fields allowed from every defined contentmodel template
-			foreach($content_models_with_processing_info as $cmodels=>$cmodels_info)
-				{
-					$dom= new DOMDocument;
-					$dom->load($cmodels_info['template']);
-					$dwc_xpath = new DOMXPath($dom);
-					$dwc_xpath->preserveWhiteSpace = false;
-					$dwc_xpath->registerNamespace('dwc', 'http://rs.tdwg.org/dwc/terms/');//FAKE? 
-			
-					$camposdwcexistentes2=$dwc_xpath->query("//dwc:*");	
-					if (sizeof($camposdwcexistentes2)>0)
-					{	
-					foreach($camposdwcexistentes2 as $itemdwc)
-						{
-						$dwc_fields[$cmodels][]=$itemdwc->localName;//Bye prefix
-						}//Aca deberia agregar todos los campos que no están definidos dentro de un campo DWC adecuado como nombre=valor,
-					}
-					unset($dwc_xpath);
-					unset($dom);
-					unset($camposdwcexistentes2);
-				}
-				
-			
 	    	//  Loop through each row of the worksheet in turn
 	    	$info = array();
-			if (($highestRow)>1)//Es decir tengo al menos el header con los campos y un registro
+			if (($highestRow)>1)//Es decir tengo al menos el header con los campos y una registro
 				{
 	   	    	$rowHeaders = $sheet->rangeToArray('A1:'.$highestColumn.'1', NULL, TRUE, TRUE,FALSE);//Devuelve los titulos de cada columna
-				
-				//Ok, now me hust see which fields belong to which cmodel, just intersect the array preserving the original row data.
-				$all_fields=array();
-				$rowHeaders[0]=array_map('stripslashes',$rowHeaders[0]);
-				$rowHeaders[0]=array_map('utf8_encode',$rowHeaders[0]);
-				error_log(var_export($rowHeaders[0],true),0);	
-				foreach($dwc_fields as $cmodels=>$dwcfields)
-					{	
-					$existing_fields_inheader[$cmodels]=array_intersect($rowHeaders[0],$dwcfields);	//we preserve the excel row keys
-					//also get an array with all dwc fields...necessary for the next step
-					$all_fields=array_merge($all_fields,$dwcfields);
-					}
-				//Deal with those fields not present anywhere.
-				//If we have this model we can use dwc:dynamicProperties to store those nasty intruders.
-				error_log(var_export($existing_fields_inheader,true),0);
-				
-				if (array_key_exists('biodiversity:OccurrenceCModel',$dwc_fields))
-					{
-						$whatsleft=array_intersect($rowHeaders[0],$all_fields);	
-						
-					}	
-				//Now we got for every cmodel a list of fields present in this excel file. great. Now fill the info. One row can generate multiple objects.	
-				
-				
-					$objectcount=0;	     
+				error_log(var_export($rowHeaders[0],true),0);			     
 			 	for ($fila = 2; $fila <= (int)$highestRow; $fila++)
 			 		{
-					
-					
-			 		$rowData=$sheet->rangeToArray('A' . $fila . ':' . $highestColumn.$fila, ' ', TRUE, TRUE, FALSE);//Devuelve fila por fila
-					$flat = trim(implode('', $rowData[0]));
-					error_log(var_export($rowData[0],true),0);	
-					//check for empty row...if found stop there.
-					if (strlen($flat)==0){break;}
-					//And now just iterate over $existing_fields_inheader and fill our data. 
-					unset($datoscombinados);
-					
-					if (sizeof($existing_fields_inheader)>0)
-					{	
-					foreach($existing_fields_inheader as  $cmodel =>$cmheaders)
-						{
-						$datoscombinados=array_combine($cmheaders,array_intersect_key($rowData[0],$cmheaders));//We first get only the data possible to this contenmodel from the row,then we combine the headernames(keys) with the data.
-						if (sizeof($datoscombinados)>0)
-							{
-								$info[$objectcount]=array('excelrow'=>$fila,'data'=>$datoscombinados,'cmodel'=>$cmodel);
-							}
-						//So we store the desired cmodel and the data in one place...nice.$file aka row is used to keep track fom where the data came in the excel to make
-						$objectcount++;
-						}
-					
-					
+					error_log("ROW:".$fila,0);
+			 		$rowData=$sheet->rangeToArray('A' . $fila . ':' . $highestColumn.$fila, ' ', TRUE, TRUE, FALSE);//Devuelve los titulos de cada columna
+					$datoscombinados=array_combine($rowHeaders[0],$rowData[0]);
+					if ($datoscombinados){$info[$fila]=$datoscombinados;}
 					}
-				}
+				
 			     $objPHPExcel->disconnectWorksheets();
 				 unset($sheet);
 				 unset($objPHPExcel);
 				 unset($objReader);
-				
 			     return $info;				
- 		    	
- 		    	
 				}
 			else
 				{
@@ -375,8 +247,8 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  protected $title =  NULL;
 	  protected $dwc = NULL;
 	  protected static $DC2MODS;
-	 
-      
+	  protected static $DWC2DC;
+      protected static $DWCtemplate;
 	  /**
 	   * Constructor.
 	   */
@@ -384,9 +256,11 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	    parent::__construct($source);
 	    $this->pidNamespace = $this->source['pid_namespace'];
 	    $this->contentModel = (array) $this->source['content_model'];
-		$transform_path = drupal_get_path('module', 'gbifexcel_importer') . '/xsl';
+	    $transform_path = drupal_get_path('module', 'gbifexcel_importer') . '/xsl';
+		$template_path = drupal_get_path('module', 'gbifexcel_importer') . '/xml';
+	    self::$DWC2DC = "$transform_path/dwc2dc.xsl";
 	    self::$DC2MODS = "$transform_path/simpleDC2MODS.xsl";
-		
+		self::$DWCtemplate= "$template_path/simpleDwCtemplate.xml"; //usaremos un template para crear el DWC
 		
 	  }
 
@@ -397,17 +271,17 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	   * Esta funcion es la que realmente crea la info para el nuevo stream DwC
 	   */
 	  public static function getOne(&$info) {
-		$key = key($info['object_info']);
 		$record = array(
 	      'pid_namespace' => $info['pid_namespace'],
 	      'file' => $info['file'],
-	      'content_model' => $info['object_info'][$key]['cmodel'],
-	      'content_model_process_info'=> $info['content_model'][$info['object_info'][$key]['cmodel']],//template and transform data	
-		);
+	      'content_model' => $info['content_model'],
+	    );
+		error_log("esta es la info completa".var_export($info['object_info'],true),0);
+	    $key = key($info['object_info']);
+		error_log("key".$key,0);
+	  
 		
-		//$info['object_info'] has $key for every object, second key for the corresponding row, and third key for the contentmodel...clever!
-		//$info['object_info'][objectcuont]=array('excelrow'=>$fila,'data'=>$datoscombinados,'cmodel'=>$cmodel);
-	    $record['object_info'] = $info['processed_objects'][$key] = $info['object_info'][$key];//we pass the whole stuff
+	    $record['object_info'] = $info['processed_objects'][$key] = $info['object_info'][$key];
 	    unset($info['object_info'][$key]);
 	    return (empty($record) ? FALSE : new static($record));
 		
@@ -419,12 +293,11 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  	{
 	  	if ($this->dwc === NULL) {
 			$dom= new DOMDocument;
-			error_log(var_export($this->source['content_model_process_info']['template'],true),0);
-			$dom->load($this->source['content_model_process_info']['template']);
+			$dom->load(self::$DWCtemplate);
 			$dwc_xpath = new DOMXPath($dom);
 			$dwc_xpath->preserveWhiteSpace = false;
-			$dwc_xpath->registerNamespace('dwc', 'http://rs.tdwg.org/dwc/terms/');
-			$datosexcel=$this->source['object_info']['data'];//data
+			$dwc_xpath->registerNamespace('dwc', 'http://rs.tdwg.org/dwc/xsd/simpledarwincore/');
+			$datosexcel=$this->source['object_info'];
 			
 			if (sizeof($datosexcel)>0)
 			{
@@ -439,7 +312,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 					foreach($camposdwcexistentes2 as $itemdwc)
 						{
 						$itemdwc->nodeValue=$valuedw;
-						}
+						}//Aca deberia agregar todos los campos que no están definidos dentro de un campo DWC adecuado como nombre=valor,
 					}
 				}
 			}
@@ -458,15 +331,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 			  	
 	  
   	  protected function isDwC($xml) {
-		  $rootdoc=$this->getLocalNameOfRootElement($xml);
-		  if (($rootdoc=='DarwinRecordSet')||($rootdoc=='SimpleDarwinRecordSet'))
-		  	{
-		  	return true;	
-		  	}
-  	    else
-			{
-			return false;	
-			}
+  	    return $this->getLocalNameOfRootElement($xml) == 'SimpleDarwinRecordSet';
   	  }
 	    
 
@@ -554,7 +419,6 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	     	 $xml = $this->getDC();
 			 $title=$this->title;
 		  	 if ($this->isDC($xml)) {//verifico si el DC quedo bien hecho
-				 error_log(var_export(self::$DC2MODS,true),0);
 	 	        $this->mods = static::runXSLTransform(array('input' => $xml, 'xsl' => self::$DC2MODS));
 	 	        
 			 } if (empty($this->mods)) { 
@@ -582,23 +446,26 @@ EOXML;
 	   */
 	  
 	  public function getTitle() {
-	    if (($this->title === NULL) || empty($this->title) ){
-			//this is a little redundat...we should have already all in place...if not...the why should we try again?
-			$xml = $this->getDC();
-		  if ($xml) {
-	        $dc_doc = new DOMDocument();
-	        $dc_doc->loadXML($xml);
-	        $dc_xpath = new DOMXPath($dc_doc);
-	        $dc_xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
-			$result=$dc_xpath->evaluate('//dc:title[text()]');
+	    if ($this->title === NULL) {
+			if ($this->dwc ===NULL)
+			   {
+		  	   $dwc = $this->getDwC();
+		       }
+		   else{$dwc = $this->dwc;}
+		  if ($dwc) {
+	        $dwc_doc = new DOMDocument();
+	        $dwc_doc->loadXML($dwc);
+	        $dwc_xpath = new DOMXPath($dwc_doc);
+	        $dwc_xpath->registerNamespace('dwc', 'http://rs.tdwg.org/dwc/xsd/simpledarwincore/');
+			$result=$dwc_xpath->evaluate('//dwc:scientificName[text()]');
 	      	if ($result->length > 0){$this->title= $result->item(0)->nodeValue;}
 			else
 				{
-				$result=$dc_xpath->evaluate('//dc:type[text()]');
-				if ($result->length > 0){$this->title= "Unkown ".$result->item(0)->nodeValue." ";}
+				$result=$dwc_xpath->evaluate('//dwc:genus[text()]');
+				if ($result->length > 0){$this->title= $result->item(0)->nodeValue." sp.";}
 				}
-				unset($dc_xpath);
-				unset($dc_doc);
+				unset($dwc_xpath);
+				unset($dwc_doc);
 			}
 	    }
 
@@ -606,15 +473,9 @@ EOXML;
 	  }
 	  public function getDC() {
   	    if ($this->dc === NULL) {
-			if ($this->dwc===NULL)
-				{$xml = $this->getDwC();}
-			else
-				{
-				$xml=$this->dwc;
-				}
+  	     	 $xml = $this->getDwC();
   		  	 if ($this->isDwC($xml)) {//verifico si el DwC quedo bien hecho
-				error_log(var_export($this->source['content_model_process_info'],true),0);	
-  	 	        $this->dc = static::runXSLTransform(array('input' => $xml, 'xsl' => $this->source['content_model_process_info']['dwc2dc']));
+  	 	        $this->dc = static::runXSLTransform(array('input' => $xml, 'xsl' => self::$DWC2DC));
 	 	        
   			 }
    	         if (empty($this->dc)) {
