@@ -162,7 +162,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
         ),
         'biodiversity:LocationCModel' => array(
           'title' => 'dwc:locationID',
-		  'template' => $red_biodiversidad_template_path.'/dwc_location_template.xml',
+		  'template' => $red_biodiversidad_template_path.'/dcterms_location_template.xml',
 		  'dwc2dc' => $red_biodiversidad_transform_path.'/dctermsclasslocation2dc.xsl',
         ),
         'biodiversity:IdentificationCModel' => array(
