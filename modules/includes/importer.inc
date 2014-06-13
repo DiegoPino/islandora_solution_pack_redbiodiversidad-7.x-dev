@@ -37,9 +37,9 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
    */
   public function getNumber() {
   
-    
+	  error_log("total de registros a importar".count($this->file['object_info']),0);
 	     return count($this->file['object_info']); //Devuelve el numero de registros totales
-	     dpm("total objectos",count($this->file['object_info']));
+	   
   }
 
   /**
@@ -144,7 +144,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
    */
   public static function getBatchInfo(array &$form_state) {
     // Load the file.
-    $file = file_load($form_state['values']['file']);
+    $excel_file = file_load($form_state['values']['file']);
 
     // Grab the content models.
     // Cast to an array, in case there are none?
@@ -195,16 +195,15 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 	
 	
 	
-	$object_realinfo=static::getIngestInfo($file,$content_models_with_processing_info); 
-   
-	$info = array(
-      'file' => $file,
+	$object_realinfo=static::getIngestInfo($excel_file,$content_models_with_processing_info); 
+	//@todo mark the excel file for deleting
+	$file = array( //No really a file...but i keep using this name because the parent class defined this structure as such....
       'pid_namespace' => $form_state['values']['namespace'],
-      'content_model' => $content_models_with_processing_info,
+      'content_model' => $content_models_with_processing_info,//In this case multiple....
       'object_info' => $object_realinfo,
       'processed_objects' => array(),
     );
-    return $info;
+    return $file;
 	
   }
 
@@ -215,11 +214,11 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
    * @return array
    *   The ingest info.
    */
-  protected static function getIngestInfo($file,$content_models_with_processing_info) {
+  protected static function getIngestInfo($excelfile,$content_models_with_processing_info) {
 	  try {
-	    	    $inputFileType = PHPExcel_IOFactory::identify(drupal_realpath($file->uri));
+	    	    $inputFileType = PHPExcel_IOFactory::identify(drupal_realpath($excelfile->uri));
 	    	    $objReader = PHPExcel_IOFactory::createReader($inputFileType);
-	    	    $objPHPExcel = $objReader->load(drupal_realpath($file->uri));
+	    	    $objPHPExcel = $objReader->load(drupal_realpath($excelfile->uri));
 	    	} catch(Exception $e) {
 	    		drupal_set_message(t('No se ha podido leer el archivo @filename con error @error', array('@filename' => $this->file->filename,'@error'=>$e->getMessage())));
 	    		
@@ -260,22 +259,22 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 				
 				//Ok, now me hust see which fields belong to which cmodel, just intersect the array preserving the original row data.
 				$all_fields=array();
-				$rowHeaders[0]=array_map('stripslashes',$rowHeaders[0]);
-				$rowHeaders[0]=array_map('utf8_encode',$rowHeaders[0]);
-				error_log(var_export($rowHeaders[0],true),0);	
+				$rowHeaders_utf8=array_map('stripslashes',$rowHeaders[0]);
+				$rowHeaders_utf8=array_map('utf8_encode',$rowHeaders_utf8);
+				error_log("Mis excel headers".var_export($rowHeaders_utf8,true),0);	
 				foreach($dwc_fields as $cmodels=>$dwcfields)
 					{	
-					$existing_fields_inheader[$cmodels]=array_intersect($rowHeaders[0],$dwcfields);	//we preserve the excel row keys
+					$existing_fields_inheader[$cmodels]=array_intersect($rowHeaders_utf8,$dwcfields);	//we preserve the excel row keys
 					//also get an array with all dwc fields...necessary for the next step
 					$all_fields=array_merge($all_fields,$dwcfields);
 					}
 				//Deal with those fields not present anywhere.
-				//If we have this model we can use dwc:dynamicProperties to store those nasty intruders.
-				error_log(var_export($existing_fields_inheader,true),0);
+				//If we have this occurrence cmodel we can use dwc:dynamicProperties to store those nasty intruders.
+				error_log("Los campos existentes en mis headers versus modelos de contenidos".var_export($existing_fields_inheader,true),0);
 				
 				if (array_key_exists('biodiversity:OccurrenceCModel',$dwc_fields))
 					{
-						$whatsleft=array_intersect($rowHeaders[0],$all_fields);	
+						$whatsleft=array_intersect($rowHeaders_utf8,$all_fields);	
 						
 					}	
 				//Now we got for every cmodel a list of fields present in this excel file. great. Now fill the info. One row can generate multiple objects.	
@@ -288,7 +287,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 					
 			 		$rowData=$sheet->rangeToArray('A' . $fila . ':' . $highestColumn.$fila, ' ', TRUE, TRUE, FALSE);//Devuelve fila por fila
 					$flat = trim(implode('', $rowData[0]));
-					error_log(var_export($rowData[0],true),0);	
+					
 					//check for empty row...if found stop there.
 					if (strlen($flat)==0){break;}
 					//And now just iterate over $existing_fields_inheader and fill our data. 
@@ -296,15 +295,16 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 					
 					if (sizeof($existing_fields_inheader)>0)
 					{	
-					foreach($existing_fields_inheader as  $cmodel =>$cmheaders)
+					foreach($existing_fields_inheader as  $cmodel => $cmheaders)
 						{
 						$datoscombinados=array_combine($cmheaders,array_intersect_key($rowData[0],$cmheaders));//We first get only the data possible to this contenmodel from the row,then we combine the headernames(keys) with the data.
 						if (sizeof($datoscombinados)>0)
 							{
-								$info[$objectcount]=array('data'=>$datoscombinados,'cmodel'=>$cmodel);
+							$file[$objectcount]=array('data'=>$datoscombinados,'cmodel'=>$cmodel);
+							$objectcount++;
 							}
 						//So we store the desired cmodel and the data in one place...nice.$file aka row is used to keep track fom where the data came in the excel to make
-						$objectcount++;
+						
 						}
 					
 					
@@ -314,14 +314,18 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 				 unset($sheet);
 				 unset($objPHPExcel);
 				 unset($objReader);
+				 if (sizeof($file)==0)
+				 	{
+				 	drupal_set_message(t('This excel files does not contain enough data for this CMODEL(s)'));
+				 	}
+					//return it anyway...empty o not
+			     	return $file;	//info...not te input file...i should have used $info instead...but i left this so readers can keep track of variables in the original class definition...		
 				
-			     return $info;				
- 		    	
  		    	
 				}
 			else
 				{
-		    	drupal_set_message(t('El archivo no contiene suficientes datos '));
+		    	drupal_set_message(t('This excel files does not contain enough data for this CMODEL(s)'));
 		    	return;	
 				}
 			  
@@ -329,7 +333,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 		
 
     
-  }
+  }//had to implement my own...i wanted UUID ID for objects
   public function preprocess() {
     $preprocessed = array();
     $item_class = $this->itemClass;
@@ -374,10 +378,10 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  protected $mods;
 	  protected $title =  NULL;
 	  protected $dwc = NULL;
-	  protected static $DC2MODS;
-	  protected static $DWC2DC;
-	  protected static $DWCTEMPLATE;
-	  protected static $TITLEFIELD;
+	  protected static $DC2MODS =NULL;
+	  protected $DWC2DC = NULL ;
+	  protected $DWCTEMPLATE = NULL;
+	  protected $TITLEFIELD;
 	 
       
 	  /**
@@ -385,10 +389,13 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	   */
 	  protected function __construct($source) {
 	    parent::__construct($source);
-	    $this->pidNamespace = $this->source['pid_namespace'];
-	    $this->contentModel = (array) $this->source['content_model'];
+	    $this->pidNamespace = $this->source['pid_namespace'];//source==record...
+	    $this->contentModel=$this->source['content_model'];
 		$transform_path = drupal_get_path('module', 'gbifexcel_importer') . '/xsl';
 	    self::$DC2MODS = "$transform_path/simpleDC2MODS.xsl";
+		$this->DWC2DC = $this->source['dwc2dc'];
+	    $this->DWCTEMPLATE=$this->source['template'];
+		$this->TITLEFIELD=$this->source['titlefield'];
 		
 		
 	  }
@@ -399,21 +406,20 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	   * @see IslandoraImportObject::getOne()
 	   * Esta funcion es la que realmente crea la info para el nuevo stream DwC
 	   */
-	  public static function getOne(&$info) {
+	  public static function getOne(&$info) {//remember...no really a file.but an array of info...so i will just change this name....it´s my implementation of the class anyway
+		$record = array();
 		$key = key($info['object_info']);
-		$record = array(
+		$record = array(//A.k.a source chunk..
 	      'pid_namespace' => $info['pid_namespace'],
-	      'file' => $info['file'],
+	      'data' => $info['object_info'][$key]['data'],
 	      'content_model' => $info['object_info'][$key]['cmodel'],
-	     
+	      'dwc2dc' => $info['content_model'][$info['object_info'][$key]['cmodel']]['dwc2dc'],//every cmodel has a different one
+		  'template'=>	$info['content_model'][$info['object_info'][$key]['cmodel']]['template'],
+		  'titlefield'=> $info['content_model'][$info['object_info'][$key]['cmodel']]['title'],
 		);
-		
-		//$info['object_info'] has $key for every object, second key for the corresponding row, and third key for the contentmodel...clever!
-		//$info['object_info'][objectcuont]=array('excelrow'=>$fila,'data'=>$datoscombinados,'cmodel'=>$cmodel);
-		self::$DWC2DC=$info['content_model'][$info['object_info'][$key]['cmodel']]['dwc2dc'];
-	    self::$DWCTEMPLATE=$info['content_model'][$info['object_info'][$key]['cmodel']]['template'];
-		self::$TITLEFIELD=$info['content_model'][$info['object_info'][$key]['cmodel']]['title'];
-	    unset($info['object_info'][$key]);
+		 
+		error_log(var_export($record,true)." para key".$key);	
+	    unset($info['object_info'][$key]);//Ok, we got one, unset this from the  big big source
 	    return (empty($record) ? FALSE : new static($record));
 		
 	    
@@ -422,15 +428,15 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  
 	  protected function getDwC()//Usaremos esta función para crear un DwC XML a partir de cada fila entregada por el excel
 	  	{
-	  	if ($this->dwc === NULL) {
-			$dom= new DOMDocument;
 			
-			$dom->load(self::$DWCTEMPLATE);
+		if ($this->dwc === NULL) {
+			$dom= new DOMDocument;
+			$dom->load($this->DWCTEMPLATE);
 			$dwc_xpath = new DOMXPath($dom);
 			$dwc_xpath->preserveWhiteSpace = false;
 			$dwc_xpath->registerNamespace('dwc', 'http://rs.tdwg.org/dwc/terms/');
-			error_log(var_export($this->source['object_info']['data'],true),0);
-			$datosexcel=$this->source['object_info']['data'];//data
+			error_log("getdwc: mis datos source".var_export($this->source['data'],true),0);
+			$datosexcel=$this->source['data'];//data
 			
 			if (sizeof($datosexcel)>0)
 			{
@@ -485,7 +491,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  
 	  protected function getDatastreams(&$errors = NULL, &$files = NULL) {
 	    module_load_include('inc', 'islandora', 'includes/utilities');
-
+        
 		
 		
 		//$to_return = parent::getDatastreams($errors, $files);
@@ -546,7 +552,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	        t('Failed to produce MODS record for @pid.'),
 	      );
 	    }
-
+        error_log("mis errores generando datastreams",var_export($errors,true),0);
 	    return $datastreams;
 	  }
 
@@ -560,7 +566,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	     	 $xml = $this->getDC();
 			 $title=$this->title;
 		  	 if ($this->isDC($xml)) {//verifico si el DC quedo bien hecho
-				 error_log(var_export(self::$DC2MODS,true),0);
+				 error_log("mi XSLT para MODS".var_export(self::$DC2MODS,true),0);
 	 	        $this->mods = static::runXSLTransform(array('input' => $xml, 'xsl' => self::$DC2MODS));
 	 	        
 			 } if (empty($this->mods)) { 
@@ -619,8 +625,8 @@ EOXML;
 				$xml=$this->dwc;
 				}
   		  	 if ($this->isDwC($xml)) {//verifico si el DwC quedo bien hecho
-				error_log(var_export($this->source['content_model_process_info'],true),0);	
-  	 	        $this->dc = static::runXSLTransform(array('input' => $xml, 'xsl' => self::$DWC2DC));
+				error_log("MI XSLT para DWC".var_export($this->DWC2DC,true),0);	
+  	 	        $this->dc = static::runXSLTransform(array('input' => $xml, 'xsl' => $this->DWC2DC));
 	 	        
   			 }
    	         if (empty($this->dc)) {

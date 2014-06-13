@@ -118,7 +118,7 @@ function islandora_red_biodiversidad_preprocess_islandora_dwc(array &$variables)
 	$dwc = $islandora_object['DwC']->content;
     $xsl = new DOMDocument();
 	$transform="dwcclass2html.xsl";
-    $xsl->load("$module_path/xsl/$transform");
+    $xsl->load($module_path.'/xsl/'.$transform);
     $xslt = new XSLTProcessor();
     $xslt->importStyleSheet($xsl);
     $html = $xslt->transformToXML(simplexml_load_string($dwc));
