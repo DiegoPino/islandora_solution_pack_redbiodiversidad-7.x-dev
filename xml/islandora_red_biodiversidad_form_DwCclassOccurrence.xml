@@ -230,6 +230,72 @@
 								</properties>
 								<children/>
 							</element>
+							<element name="modified">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<default_value>Red de Biodiversidad Chile</default_value>
+									<required>FALSE</required>
+									<title>Rights Holder</title>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Occurrence</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dcterms</prefix>
+											<value>dcterms:modified</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Occurrence/dcterms:modified</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="datasetName">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<default_value>UCN</default_value>
+									<required>FALSE</required>
+									<title>Dataset Name</title>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Occurrence</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:datasetName</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Occurrence/dwc:datasetName</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
 							<element name="institutionCode">
 								<properties>
 									<type>textfield</type>
@@ -263,6 +329,39 @@
 								</properties>
 								<children/>
 							</element>
+							<element name="institutionID">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<default_value>UCN</default_value>
+									<required>FALSE</required>
+									<title>Institution Code</title>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Occurrence</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:institutionID</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Occurrence/dwc:institutionID</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
 							<element name="collectionCode">
 								<properties>
 									<type>textfield</type>
@@ -282,6 +381,39 @@
 										</create>
 										<read>
 											<path>/dwr:DarwinRecordSet/dwc:Occurrence/dwc:collectionCode</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="collectionID">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<default_value></default_value>
+									<required>FALSE</required>
+									<title>collection ID</title>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Occurrence</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:collectionID</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Occurrence/dwc:collectionID</path>
 											<context>document</context>
 										</read>
 										<update>

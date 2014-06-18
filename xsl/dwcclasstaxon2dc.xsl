@@ -17,9 +17,9 @@ This XSL StyleSheet only processes the first ocurrence of every class
             xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
             xsi:noNamespaceSchemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
             
-            <identifier xmlns="http://purl.org/dc/elements/1.1/">
+             <!--   Not needed anymore, was previous islandora fix, because ID was not added if not previously defined<identifier xmlns="http://purl.org/dc/elements/1.1/">
                 <xsl:text>Empty Container por Object ID</xsl:text>
-            </identifier>
+            </identifier> -->
             <xsl:text> </xsl:text>
             <xsl:apply-templates select="/dwr:DarwinRecordSet/dwc:Taxon[1]/dwc:taxonRank" mode="title"/>
             <xsl:apply-templates select="/dwr:DarwinRecordSet/dwc:Taxon[1]/dcterms:*" mode="taxonterms"/>
@@ -69,6 +69,22 @@ Occurrence Class processing
         <xsl:if test="normalize-space(.)">
             <xsl:choose>
                 <xsl:when test="name()='dwc:nameAccordingTo'">
+                    <creator xmlns="http://purl.org/dc/elements/1.1/">
+                        <xsl:apply-templates select="* | node()"/>
+                    </creator>
+                    <xsl:text> </xsl:text>
+                    <xsl:comment> Source node is <xsl:value-of select="name()"/>
+                </xsl:comment>
+                </xsl:when>
+                <xsl:when test="name()='dwc:taxonRank'">
+                    <type xmlns="http://purl.org/dc/elements/1.1/">
+                        <xsl:apply-templates select="* | node()"/>
+                    </type>
+                    <xsl:text> </xsl:text>
+                    <xsl:comment> Source node is <xsl:value-of select="name()"/>
+                </xsl:comment>
+                </xsl:when>
+                 <xsl:when test="name()='dwc:scientificNameAuthorship'">
                     <creator xmlns="http://purl.org/dc/elements/1.1/">
                         <xsl:apply-templates select="* | node()"/>
                     </creator>
@@ -139,15 +155,6 @@ Occurrence Class processing
                 </xsl:comment>
                 </xsl:when>
                 <xsl:when test="name()='dwc:subgenus'">
-                    <subject xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:value-of select="local-name()"/><xsl:text>=</xsl:text>
-                        <xsl:apply-templates select="* | node()"/>
-                    </subject>
-                    <xsl:text> </xsl:text>
-                    <xsl:comment> Source node is <xsl:value-of select="name()"/>
-                </xsl:comment>
-                </xsl:when>
-                <xsl:when test="name()='dwc:specificEpithet'">
                     <subject xmlns="http://purl.org/dc/elements/1.1/">
                         <xsl:value-of select="local-name()"/><xsl:text>=</xsl:text>
                         <xsl:apply-templates select="* | node()"/>

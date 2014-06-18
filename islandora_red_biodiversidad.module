@@ -210,6 +210,7 @@ function islandora_red_biodiversidad_theme($existing, $type, $theme, $path) {
 	  'template' => 'theme/islandora-red-biodiversidad',
 	   'pattern' => 'islandora_red_biodiversidad__',
       'variables' => array('islandora_object' => NULL),
+	  'render element'=>'eol_render_element',
     ),
     'islandora_red_biodiversidad_print' => array(
       'template' => 'theme/islandora-red-biodiversidad-print',
@@ -421,8 +422,6 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad(arra
   module_load_include('inc', 'islandora', 'includes/utilities');
   module_load_include('inc', 'islandora', 'includes/metadata');
 
-  // We should eventually remove the DC object and dc_array code as it only
-  // exists to not break legacy implementations.
   if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DC'])) {
     try {
       $dc = $islandora_object['DC']->content;
@@ -504,7 +503,7 @@ function islandora_red_biodiversidad_xml_form_builder_get_self_transforms() {
 function islandora_red_biodiversidad_islandora_content_model_forms_form_associations() {
   return array(
     'islandora_red_biodiversidad_dwc_form' => array(
-      'content_model' => 'biodiversity:simpledwcCModel',
+      'content_model' => 'biodiversity:SimpledwcCModel',
       'form_name' => 'Simple Darwin Core form',
       'dsid' => 'DwC',
       'title_field' => array('SimpleDarwinRecord','dwc_fields_taxon','scientificName'),
@@ -656,7 +655,9 @@ function islandora_red_biodiversidad_form_alter(&$form, &$form_state, $form_id) 
 				if (isset($form['Occurrence']['record_level_terms']['institutionCode']))//First check if it´s still there!
 					{
 					$institutioncode = variable_get('islandora_red_biodiversidad_setting_institution_code', 'CBUCN');
-					$form['Occurrence']['record_level_terms']['institutionCode']['#default_value']=$institutioncode; //@TODO we will get this and other values from a global configuration value	
+					$form['Occurrence']['record_level_terms']['institutionCode']['#default_value']=$institutioncode;
+					$form['Occurrence']['record_level_terms']['institutionID']['#default_value']=$institutioncode;
+					 //@TODO we will get this and other values from a global configuration value	
 					}
 				if (isset($form['Occurrence']['dwc_fields_occurrence']['occurrenceID']))//First check if it´s still there!	
 					{
@@ -776,7 +777,8 @@ function islandora_red_biodiversidad_validateandpopulateTaxon(&$form, &$form_sta
 						if ($data['rank']=="SPECIES")
 							{
 							$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-scientificname','val',array($data['scientificName']));
-							$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-taxonid','val',array("http://www.gbif.org/species/".$data['usageKey']));
+							$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-taxonid','val',array($data['usageKey']));
+							$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-source','val',array("http://www.gbif.org/species/".$data['usageKey']));
 							}
 						$url2 ="http://api.gbif.org/v0.9/species/".$data['usageKey'];
 				  	    $response2 = drupal_http_request($url2);
@@ -855,7 +857,8 @@ function islandora_red_biodiversidad_validateandpopulate(&$form, &$form_state)
 					if ($data['rank']=="SPECIES")
 						{
 						$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-scientificname','val',array($data['scientificName']));
-						$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-taxonid','val',array("http://www.gbif.org/species/".$data['usageKey']));
+						$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-taxonid','val',array($data['usageKey']));
+						$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-source','val',array("http://www.gbif.org/species/".$data['usageKey']));
 						}
 					$url2 ="http://api.gbif.org/v0.9/species/".$data['usageKey'];
 			  	    $response2 = drupal_http_request($url2);
@@ -900,6 +903,90 @@ function islandora_red_biodiversidad_validateandpopulate(&$form, &$form_state)
 			return array('#type' => 'ajax', '#commands' => $commands);
 		
 }
+/**
+*Enciclopedia Of life support function
+*Using a query we can get additional info for our biodiversity:taxonCmodel objects.
+*@param string $query
+*@return a full array with info to be displayed or consumed by other functions
+*/
+function islandora_red_biodiversidad_eol_getdata($query)
+	{  
+		//We should/are caching this response....
+		//so EOL can rest a bit
+	
+   
+	$data2=array();
+	  
+	  $query=urlencode(trim($query));
+	  if (!empty($query))
+	  	{
+		if ($cache = cache_get('islandora_red_biodiversidad_'.$query))
+			{	
+				//dpm('cache hit');
+			$data2=$cache->data;		
+			}	
+		else
+			{	
+			
+  	  $url ='http://eol.org/api/search/1.0.json?q='.$query.'&page=1&exact=false&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=';
+
+  	  drupal_set_message($url);
+  	  $response = drupal_http_request($url);
+  	    if (!empty($response->error)) {
+  	      $msg_args = array(
+  	        '%url' => $url,
+  	        '@code' => $response->code,
+  	        '%error' => $response->error,
+  	      );
+  	      drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+  	      return FALSE;
+  	    }
+  	    $data = drupal_json_decode($response->data);
+	
+		if ($data['totalResults']>=1)//we got something
+			{
+			//we want the first one, we are searching for exact results only	
+			$eol_data=array_shift($data['results']);		
+			if (isset($eol_data['id'])) 
+				{
+					
+					
+				 $url2 ='http://eol.org/api/pages/1.0/'.$eol_data['id'].'.json?images=1&videos=0&sounds=0&maps=0&text=2&iucn=true&subjects=overview&licenses=cc-&details=true&common_names=true&synonyms=true&references=true&vetted=1&cache_ttl=';	
+		     	  drupal_set_message($url2);
+		     	  $response2 = drupal_http_request($url2);
+		     	    if (!empty($response->error)) {
+		     	      $msg_args = array(
+		     	        '%url' => $url2,
+		     	        '@code' => $response->code,
+		     	        '%error' => $response->error,
+		     	      );
+		     	      drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+		     	      return FALSE;
+		     	    }
+		     	    $data2 = drupal_json_decode($response2->data);	//Now we got the whole data
+					//This data is huge!
+					if (!empty($data2['identifier']))//Should be present and equal to $eol_data['id']
+						{
+						//get synonyms and get rid off duplicates.
+						$data2['synonyms']=array_map("unserialize", array_unique(array_map("serialize", $data2['synonyms'])));
+						$data2['vernacularNames'];
+						$data2['references'];
+						$data2['taxonConcepts'];//Links to external sources and their identifiers
+						$data2['dataObjects']; //all the other info
+						
+						cache_set('islandora_red_biodiversidad_'.$query, $data2, 'cache', time() + 360);	
+						}
+						
+				}
+				
+			}	
+				
+		
+	}
+}
+
+		return $data2;
+	}
 /**
  * Implements hook_islandora_datastream_alter().
  * We need to alter the  data for the  biodiversity:DWCACModel from the ingested EML stream. We don´t have the Object ID prior to ingesting and we need this value in the EML!

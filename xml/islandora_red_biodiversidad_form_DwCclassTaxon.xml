@@ -89,6 +89,38 @@
 								</properties>
 								<children/>
 							</element>
+							<element name="source">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>FALSE</required>
+									<title>Source</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dcterms</prefix>
+											<value>dcterms:source</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dcterms:source</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
 							<element name="taxonRank">
 								<properties>
 									<type>select</type>
@@ -507,6 +539,38 @@
 								</properties>
 								<children/>
 							</element>
+							<element name="infraspecificEpithet">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>false</required>
+									<title>Infra specific Epithet</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:infraspecificEpithet</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:infraspecificEpithet</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
 							<element name="vernacularName">
 								<properties>
 									<type>textfield</type>
@@ -525,6 +589,38 @@
 										</create>
 										<read>
 											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:vernacularName</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="scientificNameAuthorship">
+								<properties>
+									<type>textfield</type>
+									<access>true</access>
+									<required>FALSE</required>
+									<title>Scientific name authorship</title>
+									<tree>true</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:scientificNameAuthorship</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Taxon/dwc:scientificNameAuthorship</path>
 											<context>document</context>
 										</read>
 										<update>

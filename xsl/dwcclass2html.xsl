@@ -7,6 +7,7 @@
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:dwr="http://rs.tdwg.org/dwc/dwcrecord/"
     xmlns:dwc="http://rs.tdwg.org/dwc/terms/" 
+    xmlns:dwrs="http://rs.tdwg.org/dwc/xsd/simpledarwincore/"
     xmlns="http://www.w3.org/1999/xhtml">
 
     <xsl:output method="html" encoding="UTF-8" indent="yes"/>
@@ -70,8 +71,8 @@
             
         </xsl:if>
     </xsl:template>
-    <xsl:template name="simpledwc" match="/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:*/*">
-        <xsl:if test="normalize-space(.)">
+      <xsl:template match="dwrs:SimpleDarwinRecord/*">       
+<xsl:if test="normalize-space(.)">
             <dt class="term">
                 <xsl:value-of select="local-name()"/>
             </dt>
@@ -90,8 +91,6 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </dd>
-            <xsl:text> </xsl:text>
-
         </xsl:if>
     </xsl:template>
 </xsl:stylesheet>

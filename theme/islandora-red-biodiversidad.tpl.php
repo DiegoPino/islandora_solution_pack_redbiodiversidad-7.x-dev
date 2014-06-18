@@ -14,7 +14,7 @@
  */
 ?>
 <div class="islandora-object islandora ">
-	<div><span>Object ID </span><span class="islandora-red-biodiversidad-info"><?php print $variables['islandora_object']->id;?></span></div>
+<div><span>Object ID </span><span class="islandora-red-biodiversidad-info"><?php print $variables['islandora_object']->id;?></span></div>	
 <dl class="islandora-object-tn">
     <dt>
       <?php if (isset($variables['islandora_thumbnail_url'])): ?>
@@ -22,9 +22,8 @@
       <?php endif; ?>
     <dd></dd>
 </dl>
-  
   <?php if ($variables['parent_collections']): ?>
-    <div>
+    <div class="islandora-red-biodiversidad-content">
       <h2><?php print t('In collections'); ?></h2>
       <ul>
         <?php foreach ($variables['parent_collections'] as $collection): ?>
@@ -32,12 +31,19 @@
         <?php endforeach; ?>
       </ul>
     </div>
+	<br>
+	<hr/>
   <?php endif; ?>
-  
- 
+  <?php if ($variables['eol_render_element']): ?>
+  <div class="islandora-red-biodiversidad islandora-red-biodiversidad-content eol-data">
+  	<h2><?php print t('According to Enciclopedia of Life'); ?></h2>
+	<?php print($variables['eol_render_element']);	?>
+  </div>
+  <?php endif; ?>
+ <br>
  
 <div class="islandora-red-biodiversidad islandora-red-biodiversidad-content">
-	<h2>Darwin Core Record</h2>
+	<h2>Our Darwin Core Record</h2>
 	<div class="islandora-metadata-fields islandora-object-fields">
 	
   <?php if (isset($variables['islandora_dwc_html'])): ?>
@@ -46,7 +52,9 @@
 	</div>
 </div>
 </div>
-<h2>Dublin Core</h2>
+  
+ 
+<h2>Dublin Core for this object</h2>
  <div class="islandora-default-metadata">
       <?php if (isset($variables['metadata'])): ?>
         <?php print $variables['metadata']; ?>

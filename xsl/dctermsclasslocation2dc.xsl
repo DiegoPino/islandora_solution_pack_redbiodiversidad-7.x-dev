@@ -17,9 +17,11 @@ This XSL StyleSheet only processes the first ocurrence of every class
             xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
             xsi:noNamespaceSchemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
             
-            <identifier xmlns="http://purl.org/dc/elements/1.1/">
+           <!--   Not needed anymore, was previous islandora fix, because ID was not added if not previously defined
+ 
+ <identifier xmlns="http://purl.org/dc/elements/1.1/">
                 <xsl:text>Empty Container por Object ID</xsl:text>
-            </identifier>
+            </identifier>--> 
             <xsl:text> </xsl:text>
             <xsl:apply-templates select="/dwr:DarwinRecordSet/dcterms:Location[1]/dwc:locationID" mode="locationterms2"/>
             <xsl:apply-templates select="/dwr:DarwinRecordSet/dcterms:Location[1]/dwc:*"/>
@@ -169,7 +171,7 @@ This XSL StyleSheet only processes the first ocurrence of every class
                     <xsl:comment> Source node is <xsl:value-of select="name()"/>
                 </xsl:comment>
                 </xsl:when> 
-                <xsl:when test="name()='dwc:decimalongitude'">
+                <xsl:when test="name()='dwc:decimaLongitude'">
                     <coverage xmlns="http://purl.org/dc/elements/1.1/">
                         <xsl:value-of select="local-name()"/> = <xsl:apply-templates select="* | node()"/>
                     </coverage>

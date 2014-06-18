@@ -17,9 +17,9 @@ This XSL StyleSheet only processes the first ocurrence of every class
             xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
             xsi:noNamespaceSchemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
             
-            <identifier xmlns="http://purl.org/dc/elements/1.1/">
+           <!--   Not needed anymore, was previous islandora fix, because ID was not added if not previously defined<identifier xmlns="http://purl.org/dc/elements/1.1/">
                 <xsl:text>Empty Container por Object ID</xsl:text>
-            </identifier>
+            </identifier> -->
             <xsl:text> </xsl:text>
             <xsl:apply-templates select="/dwr:DarwinRecordSet/dwc:Occurrence[1]/dwc:occurrenceID" mode="occurrenceterms2"/>
             <xsl:apply-templates select="/dwr:DarwinRecordSet/dwc:Occurrence[1]/dwc:*"/>

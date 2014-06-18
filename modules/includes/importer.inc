@@ -12,7 +12,10 @@
 @include_once 'sites/all/libraries/phpexcel/PHPExcel.php';
 class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
  protected $itemClass = 'RedbiodiversidadBatchImportObject';
-
+ 
+ protected static $internal_pidcache=array();//We need PIDS generated on getingestinfo
+ //Because this methid is static, we need to access autside the object scope
+ 
 protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
       module_load_include('inc', 'islandora', 'includes/utilities');
 	  if (empty($this->context['results']['pid_cache'])) {
@@ -26,7 +29,18 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 
       return array_shift($this->context['results']['pid_cache']);
     }
+	//Static function to get PIDs. 
+	protected static function getInternalIdentifier(IslandoraTuque $tuque, $namespace,$cachesize) {
+	      module_load_include('inc', 'islandora', 'includes/utilities');
+		  if (empty(self::$internal_pidcache)) {
+	        // Get enough PIDs given an initial $cachesize
+	        // (plus one, so we'll always get at least one).
+			//Instead of using the build in parent function use the Islandora API to get the identifier using de uuid variable
+	        self::$internal_pidcache=(array) $tuque->repository->getNextIdentifier($namespace, variable_get('islandora_basic_collection_generate_uuid', FALSE), $cachesize + 1);
+	      }
 
+	      return array_shift(self::$internal_pidcache);
+	    }
  
  
   
@@ -144,7 +158,9 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
    */
   public static function getBatchInfo(array &$form_state) {
     // Load the file.
-    $excel_file = file_load($form_state['values']['file']);
+    module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+	
+	$excel_file = file_load($form_state['values']['file']);
 
     // Grab the content models.
     // Cast to an array, in case there are none?
@@ -156,50 +172,84 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 	$red_biodiversidad_template_path = drupal_get_path('module', 'islandora_red_biodiversidad') . '/xml';
     $contentmodels_xml_proccessing_data=array(
         'biodiversity:OccurrenceCModel' => array(
-          'title' => 'dwc:occurrenceID',
+          'title' => 'occurrenceID',
+		  'title_alt' => array('collectionID','collectionCode','catalogNumber'),	
 		  'template' => $red_biodiversidad_template_path.'/dwc_occurrence_template.xml',
 		  'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassoccurrence2dc.xsl',
         ),
         'biodiversity:LocationCModel' => array(
-          'title' => 'dwc:locationID',
+          'title' => 'locationID',
+		  'title_alt' => array('locality'),
 		  'template' => $red_biodiversidad_template_path.'/dcterms_location_template.xml',
 		  'dwc2dc' => $red_biodiversidad_transform_path.'/dctermsclasslocation2dc.xsl',
         ),
         'biodiversity:IdentificationCModel' => array(
-           'title' => 'dwc:identificationID',
+           'title' => 'identificationID',
+		   'title_alt'=>array('identifiedBy','dateIdentified'),
 		   'template' => $red_biodiversidad_template_path.'/dwc_identification_template.xml',
 		   'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassidentification2dc.xsl',
         ),
         'biodiversity:EventCModel' => array(
-           'title' => 'dwc:eventID',
+           'title' => 'eventID',
+		   'title_alt'=>array('fieldNumber','eventDate'),
 		   'template' => $red_biodiversidad_template_path.'/dwc_event_template.xml',
 		   'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassevent2dc.xsl',
         ),
         'biodiversity:SimpledwcCModel' => array(
-            'title' => 'dwc:occurrenceID', //Sames as OccurrenceCModel
+            'title' => 'occurrenceID', //Sames as OccurrenceCModel
+			'title_alt'=> array('basisOfRecord','catalogNumber'),
 		    'template' => $red_biodiversidad_template_path.'/dwc_simple_template.xml',
-		    'dwc2dc' => $red_biodiversidad_transform_path.'/dwc2dc.xsl',
+		    'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclass2dc.xsl',
         ),
         'biodiversity:TaxonCModel' => array(
-          'title' => 'dwc:scientificName',	
+          'title' => 'taxonID',	
+		  'title_alt'=> array('scientificName'),
 		  'template' => $red_biodiversidad_template_path.'/dwc_taxon_template.xml',
 		  'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclasstaxon2dc.xsl',
     ),
 );
-	foreach($content_models as $content_model)
+    $use_ontologies=FALSE;	
+if (module_exists('islandora_ontologies'))
+	{
+	$use_ontologies=TRUE;	
+		module_load_include('inc', 'islandora_ontologies', 'includes/utilities');
+	}
+	foreach($contentmodels_xml_proccessing_data as $content_model=>$data)
 		{
-		$content_models_with_processing_info[$content_model]=$contentmodels_xml_proccessing_data[$content_model];	
-		}
 		
-    
+		//We are going to try to be smart...get the last ID (dwc:class id) from Solr. If ID is absent from our Excel, the increment this one
+		$lastid=islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr($content_model);
+		$contentmodels_xml_proccessing_data[$content_model]['lastIDfromSolr']=$lastid[1];
+		
+			
+		if ($use_ontologies)
+			{
+			$contentmodels_xml_proccessing_data[$content_model]['localrel']=islandora_ontologies_get_all_for_cmodel($content_model);//This returns an array with the ontology pid as key containing array 
+			//The full property (Array) =>
+			//msg (Array)  "of no use here..."
+			//onClass (String) "info:fedora/biodiversity:LocationCModel"
+			//ns Namespace
+			//localname property local name
+			//allowsmore (Boolean) TRUE if possible...if this key is absent means the we can´t add this relation
+			//Max: if max==1 the only allow one of this relations. In Owl lite max can be only 0 or 1...
+			//If case of dupicate objects and max==1 we can´t discard/join new objects because we could end with two relations to the same...we check this in getingestinfo
+			}
+		}
+	    // Test implementation, try to use ontologies, if ontologie module is enabled
+		
+		//Ok, now things are going to get complicated. If we wan´t to be able to relate objects using existing ontologies some compromises must be done
+		//- An excel file is a bidimensional representation, so be must deal with an Star Model, one center object that relates to others...but this could lead to duplicated objects...
+	    //Or: assume that every selected cmodel is a center of something that relates (possible) to all others...
+		//To avoid duplication we could just get an MD5 from an entire record an create an MD5 index of objects by CMODEL. Every time we wan´t to add a new object we first check if this md5 exist. If so avoid creation...
+		//We keep track of every other object originated from the same excel row and construct our relations from there. If the to be create object already exists, we replace the relation with this one.
+		//Must: we need the object->id to be defined during getIngestInfo, not on preprocess?
+		
 	
-	
-	
-	$object_realinfo=static::getIngestInfo($excel_file,$content_models_with_processing_info); 
+	$object_realinfo=static::getIngestInfo($excel_file,$contentmodels_xml_proccessing_data,$content_models,$form_state['values']['namespace']); 
 	//@todo mark the excel file for deleting
 	$file = array( //No really a file...but i keep using this name because the parent class defined this structure as such....
       'pid_namespace' => $form_state['values']['namespace'],
-      'content_model' => $content_models_with_processing_info,//In this case multiple....
+      'content_model' => $contentmodels_xml_proccessing_data,//In this case multiple....
       'object_info' => $object_realinfo,
       'processed_objects' => array(),
     );
@@ -214,7 +264,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
    * @return array
    *   The ingest info.
    */
-  protected static function getIngestInfo($excelfile,$content_models_with_processing_info) {
+  protected static function getIngestInfo($excelfile,$content_models_with_processing_info,$content_models,$pid_namespace) {
 	  try {
 	    	    $inputFileType = PHPExcel_IOFactory::identify(drupal_realpath($excelfile->uri));
 	    	    $objReader = PHPExcel_IOFactory::createReader($inputFileType);
@@ -243,6 +293,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 					foreach($camposdwcexistentes2 as $itemdwc)
 						{
 						$dwc_fields[$cmodels][]=$itemdwc->localName;//Bye prefix
+						
 						}//Aca deberia agregar todos los campos que no están definidos dentro de un campo DWC adecuado como nombre=valor,
 					}
 					unset($dwc_xpath);
@@ -255,35 +306,67 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 	    	$info = array();
 			if (($highestRow)>1)//Es decir tengo al menos el header con los campos y un registro
 				{
+				$internalTuque=islandora_get_tuque_connection();
+			
+					
 	   	    	$rowHeaders = $sheet->rangeToArray('A1:'.$highestColumn.'1', NULL, TRUE, TRUE,FALSE);//Devuelve los titulos de cada columna
 				
 				//Ok, now me hust see which fields belong to which cmodel, just intersect the array preserving the original row data.
-				$all_fields=array();
+				
 				$rowHeaders_utf8=array_map('stripslashes',$rowHeaders[0]);
 				$rowHeaders_utf8=array_map('utf8_encode',$rowHeaders_utf8);
 				error_log("Mis excel headers".var_export($rowHeaders_utf8,true),0);	
-				foreach($dwc_fields as $cmodels=>$dwcfields)
+				$whatsleft=$rowHeaders_utf8;
+				foreach ($dwc_fields as $dwcfields)//Iterate over all CMODELS, even if not selected
+					{
+					//All rows that don´t belong to any Biodiversity Content Model	
+					$whatsleft=array_diff($whatsleft,$dwcfields);
+					}
+				
+				$rels_index_cmodel_to_cmodel=array();///dimension1 Subject cmodel, dimension2 Target cmodel(with the info:fedora part...sadly), value= relation property
+				//Now only iterate over our selected Cmodels
+				foreach ($content_models as $cmodels)
 					{	
-					$existing_fields_inheader[$cmodels]=array_intersect($rowHeaders_utf8,$dwcfields);	//we preserve the excel row keys
-					//also get an array with all dwc fields...necessary for the next step
-					$all_fields=array_merge($all_fields,$dwcfields);
+					
+					$tmpexistingfields=array_intersect($rowHeaders_utf8,$dwc_fields[$cmodels]);
+					if (sizeof($tmpexistingfields)>0)
+						{
+						$existing_fields_inheader[$cmodels]=$tmpexistingfields;	//we preserve the excel row keys
+						//we will use this structure to keep track of md5 to avoid duplicates
+						$md5_index_by_cmodel[$cmodels]=array();//Fill this up
+						//se what possible relations we can use and remap them so we can acces them more easely
+						foreach($content_models_with_processing_info[$cmodels]['localrel'] as $ontologie => $prop)//We can´t deal with multiple ontologies here...@todo fix it somehow..
+							{
+								foreach($prop as $propname=>$propinfo)
+								{
+								if (array_key_exists('allowsmore',$propinfo))
+									{
+									if 	(!empty($propinfo['onClass']))
+										{
+										$rels_index_cmodel_to_cmodel[$cmodels][str_replace("info:fedora/","",$propinfo['onClass'])]=array('ns'=>$propinfo['ns'],'localname'=>$propinfo['localname']);	
+										}
+									}	
+								}	
+							}
+					
+						}
+					
+						
 					}
 				//Deal with those fields not present anywhere.
 				//If we have this occurrence cmodel we can use dwc:dynamicProperties to store those nasty intruders.
-				error_log("Los campos existentes en mis headers versus modelos de contenidos".var_export($existing_fields_inheader,true),0);
+				$pidcachesize=count($existing_fields_inheader)+1;//We set our cache size to the existing cmodels (possible number of objects per row)+1!
+					
 				
-				if (array_key_exists('biodiversity:OccurrenceCModel',$dwc_fields))
-					{
-						$whatsleft=array_intersect($rowHeaders_utf8,$all_fields);	
+				
 						
-					}	
 				//Now we got for every cmodel a list of fields present in this excel file. great. Now fill the info. One row can generate multiple objects.	
-				
+				//Also check for duplicates.
 				
 					$objectcount=0;	     
 			 	for ($fila = 2; $fila <= (int)$highestRow; $fila++)
 			 		{
-					
+					$thisrow=array();//we empty this every row...it´s just an acumulator of what we have for every row
 					
 			 		$rowData=$sheet->rangeToArray('A' . $fila . ':' . $highestColumn.$fila, ' ', TRUE, TRUE, FALSE);//Devuelve fila por fila
 					$flat = trim(implode('', $rowData[0]));
@@ -292,16 +375,68 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 					if (strlen($flat)==0){break;}
 					//And now just iterate over $existing_fields_inheader and fill our data. 
 					unset($datoscombinados);
+					//We first get only the data possible to this contenmodel from the row,then we combine the headernames(keys) with the data.
+					
+					
 					
 					if (sizeof($existing_fields_inheader)>0)
 					{	
+						
+					
+						
 					foreach($existing_fields_inheader as  $cmodel => $cmheaders)
 						{
-						$datoscombinados=array_combine($cmheaders,array_intersect_key($rowData[0],$cmheaders));//We first get only the data possible to this contenmodel from the row,then we combine the headernames(keys) with the data.
+							
+							$datoscombinados=array_combine($cmheaders,array_intersect_key($rowData[0],$cmheaders));
+							
+							
+							if ($cmodel=='biodiversity:OccurrenceCModel')
+								{
+								if (sizeof($whatsleft)>0)
+									{
+									$nondwcfields=array_combine($whatsleft,array_intersect_key($rowData[0],$whatsleft));	
+									$nondwcfieldsasarrayvalues=array();
+									foreach ($nondwcfields as $key => $values)
+										{
+										 $nondwcfieldsasarrayvalues[] = $key.'='.$values;	
+										}
+										if (sizeof( $nondwcfieldsasarrayvalues)>0)
+											{
+											$datoscombinados['dynamicProperties']=implode(",",$nondwcfieldsasarrayvalues);
+										    }
+									}	
+								}
+						 
+						
+						 
+						    
+						
 						if (sizeof($datoscombinados)>0)
 							{
-							$file[$objectcount]=array('data'=>$datoscombinados,'cmodel'=>$cmodel);
-							$objectcount++;
+							//Now get an md5 representation of data	
+							$md5=md5(implode(array_values($datoscombinados)));	
+							if (!array_key_exists($md5,$md5_index_by_cmodel[$cmodel]))
+								{
+   	   							 if (!array_key_exists($content_models_with_processing_info[$cmodel]['title'],$datoscombinados))//means we dont have an ID for this record
+   	   						 	{
+   	   						 		$datoscombinados[$content_models_with_processing_info[$cmodel]['title']]=++$content_models_with_processing_info[$cmodel]['lastIDfromSolr'];
+   	   						 	}
+								$file[$objectcount]=array('data'=>$datoscombinados,'cmodel'=>$cmodel);		
+								$file[$objectcount]['pid']=self::getInternalIdentifier($internalTuque, $pid_namespace,$pidcachesize);	
+								$file[$objectcount]['localrels']=array();	
+								//check here if we got an DWC ID from Excel, if not autoincrement from Solr	
+	   							
+												
+								$thisrow[$cmodel]=$objectcount;
+								
+								$md5_index_by_cmodel[$cmodel][$md5]=$thisrow[$cmodel];	
+								$objectcount++;
+								}
+								else
+								{
+								$thisrow[$cmodel]=$md5_index_by_cmodel[$cmodel][$md5];
+								error_log('We allready have this record',0);	
+								}
 							}
 						//So we store the desired cmodel and the data in one place...nice.$file aka row is used to keep track fom where the data came in the excel to make
 						
@@ -309,11 +444,52 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 					
 					
 					}
+					//Collect what we have for this row and build relations...
+					foreach($thisrow as $cmodel => $objectcountid)
+						{
+						//Iterate over possible localrels.	
+						if (isset($rels_index_cmodel_to_cmodel[$cmodel]))
+							{
+						if (sizeof($rels_index_cmodel_to_cmodel[$cmodel])>0)
+							{
+								
+								foreach($rels_index_cmodel_to_cmodel[$cmodel] as $target=>$prop)
+									{
+									if (isset($thisrow[$target]))//Only add the relation if there is an target object of this cmodel present in this row.
+											{
+												$file[$objectcountid]['localrels'][]=array(
+													'localname'=>$prop['localname'],
+													'ns'=>$prop['ns'],
+													'targetobject'=>$file[$thisrow[$target]]['pid'],	
+									);	
+									}}
+								if ((isset($file[$objectcountid]['localrels'])) &&	is_array($file[$objectcountid]['localrels']))
+									{
+									$file[$objectcountid]['localrels'] = array_map("unserialize", array_unique(array_map("serialize", $file[$objectcountid]['localrels'])));//We get rid of duplicates here.
+									error_log('Got relations for:'.var_export($file[$objectcountid]['localrels'],true),0);	
+									}
+								}
+								
+								
+							
+							}
+							
+							
+						}
+					
+					
+					
+				
+				
 				}
 			     $objPHPExcel->disconnectWorksheets();
 				 unset($sheet);
 				 unset($objPHPExcel);
 				 unset($objReader);
+				 unset($rels_index_cmodel_to_cmodel);
+				 unset($thisrow);
+				 unset($internalTuque);
+				 
 				 if (sizeof($file)==0)
 				 	{
 				 	drupal_set_message(t('This excel files does not contain enough data for this CMODEL(s)'));
@@ -333,7 +509,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 		
 
     
-  }//had to implement my own...i wanted UUID ID for objects
+  }//had to implement my own...i wanted UUID ID for objects and local relations based on ontologies...
   public function preprocess() {
     $preprocessed = array();
     $item_class = $this->itemClass;
@@ -348,25 +524,38 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
       if ($item) {
 		$internal_setID_counter++;
         $this->parameters['namespace'] = $this->getNamespace($item);
-        $preprocessed[] = $object = new IslandoraImporterBatchObject($this->connection, $item, $this->parameters);
+        $preprocessed[] = $object = new RedBiodiviersidadIslandoraImporterBatchObject($this->connection, $item, $this->parameters);
         $object->addRelationships();
 		//Added local generated id (using uui parameter from islandoras configuration)
-		$object->id=$this->getIdentifier($this->connection, $this->parameters['namespace']);
-        //$object->object_info=$item;//Solo pasaremos el objeto actual...esto está mal en la implementación parent!
+		$object->id=$item->getCurrentPid();
+		$object->addOntologiesRelationships();
+		//$object->object_info=$item;//Solo pasaremos el objeto actual...esto está mal en la implementación parent!
 		$this->addToDatabase($object, $object->getResources());
-		if ($internal_setID_counter==50)//Diego Pino, Excel files can be large. Set group of 5 records to a batch set so we don´t run out of memory in Drupal or get PDO errors
+		if ($internal_setID_counter==50)//Diego Pino, Excel files can be large. Set group of 50 records to a batch set so we don´t run out of memory in Drupal or get PDO errors
 			{
-			
 			$this->setId++;
 			$internal_setID_counter=0;
 			}
       }
     }
-
+	
     return $preprocessed;
   }
 }
-
+/**
+* @class IslandoraImporterBatchObject
+*/
+class RedBiodiviersidadIslandoraImporterBatchObject extends  IslandoraImporterBatchObject
+{
+    public function addOntologiesRelationships() {
+      $localrels = $this->importerObjectInstance->getRels();
+	  foreach ($localrels as $rels)
+	  	{
+	  	$this->relationships->add($rels['ns'], $rels['localname'], $rels['targetobject'],RELS_TYPE_URI);	
+	  	}
+    }
+	
+}
 /**
  * GBIF Excel import object.
  *
@@ -376,12 +565,14 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 
 	  protected $mods;
-	  protected $title =  NULL;
+	  protected $title = NULL;
 	  protected $dwc = NULL;
 	  protected static $DC2MODS =NULL;
 	  protected $DWC2DC = NULL ;
 	  protected $DWCTEMPLATE = NULL;
 	  protected $TITLEFIELD;
+	  protected $rels;
+	  protected $pid;
 	 
       
 	  /**
@@ -396,7 +587,8 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 		$this->DWC2DC = $this->source['dwc2dc'];
 	    $this->DWCTEMPLATE=$this->source['template'];
 		$this->TITLEFIELD=$this->source['titlefield'];
-		
+		$this->rels=$this->source['localrels'];
+		$this->pid=$this->source['pid'];
 		
 	  }
 
@@ -406,6 +598,15 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	   * @see IslandoraImportObject::getOne()
 	   * Esta funcion es la que realmente crea la info para el nuevo stream DwC
 	   */
+	  public function getCurrentPid()
+	  	{
+	  	return $this->pid;
+	  	}
+  	  public function getRels()
+  	  	{
+  	  	return $this->rels;
+  	  	}
+	  
 	  public static function getOne(&$info) {//remember...no really a file.but an array of info...so i will just change this name....it´s my implementation of the class anyway
 		$record = array();
 		$key = key($info['object_info']);
@@ -416,9 +617,11 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	      'dwc2dc' => $info['content_model'][$info['object_info'][$key]['cmodel']]['dwc2dc'],//every cmodel has a different one
 		  'template'=>	$info['content_model'][$info['object_info'][$key]['cmodel']]['template'],
 		  'titlefield'=> $info['content_model'][$info['object_info'][$key]['cmodel']]['title'],
+		  'localrels'=>$info['object_info'][$key]['localrels'],
+		  'pid'=>$info['object_info'][$key]['pid'],
 		);
 		 
-		error_log(var_export($record,true)." para key".$key);	
+			
 	    unset($info['object_info'][$key]);//Ok, we got one, unset this from the  big big source
 	    return (empty($record) ? FALSE : new static($record));
 		
@@ -435,7 +638,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 			$dwc_xpath = new DOMXPath($dom);
 			$dwc_xpath->preserveWhiteSpace = false;
 			$dwc_xpath->registerNamespace('dwc', 'http://rs.tdwg.org/dwc/terms/');
-			error_log("getdwc: mis datos source".var_export($this->source['data'],true),0);
+			//error_log("getdwc: mis datos source".var_export($this->source['data'],true),0);
 			$datosexcel=$this->source['data'];//data
 			
 			if (sizeof($datosexcel)>0)
@@ -552,7 +755,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	        t('Failed to produce MODS record for @pid.'),
 	      );
 	    }
-        error_log("mis errores generando datastreams",var_export($errors,true),0);
+        //error_log("mis errores generando datastreams",var_export($errors,true),0);
 	    return $datastreams;
 	  }
 
@@ -564,9 +767,9 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  public function getMODS() {
 	    if ($this->mods === NULL) {
 	     	 $xml = $this->getDC();
-			 $title=$this->title;
+			 $title=$this->getTitle();
 		  	 if ($this->isDC($xml)) {//verifico si el DC quedo bien hecho
-				 error_log("mi XSLT para MODS".var_export(self::$DC2MODS,true),0);
+				// error_log("mi XSLT para MODS".var_export(self::$DC2MODS,true),0);
 	 	        $this->mods = static::runXSLTransform(array('input' => $xml, 'xsl' => self::$DC2MODS));
 	 	        
 			 } if (empty($this->mods)) { 
@@ -597,23 +800,28 @@ EOXML;
 	    if (($this->title === NULL) || empty($this->title) ){
 			//this is a little redundat...we should have already all in place...if not...the why should we try again?
 			$xml = $this->getDC();
-		  if ($xml) {
-	        $dc_doc = new DOMDocument();
+			error_log("mi DC ".var_export($xml,true),0);
+		  if ($xml) {			
+			$dc_doc = new DOMDocument();
 	        $dc_doc->loadXML($xml);
 	        $dc_xpath = new DOMXPath($dc_doc);
 	        $dc_xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
-			$result=$dc_xpath->evaluate('//dc:title[text()]');
+			$result=$dc_xpath->evaluate('dc:title[text()]');
 	      	if ($result->length > 0){$this->title= $result->item(0)->nodeValue;}
 			else
 				{
-				$result=$dc_xpath->evaluate('//dc:type[text()]');
+				$result=$dc_xpath->evaluate('dc:type[text()]');
 				if ($result->length > 0){$this->title= "Unkown ".$result->item(0)->nodeValue." ";}
 				}
 				unset($dc_xpath);
 				unset($dc_doc);
 			}
+			else
+			{
+			error_log('No DC XML',0);	
+			}
 	    }
-
+        error_log('Este es mi titulo'. $this->title,0);
 	    return $this->title;
 	  }
 	  public function getDC() {
@@ -625,12 +833,12 @@ EOXML;
 				$xml=$this->dwc;
 				}
   		  	 if ($this->isDwC($xml)) {//verifico si el DwC quedo bien hecho
-				error_log("MI XSLT para DWC".var_export($this->DWC2DC,true),0);	
+				//error_log("MI XSLT para DWC".var_export($this->DWC2DC,true),0);	
   	 	        $this->dc = static::runXSLTransform(array('input' => $xml, 'xsl' => $this->DWC2DC));
 	 	        
   			 }
    	         if (empty($this->dc)) {
-			 
+				 error_log('vacio!',0);
 			 }
 		 }
 	    return $this->dc;

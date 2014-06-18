@@ -6,7 +6,10 @@
 		<dcterms:rights>This material is provided for research,education, and private use only.</dcterms:rights>
 		<dcterms:rightsHolder></dcterms:rightsHolder>
 		<dwc:institutionCode></dwc:institutionCode>
+		<dwc:institutionID/>
+		<dwc:datasetName/>
 		<dwc:collectionCode></dwc:collectionCode>
+		<dwc:collectionID/>
 		<dwc:basisOfRecord></dwc:basisOfRecord>
 		<dwc:dynamicProperties></dwc:dynamicProperties>
 		<dwc:occurrenceID></dwc:occurrenceID>
@@ -26,5 +29,6 @@
 		<dwc:associatedReferences/>
 		<dwc:associatedSequences/>
 		<dcterms:accessRights>http://creativecommons.org/licenses/by-sa/3.0/cl/</dcterms:accessRights>
+		<dcterms:modified/>
 	</dwc:Occurrence>
 </dwr:DarwinRecordSet>

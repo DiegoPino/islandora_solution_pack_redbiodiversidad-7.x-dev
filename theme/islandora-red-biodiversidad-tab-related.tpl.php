@@ -23,7 +23,11 @@
           <?php foreach ($related as $item): ?>
             <li><?php print $item['relation']; ?>
 				<?php print "-> " .$item['model_label']; ?>
-				<?php print l( $item['object']->label, "islandora/object/".$item['object']->id.""); ?>
+				<?php if (!empty($item['object']->label))
+				{
+				print l($item['object']->label, "islandora/object/".$item['object']->id.""); 
+			}else{
+				print l($item['object']->id, "islandora/object/".$item['object']->id."");} ?>
 			</li>
           <?php endforeach; ?>
         </ul>

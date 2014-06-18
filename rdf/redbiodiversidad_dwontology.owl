@@ -24,6 +24,23 @@
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#inverseOf -->
+
+    <owl:AnnotationProperty rdf:about="&owl;inverseOf"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
     // Object Properties
     //
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -35,6 +52,7 @@
     <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#atEvent -->
 
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#atEvent">
+        <rdfs:label xml:lang="en">At event</rdfs:label>
         <rdfs:comment xml:lang="en">Occurrence happened during an particular Event</rdfs:comment>
     </owl:ObjectProperty>
     
@@ -42,13 +60,18 @@
 
     <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#atLocation -->
 
-    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#atLocation"/>
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#atLocation">
+        <rdfs:label xml:lang="en">At Location</rdfs:label>
+        <rdfs:comment xml:lang="en">Event happened at particular Location</rdfs:comment>
+    </owl:ObjectProperty>
     
 
 
     <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#eventOf -->
 
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#eventOf">
+        <rdfs:label xml:lang="en">event Of</rdfs:label>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#atEvent"/>
         <rdfs:comment xml:lang="en">Event of an Occurrence. Multiple Ocurrences may happened on a single Event</rdfs:comment>
     </owl:ObjectProperty>
     
@@ -69,24 +92,28 @@
     <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#hasIdentification -->
 
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#hasIdentification">
-   		<rdfs:comment xml:lang="en">One Occurrence may have multiple Identifications, it´s one-to-many</rdfs:comment>
-	</owl:ObjectProperty>
-	
-	<!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifies -->
-	
-    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifies">
-        <rdfs:comment xml:lang="en">Multiple Identifications may origin from a single Ocurrence, it´s many-to-one</rdfs:comment>
-    	 <owl:inverseOf rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#hasIdentification"/>
-	</owl:ObjectProperty>
+        <rdfs:label xml:lang="en">has identification</rdfs:label>
+        <rdfs:comment xml:lang="en">One Occurrence may have multiple Identifications, it´s one-to-many</rdfs:comment>
+    </owl:ObjectProperty>
+    
 
 
     <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifiedAs -->
 
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifiedAs">
-        <rdfs:comment xml:lang="en"></rdfs:comment>
+        <rdfs:label xml:lang="en">identified as</rdfs:label>
+        <rdfs:comment xml:lang="en">One formal Identification leads to a single Taxon</rdfs:comment>
     </owl:ObjectProperty>
-	
-   
+    
+
+
+    <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifies -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifies">
+        <rdfs:label xml:lang="en">identifies</rdfs:label>
+        <rdfs:comment xml:lang="en">Multiple Identifications may origin from a single Ocurrence, it´s many-to-one</rdfs:comment>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#hasIdentification"/>
+    </owl:ObjectProperty>
     
 
 
@@ -99,8 +126,9 @@
     <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#locatesEvent -->
 
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#locatesEvent">
-        <rdfs:label xml:lang="en">locatesEvent</rdfs:label>
-        <rdfs:comment xml:lang="en">One Darwin Core Location may have multiple events</rdfs:comment>
+        <rdfs:label xml:lang="en">locates Event</rdfs:label>
+		   <rdfs:comment xml:lang="en">One Darwin Core Location may have multiple events</rdfs:comment>
+       <owl:inverseOf rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#atLocation"/>
     </owl:ObjectProperty>
     
 
@@ -127,6 +155,16 @@
     
 
 
+    <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#taxonOfId -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#taxonOfId">
+        <rdfs:label xml:lang="en">taxon of id</rdfs:label>
+        <rdfs:comment xml:lang="en">One Taxon can be subject of multiple identifications</rdfs:comment>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifiedAs"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -138,72 +176,86 @@
     
 
 
-    <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#info:fedora/biodiversity:GeologicaContextCModel -->
+    <!-- info:fedora/biodiversity:GeologicaContextCModel -->
 
     <owl:Class rdf:about="info:fedora/biodiversity:GeologicaContextCModel"/>
     
 
 
-    <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#info:fedora/biodiversity:IdentificationCModel -->
+    <!-- info:fedora/biodiversity:IdentificationCModel -->
 
     <owl:Class rdf:about="info:fedora/biodiversity:IdentificationCModel">
         <rdfs:subClassOf>
             <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifies"/>
+                <owl:allValuesFrom rdf:resource="info:fedora/biodiversity:OccurrenceCModel"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifiedAs"/>
                 <owl:onClass rdf:resource="info:fedora/biodiversity:TaxonCModel"/>
-                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
 
 
-    <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#info:fedora/biodiversity:LocationCModel -->
+    <!-- info:fedora/biodiversity:LocationCModel -->
 
-    <owl:Class rdf:about="info:fedora/biodiversity:LocationCModel"/>
+    <owl:Class rdf:about="info:fedora/biodiversity:LocationCModel">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#hasGeologicalContext"/>
+                <owl:allValuesFrom rdf:resource="info:fedora/biodiversity:GeologicaContextCModel"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#locatesEvent"/>
+                <owl:allValuesFrom rdf:resource="info:fedora/biodiversity:EventCModel"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
     
 
 
-    <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#info:fedora/biodiversity:MaterialSampleCModel -->
+    <!-- info:fedora/biodiversity:MaterialSampleCModel -->
 
     <owl:Class rdf:about="info:fedora/biodiversity:MaterialSampleCModel"/>
     
 
 
-    <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#info:fedora/biodiversity:OccurrenceCModel -->
+    <!-- info:fedora/biodiversity:OccurrenceCModel -->
 
     <owl:Class rdf:about="info:fedora/biodiversity:OccurrenceCModel">
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#related_toLocation"/>
-                <owl:onClass rdf:resource="info:fedora/otro:mal"/>
-                <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+                <owl:onClass rdf:resource="info:fedora/biodiversity:LocationCModel"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#related_toLocation"/>
                 <owl:onClass rdf:resource="info:fedora/biodiversity:LocationCModel"/>
-                <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+                <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">0</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#atEvent"/>
-                <owl:onClass rdf:resource="info:fedora/biodiversity:eventCModel"/>
-                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">0</owl:minCardinality>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#related_toTaxon"/>
-                <owl:onClass rdf:resource="info:fedora/biodiversity:TaxonCModel"/>
-                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+                <owl:onClass rdf:resource="info:fedora/biodiversity:EventCModel"/>
+                <owl:maxQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#atEvent"/>
-                <owl:onClass rdf:resource="info:fedora/biodiversity:eventCModel"/>
-                <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+                <owl:onClass rdf:resource="info:fedora/biodiversity:EventCModel"/>
+                <owl:minQualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">0</owl:minQualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -214,29 +266,42 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#related_toLocation"/>
-                <owl:onClass rdf:resource="info:fedora/biodiversity:LocationCModel"/>
-                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">0</owl:minCardinality>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#related_toTaxon"/>
+                <owl:onClass rdf:resource="info:fedora/biodiversity:TaxonCModel"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
 
 
-    <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#info:fedora/biodiversity:TaxonCModel -->
+    <!-- info:fedora/biodiversity:TaxonCModel -->
 
-    <owl:Class rdf:about="info:fedora/biodiversity:TaxonCModel"/>
+    <owl:Class rdf:about="info:fedora/biodiversity:TaxonCModel">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#taxonOfId"/>
+                <owl:allValuesFrom rdf:resource="info:fedora/biodiversity:IdentificationCModel"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
     
 
 
-    <!-- http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#info:fedora/biodiversity:eventCModel -->
+    <!-- info:fedora/biodiversity:EventCModel -->
 
-    <owl:Class rdf:about="info:fedora/biodiversity:eventCModel">
+    <owl:Class rdf:about="info:fedora/biodiversity:EventCModel">
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#atLocation"/>
                 <owl:onClass rdf:resource="info:fedora/biodiversity:LocationCModel"/>
-                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#eventOf"/>
+                <owl:allValuesFrom rdf:resource="info:fedora/biodiversity:OccurrenceCModel"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>

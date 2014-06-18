@@ -17,9 +17,9 @@ This XSL StyleSheet only processes the first ocurrence of every class
             xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
             xsi:noNamespaceSchemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
             
-            <identifier xmlns="http://purl.org/dc/elements/1.1/">
+            <!--   Not needed anymore, was previous islandora fix, because ID was not added if not previously defined<identifier xmlns="http://purl.org/dc/elements/1.1/">
                 <xsl:text>Empty Container por Object ID</xsl:text>
-            </identifier>
+            </identifier> -->
             <xsl:text> </xsl:text>
             <xsl:apply-templates select="/dwr:DarwinRecordSet/dwc:Identification[1]/dwc:identificationID" mode="identificationterms2"/>
             <xsl:apply-templates select="/dwr:DarwinRecordSet/dwc:Identification[1]/dwc:*"/>
@@ -66,33 +66,25 @@ Occurrence Class processing
     <!--   
  Taxon Class processing
  -->
-    <xsl:template name="IdentificationID" match="/dwr:DarwinRecordSet/dwc:Identification[1]/dwc:eventID" mode="identificationterms2">
+    <xsl:template name="IdentificationID" match="/dwr:DarwinRecordSet/dwc:Identification[1]/dwc:identificationID" mode="identificationterms2">
         <xsl:if test="normalize-space(.)">
             <title xmlns="http://purl.org/dc/elements/1.1/">
                 <xsl:apply-templates select="* | node()"/>
             </title>
         </xsl:if>
     </xsl:template>    
-    <xsl:template name="taxonterms" match="/dwr:DarwinRecordSet/dwc:Identification[1]/dwc:*">
+    <xsl:template name="identificationterms" match="/dwr:DarwinRecordSet/dwc:Identification[1]/dwc:*">
         <xsl:if test="normalize-space(.)">
             <xsl:choose>
-                <xsl:when test="name()='dwc:habitat'">
-                    <subject xmlns="http://purl.org/dc/elements/1.1/">
+                <xsl:when test="name()='dwc:basisOfRecord'">
+                    <type xmlns="http://purl.org/dc/elements/1.1/">
                         <xsl:value-of select="local-name()"/> = <xsl:apply-templates select="* | node()"/>
-                    </subject>
+                    </type>
                     <xsl:text> </xsl:text>
                     <xsl:comment> Source node is <xsl:value-of select="name()"/>
-                </xsl:comment>
-                </xsl:when>   
-                <xsl:when test="name()='dwc:samplingProtocol'">
-                    <description xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:value-of select="local-name()"/> = <xsl:apply-templates select="* | node()"/>
-                    </description>
-                    <xsl:text> </xsl:text>
-                    <xsl:comment> Source node is <xsl:value-of select="name()"/>
-                </xsl:comment>
-                </xsl:when>    
-                <xsl:when test="name()='dwc:samplingEffort'">
+                </xsl:comment> 
+                </xsl:when>
+                <xsl:when test="name()='dwc:identificationQualifier'">
                         <description xmlns="http://purl.org/dc/elements/1.1/">
                             <xsl:value-of select="local-name()"/> = <xsl:apply-templates select="* | node()"/>
                         </description>
@@ -100,7 +92,7 @@ Occurrence Class processing
                         <xsl:comment> Source node is <xsl:value-of select="name()"/>
                 </xsl:comment>
                 </xsl:when>
-                <xsl:when test="name()='dwc:eventDate'">
+                <xsl:when test="name()='dwc:dateIdentified'">
                     <date xmlns="http://purl.org/dc/elements/1.1/">
                         <xsl:value-of select="local-name()"/><xsl:text> = </xsl:text>
                         <xsl:apply-templates select="* | node()"/>
@@ -109,26 +101,8 @@ Occurrence Class processing
                     <xsl:comment> Source node is <xsl:value-of select="name()"/>
                 </xsl:comment>
                 </xsl:when>
-                <xsl:when test="name()='dwc:fieldNumber'">
-                    <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:apply-templates select="* | node()"/>
-                    </identifier>
-                    <xsl:text> </xsl:text>
-                    <xsl:comment> Source node is <xsl:value-of select="name()"/>
-                </xsl:comment>
-                </xsl:when>
-                <xsl:when test="name()='dwc:fieldNotes'">
+                <xsl:when test="name()='dwc:typeStatus'">
                     <description xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:value-of select="local-name()"/><xsl:text> = </xsl:text>
-                        <xsl:apply-templates select="* | node()"/>
-                    </description>
-                    <xsl:text> </xsl:text>
-                    <xsl:comment> Source node is <xsl:value-of select="name()"/>
-                </xsl:comment>
-                </xsl:when>
-                <xsl:when test="name()='dwc:dynamicProperties'">
-                    <description xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:value-of select="local-name()"/><xsl:text> = </xsl:text>
                         <xsl:apply-templates select="* | node()"/>
                     </description>
                     <xsl:text> </xsl:text>

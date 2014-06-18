@@ -13,7 +13,10 @@
 		<dwc:genus></dwc:genus>
 		<dwc:subgenus/>
 		<dwc:specificEpithet/>
+		<dwc:infraspecificEpithet/>
 		<dwc:vernacularName/>
 		<dwc:taxonRemarks></dwc:taxonRemarks>
+		<dcterms:source/>
+		<dwc:scientificNameAuthorship/>
 	</dwc:Taxon>
 </dwr:DarwinRecordSet>
