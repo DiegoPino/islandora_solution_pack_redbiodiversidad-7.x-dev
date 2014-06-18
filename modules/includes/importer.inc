@@ -315,7 +315,7 @@ if (module_exists('islandora_ontologies'))
 				
 				$rowHeaders_utf8=array_map('stripslashes',$rowHeaders[0]);
 				$rowHeaders_utf8=array_map('utf8_encode',$rowHeaders_utf8);
-				error_log("Mis excel headers".var_export($rowHeaders_utf8,true),0);	
+				//error_log("Mis excel headers".var_export($rowHeaders_utf8,true),0);	
 				$whatsleft=$rowHeaders_utf8;
 				foreach ($dwc_fields as $dwcfields)//Iterate over all CMODELS, even if not selected
 					{
@@ -435,7 +435,7 @@ if (module_exists('islandora_ontologies'))
 								else
 								{
 								$thisrow[$cmodel]=$md5_index_by_cmodel[$cmodel][$md5];
-								error_log('We allready have this record',0);	
+								//error_log('We allready have this record',0);	
 								}
 							}
 						//So we store the desired cmodel and the data in one place...nice.$file aka row is used to keep track fom where the data came in the excel to make
@@ -466,7 +466,7 @@ if (module_exists('islandora_ontologies'))
 								if ((isset($file[$objectcountid]['localrels'])) &&	is_array($file[$objectcountid]['localrels']))
 									{
 									$file[$objectcountid]['localrels'] = array_map("unserialize", array_unique(array_map("serialize", $file[$objectcountid]['localrels'])));//We get rid of duplicates here.
-									error_log('Got relations for:'.var_export($file[$objectcountid]['localrels'],true),0);	
+									//error_log('Got relations for:'.var_export($file[$objectcountid]['localrels'],true),0);	
 									}
 								}
 								
@@ -800,7 +800,7 @@ EOXML;
 	    if (($this->title === NULL) || empty($this->title) ){
 			//this is a little redundat...we should have already all in place...if not...the why should we try again?
 			$xml = $this->getDC();
-			error_log("mi DC ".var_export($xml,true),0);
+			//error_log("mi DC ".var_export($xml,true),0);
 		  if ($xml) {			
 			$dc_doc = new DOMDocument();
 	        $dc_doc->loadXML($xml);
@@ -818,10 +818,10 @@ EOXML;
 			}
 			else
 			{
-			error_log('No DC XML',0);	
+			//error_log('No DC XML',0);	
 			}
 	    }
-        error_log('Este es mi titulo'. $this->title,0);
+        //error_log('Este es mi titulo'. $this->title,0);
 	    return $this->title;
 	  }
 	  public function getDC() {
@@ -838,7 +838,7 @@ EOXML;
 	 	        
   			 }
    	         if (empty($this->dc)) {
-				 error_log('vacio!',0);
+				 //error_log('vacio!',0);
 			 }
 		 }
 	    return $this->dc;
