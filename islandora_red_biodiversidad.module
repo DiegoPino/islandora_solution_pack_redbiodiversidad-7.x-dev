@@ -414,6 +414,7 @@ function islandora_red_biodiversidad_biodiversity_GeologicalContextCModel_island
 
  */
 function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad(array &$variables) {
+  //Not being called....
   drupal_add_js('misc/form.js');
   drupal_add_js('misc/collapse.js');
   $islandora_object = $variables['islandora_object'];
@@ -421,7 +422,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad(arra
   module_load_include('inc', 'islandora', 'includes/datastream');
   module_load_include('inc', 'islandora', 'includes/utilities');
   module_load_include('inc', 'islandora', 'includes/metadata');
-
+  
   if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DC'])) {
     try {
       $dc = $islandora_object['DC']->content;
@@ -484,8 +485,8 @@ function islandora_red_biodiversidad_xml_form_builder_get_transforms() {
 /** Implements hook_xml_form_builder_get_self_transforms().
  * We are also adding a self transform 'emlself.xsl' for EML form in DWCACmodel(Darwin Core Archive Model). EML defines elements inside root <eml:eml> as unqualified, 
  * but XMLFORMS uses default namespace prefix por all elements(or i'm doing someting very wrong!), so i always get prefix eml: appended to all elements
- * solution: Dont´ use eml prefix for root element at all. Add it later using a selftransform. It's quicker to add only to the root elements, insteado of removing every appender prefix.
- * @TODO fix it without self_transform: i need a <eml:eml> root with <dataset> etc elements without prefix. How? Please.
+ * solution: Dont´ use eml prefix for root element at all. Add it later using a selftransform. It's quicker to add only to the root elements, instead of removing every appender prefix.
+ * @TODO fix it without self_transform: i need a <eml:eml> root with <dataset> etc elements without prefix. How? Please. mail me!
 */
 
 function islandora_red_biodiversidad_xml_form_builder_get_self_transforms() {
@@ -703,7 +704,7 @@ function islandora_red_biodiversidad_leaflet_map_info() {
 		  return array(
 		    'islandora_red_biodiversidad' => array(
 		      'label' => 'islandoraredbiodiversidad',
-		      'description' => t('Leaflet Map style for islandora red biodiversidad module'),
+		      'description' => t('Leaflet Map for islandora red biodiversidad module'),
 		      'settings' => array(
 		        'zoom' => 4,
 		        'minZoom' => 1,
@@ -725,24 +726,61 @@ function islandora_red_biodiversidad_leaflet_map_info() {
 				'disableClusteringAtZoom' => FALSE,
 			    'maxClusterRadius' => 80,
 			    'addRegionToolTips' => TRUE,
+				'layerControl' => TRUE,
 		      ),
 		      'attribution' => array(
 		        'prefix' => '',
 		      ),
 		      'layers' => array(
-		        'earth' => array(
-		          'type' => 'foobar',
+		        'Open Street Map' => array( 
+				  'type' => 'xyz',
+		          'urlTemplate' => 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+		          'options' => array(
+		            'attribution' => '© OpenStreetMap contributors',
+		          ),
+		        ),
+		        'Hight Contrast' => array(
+				'type' => 'xyz',		          
 		          'urlTemplate' => 'http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png',
 		          'options' => array(
-		            'attribution' => NULL,
-		            'noWrap' => TRUE,
+		          'attribution' => '© stamen.com',
 		          ),
 		        ),
 		      ),
 		    ),
 		  );
 		}		
+		/**
+		 * Implements hook_library().
+		 */
+function  islandora_red_biodiversidad_library() {
 
+		  $path=drupal_get_path('module', 'islandora_red_biodiversidad');
+		  $libraries['leaflet_markercluster_layercontrol'] = array(
+		    'title' => 'Leaflet Markercluster Layer Control',
+		    'version' => 0.1,
+		    'js' => array(
+		      array(
+		        'type' => 'file',
+		        'data' => "$path/js/leaflet.markercluster.layercontrol.js",
+		        'group' => JS_LIBRARY,
+		        'preprocess' => FALSE,
+		        'weight' => 2,
+		      ),
+		    ), 
+		  );
+
+		  return $libraries;
+		}
+function islandora_red_biodiversidad_leaflet_map_prebuild_alter(&$vars = NULL) {
+		  if (!isset($vars['map']['settings']['maxClusterRadius']) || $vars['map']['settings']['maxClusterRadius'] > 0) {
+		    drupal_add_library('islandora_red_biodiversidad', 'leaflet_markercluster_layercontrol');
+		    $options = array('type' => 'file', 'weight' => 2);
+		    drupal_add_js(drupal_get_path('module', 'islandora_red_biodiversidad') . '/js/leaflet.markercluster.layercontrol.js', $options);
+		    // Increase weight so we're included after 'leaflet_markercluster_drupal.js'
+		   
+		  }
+		}
 	
 function islandora_red_biodiversidad_validateandpopulateTaxon(&$form, &$form_state)
 	{        

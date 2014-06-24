@@ -7,19 +7,34 @@
 
 /**
  * Implements hook_preprocess().
-* Allmost the same as islandora_solr_geo module
-* @see islandora_solr_geo
-* Map requires a latlong solr field. Using XSL we combined decimal latitud and longitud from Darwin Core dcterms:Location type schema into one named dwc.latlong_coordinatefull ot latlong type(so we can make spatial queries to solr)
+* Idea based on islandora_solr_geo module
+* @see leaflet and solr
+* Map requires a latlong solr field. Using XSL we combined decimal latitud and longitud from Darwin Core dcterms:Location type schema into one named dwc.latlong_p of class latlong type(so we can make spatial queries to solr)
+* dwc.latlong contains to dynamic fields, dwc.latlong_p_0_coordinate and dwc.latlong_p_1_coordinate who actually store the lat/long coordinates in double.
 * @see solrconfig/DwC_to_solr.xslt and solrconfig/schema.xml
- */
+* Note: there is something i don´t like about the standard Rel_ext to Solr XSLT inf fedoragsearch. There is no way we could use a !join to get related objects, 
+* because the values inside the Solr Index for RELS_EXT relations have already de info:fedora part prepended and our ID not.
+* This limits our use of Solr to get relations based on joins
+* @todo make an additional solr field that stores data in this form :fieldname predicate name, value = object->id whitout the info:fedora part. 
+*/
 function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(array &$variables)
 	{
 	    $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
 	    module_load_include('inc', 'islandora_solr_search', 'includes/utilities');
-	    $mappings = array(
+		module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+	    
+		$islandora_object = $variables['islandora_object'];
+	    $object_pid = $islandora_object->id;
+	    drupal_set_title($islandora_object->label);
+	    //drupal_set_breadcrumb(islandora_get_breadcrumbs($islandora_object));
+		
+		
+		$mappings = array(
 	      'location' => array(
 	        'cmodel' => 'biodiversity:LocationCModel',
-	        'latlong' => 'dwc.latlong_coordinatefull',
+	        'latlong_lat' => 'dwc.latlong_p_0_coordinate',
+			'latlong_long' => 'dwc.latlong_p_1_coordinate',
+			'latlong' => 'dwc.latlong_p',
 	      ),
     
 	    );
@@ -30,7 +45,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	        'islandora_solr_content_model_field', 'RELS_EXT_hasModel_uri_ms'
 	    );
    
-	    $biodiversidad_query_field = $mappings['location']['latlong'];
+	    $biodiversidad_query_field = $mappings['location']['latlong_lat'];
 	    $stub="";
 	    
 	    $query_processor = new IslandoraSolrQueryProcessor();
@@ -41,9 +56,15 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	        )
 	    );
 	    $query_processor->solrStart = 0;
-	    $query_processor->solrLimit = 1000;
+	    //$query_processor->solrLimit = 1000;//no limit better for now, leaflet can manage aprox 50.000 cluster points concurrent.
+		//Let's add some base restrictions to comply with Solr module permissiones
+		
+		$xacml_restrictions=islandora_red_biodiversidad_getxacml_solrquery_restrictions();
+		
+		
+		
 	    $query_processor->solrParams = array(
-	      'fl' => "$biodiversidad_query_field,PID,fgs_label_mt",
+	      'fl' => $mappings['location']['latlong_lat'].",".$mappings['location']['latlong_long'].",PID,fgs_label_mt",
 	      'fq' => format_string(
 	          '!content_model_field:"info:fedora/!content_model"', array(
 	            '!content_model_field' => $content_model_field,
@@ -51,6 +72,11 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	          )
 	      ),
 	    );
+        
+		if (!empty($xacml_restrictions)) {
+          $query_processor->solrParams['fq'] = $query_processor->solrParams['fq']." AND ( ".$xacml_restrictions." )";
+        }
+		
 	    $url = parse_url(variable_get('islandora_solr_url', 'localhost:8080/solr'));
 	    $solr = new Apache_Solr_Service($url['host'], $url['port'], $url['path'] . '/');
 	    $solr->setCreateDocuments(FALSE);
@@ -65,36 +91,44 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	    $locations = array();
 	    $mapa_variables = array();
 		$lati_long = array();
-	    foreach ($json['response']['docs'] as $key=>$choice) {
-			
+	    //This gives us all the locations, but i could need conditional on where i'm standing(calling) also the occurence data and the associated taxons. 
+		//Now do some SPARQL Magic...
+		$locations2=array();
+		$locations3=array();
+		
+		
+		$j=0;
+		 $clustergroup='Locs';
+		foreach ($json['response']['docs'] as $key=>$choice) {
+			$j++;
 			//dpm($choice);
-	      
-		  if (isset($choice[$mappings['location']['latlong']])) {
-		  $coords = explode(",", $choice[$mappings['location']['latlong']][0]);
+	        if ($j>5){ $clustergroup='Locs2';}
+		  if ((isset($choice[$mappings['location']['latlong_lat']])) && (isset($choice[$mappings['location']['latlong_long']]))) {
+		  //$coords = explode(",", $choice[$mappings['location']['latlong']][0]); not needed anymore
 		   $point=array(
 		  'type' => 'point',
-		  'lat' => (float) $coords[0],
-		  'lon' => (float) $coords[1],
+		  'lat' => (float) $choice[$mappings['location']['latlong_lat']],
+		  'lon' => (float) $choice[$mappings['location']['latlong_long']],
 		  'leaflet_id' => 'point-'.$key,
+		 // 'flags'=>0x01,
 		  'popup' => l($choice['fgs_label_mt'][0], 'islandora/object/'.$choice['PID']),
-		 
+		  'clusterGroup'=>$clustergroup,
 		 );
 			  
 			  
 		      array_push($locations, $point);	
 
-			//$list[$choice['PID']] = array('latlong'=>$choice[$mappings['location']['latlong']],'label'=>$choice['fgs_label_ms']);
+			
 	      }
 	    }
+	
 		
-		
-		//$locations = $variables['locations'];
-	    //$map_options = $variables['map_options'];
-	    //$map_style = $variables['map_style'];
+	
 		if (!empty($locations)) {
 		  $styles = module_invoke_all('leaflet_map_info'); 
-		 //dpm($styles);
-		 //dpm(leaflet_render_map($styles['islandora_red_biodiversidad'], $locations, '500px'));
+			
+		
+		
 		
 	   $variables['results'] =leaflet_render_map($styles['islandora_red_biodiversidad'], $locations, '500px');	
 	   }  
@@ -103,8 +137,8 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 
 /* Here we transform Darwin Core to HTML using XLST for displaying */
 function islandora_red_biodiversidad_preprocess_islandora_dwc(array &$variables) {
-    drupal_add_js('misc/form.js');
-    drupal_add_js('misc/collapse.js');
+   drupal_add_js('misc/form.js');
+   drupal_add_js('misc/collapse.js');
    module_load_include('inc', 'islandora', 'includes/datastream');
    module_load_include('inc', 'islandora', 'includes/utilities');
    module_load_include('inc', 'islandora', 'includes/metadata');
@@ -373,13 +407,33 @@ render_arrays
   
 }
 /*
-having an Ontology defined, we display related objects on a tab for every Object belonging to his solution pack provided CMODELS
+Having an Ontology defined or not, we display related objects on a tab for every Object belonging to his solution pack provided CMODELS
 */
 
 function islandora_red_biodiversidad_preprocess_islandora_dwc_related(array &$variables) {
  $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+  
+ 
+  
 $islandora_object = $variables['islandora_object'];
+
+$pid = $islandora_object->id;
+drupal_set_title($islandora_object->label);
+
+
+if (module_exists('islandora_ontologies'))
+	{
+		
+	module_load_include('inc', 'islandora_ontologies', 'includes/utilities');
+	$models = $islandora_object->models;
+	foreach($models  as $contentmodelpid)
+		{
+	   islandora_ontologies_get_graph_path($contentmodelpid);
+        }
+}
+
+
 $repository = $islandora_object->repository;
 $rels = $islandora_object->relationships->get();
 $related = array();
@@ -397,10 +451,10 @@ foreach ($rels as $key => $rel) {
      } 
   }
 }
-/*@TODO read(and parse) the ontology OWL file directly from the content model*/
+/*@todo read(and parse) the ontology OWL file directly from the content model*/
   
  
-  $pid=$islandora_object->id;
+  
   $connection = islandora_get_tuque_connection();
   $escaped_pid = str_replace(':', '_', $pid);
   if ($connection) {
@@ -417,6 +471,7 @@ WHERE {{
   }
 
 EOQ;
+dpm ($query);
     $results = $connection->repository->ri->sparqlQuery($query);
   //var_dump($query);
 //print_r($results);// Sort the objects into their proper order.
@@ -457,7 +512,8 @@ EOQ;
 								if 	($rel['predicate']['value']=='depends_on'){$relationlabel='is_dependant_of';}else{$relationlabel=$rel['predicate']['value'];}
 								break;
 								default:
-								$relationlabel=$rel['predicate']['namespace'].":".$rel['predicate']['value'];
+								$relationlabel=$rel['predicate']['namespace'].":".$rel['predicate']['value'];//
+								$relationlabel=$rel['predicate']['value'];
 								}
 									
 								
