@@ -19,7 +19,7 @@ Edited by Diego Pino ... DwC complete class to OAI_DC March 2014.
 	xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-    <xsl:output method="xml" indent="yes"/>
+    <xsl:output encoding="UTF-8" method="xml" indent="yes"/>
     <xsl:template match="text()">
     </xsl:template>   
     <xsl:template match="/">

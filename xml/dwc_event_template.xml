@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <DarwinRecordSet xmlns="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:dwr="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dwc="http://rs.tdwg.org/dwc/terms/" xmlns:dcterms="http://purl.org/dc/terms/">
 	<dwc:Event>
 		<dcterms:type>Event</dcterms:type>

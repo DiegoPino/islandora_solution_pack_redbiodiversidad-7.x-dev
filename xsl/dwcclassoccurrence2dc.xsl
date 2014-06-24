@@ -10,7 +10,7 @@ This XSL StyleSheet only processes the first ocurrence of every class
     xmlns:dwr="http://rs.tdwg.org/dwc/dwcrecord/" xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
     xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
    
-    <xsl:output method="xml" indent="yes"/>
+    <xsl:output encoding="UTF-8" method="xml" indent="yes"/>
     
     <xsl:template match="/">
         <oai_dc:dc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

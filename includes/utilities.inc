@@ -316,3 +316,27 @@ function islandora_red_biodiversidad_get_parents_from_rels_ext(AbstractObject $o
   $collections = array_map($map, $collections);
   return array_filter($collections);
 }
+
+//Similar islandora_xacml_api_islandora_solr_query. But we don´t wan´t to use the limits and other defaults used by the solr api, so we implement our permission check independently
+
+function islandora_red_biodiversidad_getxacml_solrquery_restrictions() {
+  global $user;
+
+  if ($user->uid != 0) {
+    $user_name = $user->name;
+  }
+  else {
+    $user_name = 'anonymous';
+  }
+
+  $fq = variable_get('islandora_xacml_api_rels_viewable_user', 'rels.isViewableByUser') . ":\"" . $user_name . "\" OR ";
+
+  // Check if any of my roles are allowed.
+  foreach ($user->roles as $role) {
+    $fq .= variable_get('islandora_xacml_api_rels_viewable_role', 'rels.isViewableByRole') . ":\"" . $role . "\" OR ";
+  }
+  // Check if the object is open (unrestricted).
+  $fq .= "((*:* -" . variable_get('islandora_xacml_api_rels_viewable_user', 'rels.isViewableByUser') . ":[* TO *]) AND (*:* -" . variable_get('islandora_xacml_api_rels_viewable_role', 'rels.isViewableByRole') . ":[* TO *]))";
+  return $fq;
+}
+

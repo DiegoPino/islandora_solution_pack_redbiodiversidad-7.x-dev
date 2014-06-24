@@ -281,7 +281,7 @@ if (module_exists('islandora_ontologies'))
 			//First get all the xml fields allowed from every defined contentmodel template
 			foreach($content_models_with_processing_info as $cmodels=>$cmodels_info)
 				{
-					$dom= new DOMDocument;
+					$dom= new DOMDocument('1.0', 'UTF-8');
 					$dom->load($cmodels_info['template']);
 					$dwc_xpath = new DOMXPath($dom);
 					$dwc_xpath->preserveWhiteSpace = false;
@@ -494,7 +494,7 @@ if (module_exists('islandora_ontologies'))
 				 	{
 				 	drupal_set_message(t('This excel files does not contain enough data for this CMODEL(s)'));
 				 	}
-					//return it anyway...empty o not
+					//return it anyway...empty or not
 			     	return $file;	//info...not te input file...i should have used $info instead...but i left this so readers can keep track of variables in the original class definition...		
 				
  		    	
@@ -515,46 +515,39 @@ if (module_exists('islandora_ontologies'))
     $item_class = $this->itemClass;
 	
     $total = $this->getNumber();
-	$internal_setID_counter=0;
+	//$internal_setID_counter=0;
 	$date = date_create();
-	$this->setId=1;
+	//$this->setId=1;
 	
+	//return $preprocessed;
     for ($i = 0; $i < $total; $i++) {
       $item = $item_class::getOne($this->file);
       if ($item) {
-		$internal_setID_counter++;
+		//$internal_setID_counter++;
         $this->parameters['namespace'] = $this->getNamespace($item);
-        $preprocessed[] = $object = new RedBiodiviersidadIslandoraImporterBatchObject($this->connection, $item, $this->parameters);
+        $preprocessed[] = $object = new IslandoraImporterBatchObject($this->connection, $item, $this->parameters);
         $object->addRelationships();
 		//Added local generated id (using uui parameter from islandoras configuration)
 		$object->id=$item->getCurrentPid();
-		$object->addOntologiesRelationships();
+		//$object->addOntologiesRelationships();
+  	  	$localrels=$item->getRels();
+	  foreach ($localrels as $rels)
+  	  	{
+  	  	$object->relationships->add($rels['ns'], $rels['localname'], $rels['targetobject'],RELS_TYPE_URI);	
+  	  	}
+		
 		//$object->object_info=$item;//Solo pasaremos el objeto actual...esto está mal en la implementación parent!
 		$this->addToDatabase($object, $object->getResources());
-		if ($internal_setID_counter==50)//Diego Pino, Excel files can be large. Set group of 50 records to a batch set so we don´t run out of memory in Drupal or get PDO errors
+		/*if ($internal_setID_counter==50)//Diego Pino, Excel files can be large. Set group of 50 records to a batch set so we don´t run out of memory in Drupal or get PDO errors
 			{
 			$this->setId++;
 			$internal_setID_counter=0;
-			}
+			}*/
       }
     }
 	
     return $preprocessed;
   }
-}
-/**
-* @class IslandoraImporterBatchObject
-*/
-class RedBiodiviersidadIslandoraImporterBatchObject extends  IslandoraImporterBatchObject
-{
-    public function addOntologiesRelationships() {
-      $localrels = $this->importerObjectInstance->getRels();
-	  foreach ($localrels as $rels)
-	  	{
-	  	$this->relationships->add($rels['ns'], $rels['localname'], $rels['targetobject'],RELS_TYPE_URI);	
-	  	}
-    }
-	
 }
 /**
  * GBIF Excel import object.
@@ -567,7 +560,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  protected $mods;
 	  protected $title = NULL;
 	  protected $dwc = NULL;
-	  protected static $DC2MODS =NULL;
+	  protected static $DC2MODS = NULL;
 	  protected $DWC2DC = NULL ;
 	  protected $DWCTEMPLATE = NULL;
 	  protected $TITLEFIELD;
@@ -633,7 +626,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	  	{
 			
 		if ($this->dwc === NULL) {
-			$dom= new DOMDocument;
+			$dom= new DOMDocument('1.0', 'UTF-8');
 			$dom->load($this->DWCTEMPLATE);
 			$dwc_xpath = new DOMXPath($dom);
 			$dwc_xpath->preserveWhiteSpace = false;
@@ -647,7 +640,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 				{
 				//drupal_set_message(t('Query data es @campos', array('@campos' => $campos)));
 				$keydw=utf8_encode(stripslashes($keydw));
-				$valuedw=utf8_encode($valuedw);
+				$valuedw=htmlspecialchars(trim($valuedw), ENT_QUOTES,'UTF-8');
 					$camposdwcexistentes2=$dwc_xpath->query("//dwc:$keydw");	
 					if (sizeof($camposdwcexistentes2)>0)
 					{	
@@ -709,6 +702,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	        'control_group' => 'M',
 			'filename' => $name,
 	        'datastream_file' => file_create_url($file->uri),
+			'file' => $file,
 			
 	      );
 	    }
@@ -729,6 +723,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	        'mimetype' => 'text/xml',
 	        'control_group' => 'X',
 	        'datastream_file' => file_create_url($file->uri),
+			'file' => $file,
 			
 	      );
 	    }
@@ -747,6 +742,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	        'mimetype' => 'text/xml',
 	        'control_group' => 'M',
 	        'datastream_file' => file_create_url($file->uri),
+			'file' => $file,
 			
 	      );
 	    }
@@ -802,16 +798,16 @@ EOXML;
 			$xml = $this->getDC();
 			//error_log("mi DC ".var_export($xml,true),0);
 		  if ($xml) {			
-			$dc_doc = new DOMDocument();
+			$dc_doc = new DOMDocument('1.0', 'UTF-8');
 	        $dc_doc->loadXML($xml);
 	        $dc_xpath = new DOMXPath($dc_doc);
 	        $dc_xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
 			$result=$dc_xpath->evaluate('dc:title[text()]');
-	      	if ($result->length > 0){$this->title= $result->item(0)->nodeValue;}
+	      	if ($result->length > 0){$this->title= trim($result->item(0)->nodeValue);}
 			else
 				{
 				$result=$dc_xpath->evaluate('dc:type[text()]');
-				if ($result->length > 0){$this->title= "Unkown ".$result->item(0)->nodeValue." ";}
+				if ($result->length > 0){$this->title= "Unkown ".trim($result->item(0)->nodeValue)." ";}
 				}
 				unset($dc_xpath);
 				unset($dc_doc);
