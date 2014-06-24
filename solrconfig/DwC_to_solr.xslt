@@ -11,7 +11,7 @@ xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
 	    <xsl:param name="content"/>
 	    <xsl:param name="prefix">dwc.</xsl:param>
             <xsl:param name="prefixdc">dcterms.</xsl:param>
-	    <xsl:param name="suffix">_ms</xsl:param>
+	    <xsl:param name="suffix">_s</xsl:param>
 	    
 	    <!-- Class Records -->
 	    <xsl:for-each select="$content//dwc:Taxon/*">
@@ -104,13 +104,10 @@ xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
 			<xsl:when test="name()='dwc:decimalLongitude'">
 <field> 
 <xsl:attribute name="name">
-<xsl:value-of select="concat($prefix, 'latlong','_coordinatefull')"/>
+<xsl:value-of select="concat($prefix, 'latlong','_p')"/>
 </xsl:attribute>
-<xsl:attribute name="type">
-<xsl:value-of select="'location'"/>
-</xsl:attribute>			
 	<xsl:value-of select="../dwc:decimalLatitude"/>
-				<xsl:text>, </xsl:text>
+				<xsl:text>,</xsl:text>
 			<xsl:value-of select="normalize-space(text())" />
 </field>
 			</xsl:when>
@@ -135,6 +132,19 @@ xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
 
 
 		<xsl:for-each select="$content//dwr:SimpleDarwinRecordSet[1]/dwr:SimpleDarwinRecord[1]/*">
+ <xsl:choose>
+                        <xsl:when test="name()='dwc:decimalLongitude'">
+<field> 
+<xsl:attribute name="name">
+<xsl:value-of select="concat($prefix, 'latlong','_p')"/>
+</xsl:attribute>
+        <xsl:value-of select="../dwc:decimalLatitude"/>
+                                <xsl:text>,</xsl:text>
+                        <xsl:value-of select="normalize-space(text())" />
+</field>
+                        </xsl:when>
+                        <xsl:otherwise>
+
                     <field>
                             <xsl:attribute name="name">
   <xsl:choose><xsl:when test="(substring-before(name(),':')='dwc')">
@@ -146,6 +156,9 @@ xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
                     </xsl:attribute>
                             <xsl:value-of select="normalize-space(text())" />
                     </field>
+ </xsl:otherwise>
+</xsl:choose>
+
             </xsl:for-each>
 
     </xsl:template>
