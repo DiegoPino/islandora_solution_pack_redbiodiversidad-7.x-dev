@@ -210,31 +210,41 @@ function  islandora_red_biodiversidad_content_model_tohuman(AbstractObject $fedo
 function islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr($cmodel_pid)
 {
     module_load_include('inc', 'islandora_solr_search', 'includes/utilities');
-   $lastID="000000";//Assume some large autoincrementable number in case we don´t have anything in our solr index		
+    $institutioncode = variable_get('islandora_red_biodiversidad_setting_institution_code', 'CBUCN');
+	$lastID="";//Assume some large autoincrementable number in case we don´t have anything in our solr index	
 	$mappings = array(
       'biodiversity:OccurrenceCModel' => array(
         'field' => 'dwc.occurrenceID',
+		'default' => 'occurrence',
       ),
       'biodiversity:LocationCModel' => array(
         'field' => 'dwc.locationID',
+		'default' => 'location',
       ),
       'biodiversity:IdentificationCModel' => array(
          'field' => 'dwc.identificationID',
+		 'default' => 'identification',
       ),
       'biodiversity:MaterialSampleCModel' => array(
          'field' => 'dwc.materialSampleID',
+		 'default' => 'materialsample',
       ),
       'biodiversity:GeologicalContextCModel' => array(
          'field' => 'dwc.geologicalContextID',
+		 'default' => 'geologicalcontext',
       ),
       'biodiversity:EventCModel' => array(
          'field' => 'dwc.eventID',
+		 'default' => 'event',
       ),
       'biodiversity:SimpledwcCModel' => array(
           'field' => 'dwc.occurrenceID', //Sames as OccurrenceCModel
+		  'default' => 'sdwc_occurrence',
       ),
       'biodiversity:TaxonCModel' => array(
-        'field' => 'dwc.taxonID',//We won´t we calling this function for this model. Rarely Taxon ID are defined as new(there is almost always a unique existing ID from GBIF, EOL, etc). In case of a 
+        'field' => 'dwc.taxonID',
+		'default' => 'taxon',
+		//We should not be calling this function on ingest. Rarely Taxon ID are defined as new(there is almost always a unique existing ID from GBIF, EOL, etc). Also if we already have one of those in our solr the incrementing it would be a very bad idea! But we implemented some fallback anyway for our import module. Our People-scientist never give taxons and unique ID!
 	),
     );
  	
@@ -243,6 +253,8 @@ function islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr($cmodel_pid)
 		{
 		return array();
 		}
+	
+		
     $content_model_field = variable_get(
         'islandora_solr_content_model_field', 'RELS_EXT_hasModel_uri_ms'
     );
@@ -277,12 +289,29 @@ function islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr($cmodel_pid)
     $list = array();
   
     foreach ($json['response']['docs'] as $choice) {
-	
       if (isset($choice['PID'])) {
-        $lastID=$choice[$mappings[$cmodel_pid]['field']."_s"];
-      }
+		  if (isset($choice[$mappings[$cmodel_pid]['field']."_s"]))
+		  	{
+			$lastID=$choice[$mappings[$cmodel_pid]['field']."_s"];
+			}
+	  }
     }
-    dpm($choice);
+	//Exception for taxon ID
+	if ($cmodel_pid=="biodiversity:TaxonCModel")//I'm not going to autoincrement something that could be originated from somewhere else. 
+	{
+		//so check if it´s starts with our $institutioncode...this could be changed many times by the administrator, but it´s the only way to be semi-sure.
+		if (0 !== strpos($lastID, ' $institutioncode:')) {
+			$lastID="";
+			//it does not begin with our PID, so set it emtpy and let the next code handle it
+		}
+	}
+	
+    if (empty($lastID))
+		{
+		$lastID=$institutioncode.":".$mappings[$cmodel_pid]['default'].":0000";//In case our solr does not give us any data, or we are dealing with the first object of it´s kind 
+		}
+		
+		;//Assume some large autoincrementable number in case we don´t have anything in our solr index	)
     return array($mappings[$cmodel_pid]['field'],$lastID);
   }
 /**
