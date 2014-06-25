@@ -241,7 +241,10 @@ Occurrence Class processing
     <xsl:template match="dwc:taxonRank" mode="title">
         <xsl:if test="normalize-space(.)">
             <xsl:variable name="taxonstring">
-            <xsl:choose>               
+            <xsl:choose>   
+            <xsl:when test=".='species'">
+                    <xsl:value-of select="'scientificName'"/>
+                </xsl:when>            
                 <xsl:when test=".='family'">
                     <xsl:value-of select="'family'"/>
                 </xsl:when>
@@ -252,13 +255,13 @@ Occurrence Class processing
                     <xsl:value-of select="'class'"/>
                 </xsl:when>
                 <xsl:when test=".='genus'">
-                    <xsl:value-of select="'class'"/>
+                    <xsl:value-of select="'genus'"/>
                 </xsl:when>
                 <xsl:when test=".='order'">
                     <xsl:value-of select="'order'"/>
                 </xsl:when>
                 <xsl:when test=".='subgenus'">
-                    <xsl:value-of select="'order'"/>
+                    <xsl:value-of select="'subgenus'"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:value-of select="'scientificName'"/>

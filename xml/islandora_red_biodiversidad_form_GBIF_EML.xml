@@ -33,7 +33,7 @@
 					<required>FALSE</required>
 					<tree>TRUE</tree>
 					<title>packageId</title>
-					<description>PackageId is set automatictly by the system. But if you are updating and exisiting GBIF resource, the you can set this yourself.</description>
+					<description>PackageId is set by this system. But if you are updating and exisiting GBIF resource, the you can set this yourself.</description>
 					<actions>
 						<create>
 							<path>self::node()</path>

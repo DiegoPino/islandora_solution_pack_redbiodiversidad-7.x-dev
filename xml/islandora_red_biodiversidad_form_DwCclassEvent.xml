@@ -139,7 +139,7 @@
 								<properties>
 									<type>textfield</type>
 									<access>TRUE</access>
-									<default_value>zool</default_value>
+									<default_value></default_value>
 									<required>FALSE</required>
 									<title>Dynamic Properties</title>
 									<tree>TRUE</tree>
@@ -282,12 +282,12 @@
 							</element>
 							<element name="eventDate">
 								<properties>
-									<type>textfield</type>
+									<type>datepicker</type>
 									<access>TRUE</access>
 									<required>FALSE</required>
 									<title>Event date</title>
 									<description>
-									The date-time or interval during which an Event occurred. For occurrences, this is the date-time when the event was recorded. Not suitable for a time in a geological context. Recommended best practice is to use an encoding scheme, such as ISO 8601:2004(E).	
+									The date-time or interval during which an Event occurred. Not suitable for a time in a geological context. Recommended best practice is to use an encoding scheme, such as ISO 8601:2004(E).	
 									Examples: "1963-03-08T14:07-0600" is 8 Mar 1963 2:07pm in the time zone six hours earlier than UTC, "2009-02-20T08:40Z" is 20 Feb 2009 8:40am UTC, "1809-02-12" is 12 Feb 1809, "1906-06" is Jun 1906, "1971" is just that year, "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z" is the interval between 1 Mar 2007 1pm UTC and 11 May 2008 3:30pm UTC, "2007-11-13/15" is the interval between 13 Nov 2007 and 15 Nov 2007. For discussion see http://code.google.com/p/darwincore/wiki/Event
 									</description>
 									<tree>TRUE</tree>
@@ -459,7 +459,7 @@
 							</element>
 							<element name="eventRemarks">
 								<properties>
-									<type>textfield</type>
+									<type>textarea</type>
 									<access>TRUE</access>
 									<required>FALSE</required>
 									<title>eventRemarks</title>

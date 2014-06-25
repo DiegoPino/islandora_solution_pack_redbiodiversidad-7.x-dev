@@ -201,7 +201,7 @@
 								<properties>
 									<type>textfield</type>
 									<access>TRUE</access>
-									<default_value>Red de Biodiversidad Chile</default_value>
+									<default_value></default_value>
 									<required>FALSE</required>
 									<title>Rights Holder</title>
 									<tree>TRUE</tree>
@@ -267,7 +267,7 @@
 								<properties>
 									<type>textfield</type>
 									<access>TRUE</access>
-									<default_value>UCN</default_value>
+									<default_value></default_value>
 									<required>FALSE</required>
 									<title>Dataset Name</title>
 									<tree>TRUE</tree>
@@ -475,9 +475,10 @@
 							</element>
 							<element name="dynamicProperties">
 								<properties>
-									<type>textfield</type>
+									<type>textarea</type>
 									<access>TRUE</access>
-									<default_value>zool</default_value>
+									<description>A list (concatenated and separated) of additional measurements, facts, characteristics, or assertions about the record. Meant to provide a mechanism for structured content such as key-value pairs.</description>
+									<default_value></default_value>
 									<required>FALSE</required>
 									<title>Dynamic Properties</title>
 									<tree>TRUE</tree>
@@ -1035,7 +1036,7 @@ Examples: "skin; skull; skeleton", "whole animal (ETOH); tissue (EDTA)", "fossil
 							</element>
 							<element name="associatedReferences">
 								<properties>
-									<type>textfield</type>
+									<type>textarea</type>
 									<access>TRUE</access>
 									<required>FALSE</required>
 									<title>Associated References</title>
@@ -1067,7 +1068,7 @@ Examples: "skin; skull; skeleton", "whole animal (ETOH); tissue (EDTA)", "fossil
 							</element>
 							<element name="associatedSequences">
 								<properties>
-									<type>textfield</type>
+									<type>textarea</type>
 									<access>TRUE</access>
 									<required>FALSE</required>
 									<title>Associated Sequences</title>

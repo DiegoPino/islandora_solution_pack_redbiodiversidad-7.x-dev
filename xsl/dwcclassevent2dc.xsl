@@ -2,7 +2,7 @@
 
 <!--
 Diego Pino ... DwC class Any to OAI_DC Jun 2014.
-This XSL StyleSheet only processes the first ocurrence of every class
+This XSL StyleSheet only processes the first occurrence of every class
 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
@@ -21,61 +21,36 @@ This XSL StyleSheet only processes the first ocurrence of every class
                 <xsl:text>Empty Container por Object ID</xsl:text>
             </identifier> -->
             <xsl:text> </xsl:text>
-            <xsl:apply-templates select="/dwr:DarwinRecordSet/dwc:Event[1]/dwc:eventID" mode="eventterms2"/>
-            <xsl:apply-templates select="/dwr:DarwinRecordSet/dwc:Event[1]/dwc:*"/>
+            <xsl:apply-templates select="/dwr:DarwinRecordSet/dwc:Event[1]/dwc:*" mode="dwcterms"/>
             <xsl:apply-templates select="/dwr:DarwinRecordSet/dwc:Event[1]/dcterms:*" mode="eventterms"/>
-            
         </oai_dc:dc>
     </xsl:template>
-    <!--   
-Occurrence Class processing
-
-    <xsl:template match="/dwr:DarwinRecordSet/dwc:Event[1]/child::node()">
-        <xsl:if test="normalize-space(.)">
-            <xsl:choose>
-                <xsl:when test="name()='dwc:institutionCode'">
-                    <publisher xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:apply-templates select="* | node()"/>
-                    </publisher>
-                </xsl:when>
-                <xsl:when test="name()='dwc:catalogNumber'">
-                    <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:apply-templates select="* | node()"/>
-                    </identifier>
-                </xsl:when>
-                <xsl:when test="name()='dwc:recordNumber'">
-                    <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:apply-templates select="* | node()"/>
-                    </identifier>
-                </xsl:when>
-                <xsl:when test="name()='dwc:otherCatalogNumbers'">
-                    <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:apply-templates select="* | node()"/>
-                    </identifier>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:call-template name="anyID"> </xsl:call-template>
-                    <xsl:call-template name="anyRemarks"> </xsl:call-template>
-                    <xsl:call-template name="anyBy"> </xsl:call-template>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:if>
-    </xsl:template>
- -->
 
     <!--   
- Taxon Class processing
+ Event Class processing
  -->
-    <xsl:template name="eventID" match="/dwr:DarwinRecordSet/dwc:Event[1]/dwc:eventID" mode="eventterms2">
-        <xsl:if test="normalize-space(.)">
-            <title xmlns="http://purl.org/dc/elements/1.1/">
-                <xsl:apply-templates select="* | node()"/>
-            </title>
-        </xsl:if>
-    </xsl:template>    
-    <xsl:template name="taxonterms" match="/dwr:DarwinRecordSet/dwc:Event[1]/dwc:*">
+    
+ 
+ 
+<xsl:template match="/dwr:DarwinRecordSet/dwc:Event[1]/dwc:*" mode="dwcterms">
+    
+    <xsl:variable name="datefortitle">
+	  <xsl:value-of select="/*/dwc:Event[1]/dwc:eventDate" />
+	</xsl:variable>
+	
         <xsl:if test="normalize-space(.)">
             <xsl:choose>
+                 <xsl:when test="name()='dwc:eventID'">
+                  <identifier xmlns="http://purl.org/dc/elements/1.1/">
+                        <xsl:apply-templates select="* | node()"/>
+                    </identifier>
+                   <title xmlns="http://purl.org/dc/elements/1.1/">
+                      <xsl:apply-templates select="* | node()"/>
+                      <xsl:if test="normalize-space($datefortitle)">
+                      	<xsl:value-of select="concat(' on ',$datefortitle)"/>
+                      </xsl:if>
+                  </title>    
+                 </xsl:when>
                 <xsl:when test="name()='dwc:habitat'">
                     <subject xmlns="http://purl.org/dc/elements/1.1/">
                         <xsl:value-of select="local-name()"/> = <xsl:apply-templates select="* | node()"/>
@@ -149,40 +124,8 @@ Occurrence Class processing
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:if>
-    </xsl:template>
-    <!--   
- Event Class processing
-
-    <xsl:template match="/dwr:DarwinRecordSet/dwc:Event[1]/child::node()">
-        <xsl:if test="normalize-space(.)">
-            <xsl:choose>
-                <xsl:when test="name()='dwc:institutionCode'">
-                    <publisher xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:apply-templates select="* | node()"/>
-                    </publisher>
-                </xsl:when>
-                <xsl:when test="name()='dwc:catalogNumber'">
-                    <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:apply-templates select="* | node()"/>
-                    </identifier>
-                </xsl:when>
-                <xsl:when test="name()='dwc:recordNumber'">
-                    <identifier xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:apply-templates select="* | node()"/>
-                    </identifier>
-                </xsl:when>
-
-                <xsl:otherwise>
-                    <xsl:call-template name="anyID"> </xsl:call-template>
-                    <xsl:call-template name="anyRemarks"> </xsl:call-template>
-                    <xsl:call-template name="anyBy"> </xsl:call-template>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:if>
-    </xsl:template> -->
-    <!--   
- We need to extract the taxon rank(Taxon Class) to decide which taxon term are we using as title
- -->
+    </xsl:template>  
+ 
 
     <xsl:template match="/dwr:DarwinRecordSet/dwc:Event[1]/dcterms:*" mode="eventterms" name="dcterms">
         <xsl:if test="normalize-space(.)">

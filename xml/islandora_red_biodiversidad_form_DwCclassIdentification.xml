@@ -167,7 +167,7 @@
 							</element>
 							<element name="dateIdentified">
 								<properties>
-									<type>textfield</type>
+									<type>datepicker</type>
 									<access>true</access>
 									<required>false</required>
 									<title>Date Identified</title>
