@@ -471,7 +471,7 @@ WHERE {{
   }
 
 EOQ;
-dpm ($query);
+
     $results = $connection->repository->ri->sparqlQuery($query);
   //var_dump($query);
 //print_r($results);// Sort the objects into their proper order.
