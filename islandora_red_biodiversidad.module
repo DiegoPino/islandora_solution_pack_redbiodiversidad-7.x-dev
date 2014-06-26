@@ -794,7 +794,7 @@ function islandora_red_biodiversidad_validateandpopulateTaxon(&$form, &$form_sta
 		  $parametro=urlencode(trim($form['Taxon']['dwc_fields_taxon']['scientificName']['#value']));
 	 
 		  $url ="http://api.gbif.org/v0.9/species/match?strict=true&verbose=true&name=".$parametro;
-		  drupal_set_message($url);
+		  //drupal_set_message($url);
 		  $response = drupal_http_request($url);
 		    if (!empty($response->error)) {
 		      $msg_args = array(
@@ -865,7 +865,7 @@ function islandora_red_biodiversidad_validateandpopulateTaxon(&$form, &$form_sta
 function islandora_red_biodiversidad_validateandpopulate(&$form, &$form_state)
 {        
 	
-	 drupal_set_message(t('You just performed an ajax reload.'));
+	//drupal_set_message(t('You just performed an ajax reload.'));
 	 // $text = $form_state['values']['html_command_example'];
 	  $selector ='#edit-simpledarwinrecord-dwc-fields-taxon-scientificname';
 	  $commands = array();
@@ -968,7 +968,7 @@ function islandora_red_biodiversidad_eol_getdata($query)
 			
   	  $url ='http://eol.org/api/search/1.0.json?q='.$query.'&page=1&exact=false&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=';
 
-  	  drupal_set_message($url);
+  	  //drupal_set_message($url);
   	  $response = drupal_http_request($url);
   	    if (!empty($response->error)) {
   	      $msg_args = array(
@@ -990,7 +990,7 @@ function islandora_red_biodiversidad_eol_getdata($query)
 					
 					
 				 $url2 ='http://eol.org/api/pages/1.0/'.$eol_data['id'].'.json?images=1&videos=0&sounds=0&maps=0&text=2&iucn=true&subjects=overview&licenses=cc-&details=true&common_names=true&synonyms=true&references=true&vetted=1&cache_ttl=';	
-		     	  drupal_set_message($url2);
+		     	 // drupal_set_message($url2);
 		     	  $response2 = drupal_http_request($url2);
 		     	    if (!empty($response->error)) {
 		     	      $msg_args = array(
@@ -1012,7 +1012,7 @@ function islandora_red_biodiversidad_eol_getdata($query)
 						$data2['taxonConcepts'];//Links to external sources and their identifiers
 						$data2['dataObjects']; //all the other info
 						
-						cache_set('islandora_red_biodiversidad_'.$query, $data2, 'cache', time() + 360);	
+						cache_set('islandora_red_biodiversidad_'.$query, $data2, 'cache', time() + 86400);	
 						}
 						
 				}
