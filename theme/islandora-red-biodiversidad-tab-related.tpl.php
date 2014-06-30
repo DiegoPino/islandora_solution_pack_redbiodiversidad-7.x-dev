@@ -19,6 +19,9 @@
     <?php if($related): ?>
       <div>
         <h2><?php print t('Related Darwin Core Objects'); ?></h2>
+		<div>
+			<?php print $variables['related_sparql_results'];?>
+		</div>
         <ul>
           <?php foreach ($related as $item): ?>
             <li><?php print $item['relation']; ?>
