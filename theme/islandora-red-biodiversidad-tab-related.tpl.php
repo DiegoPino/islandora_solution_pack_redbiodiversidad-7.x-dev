@@ -16,7 +16,7 @@
 <div class="islandora-related-objects islandora">
   <div class="islandora-related-content-wrapper clearfix">
 
-    <?php if($related): ?>
+    <?php if($variables['related_sparql_results']): ?>
       <div>
         <h2><?php print t('Related Darwin Core Objects'); ?></h2>
 		<div>

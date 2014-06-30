@@ -733,7 +733,8 @@ foreach ($result as $ontologie=>$graphs)
 				$s=$s=='s'?'o':'s';
 				if ($cur>0)
 					{
-				$relationsandcmodels_sparqlmapping_hash[$sparql_object]=array($cmodel,$current_rel);
+					    
+				    $relationsandcmodels_sparqlmapping_hash[$sparql_object]=array($cmodel,$current_rel);
 					$sparql_object="";	
 					$current_rel="";
 					}
@@ -765,6 +766,8 @@ foreach ($result as $ontologie=>$graphs)
 					$cur++;
 					$query.="> ?$s$cur"."_$paths"."\r\n";
 					$sparql_object=$s.$cur."_$paths";	
+				    
+					
 					$current_rel=$rel;
 					
 					
@@ -848,7 +851,7 @@ EOQ;
 				
 				foreach ($results as $result) {
 				    $related_sparql_closeure="";
-					$related_sparql="";
+					$related_sparql="<div>$islandora_object->label".t(' relates via:');
 					$list=array();
 					$level=0;
 					foreach($result as $sparqlvar=>$hit)
@@ -861,14 +864,19 @@ EOQ;
 						$object = $islandora_object->repository->getObject($hit['value']);
 						$model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
 						$relation=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0];	
-						$related_sparql=$related_sparql."<ul class=\"action-links\"><i class=\"icon-li icon-chevron-right\"></i><li class=\"level-$level\"><span>$relation</span>".l($object->label, "islandora/object/".$hit['value']);
-						//$related[]=array('relation'=>$relation,'object'=>$object,'model_label'=>$model_label);	
+						$rel_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/',$relation, $m)? $m[2]: $relation;
+						
+						$rel_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $rel_label, $m)? $m[2]: $rel_label;	
+						//If the Ontology is nice written...the this makes wonders:
+						$splitedlabel=implode(' ',preg_split('/(?=[A-Z])/', $rel_label, -1, PREG_SPLIT_NO_EMPTY));
+						$rel_label=!empty($splitedlabel)?$splitedlabel:$rel_label;
+						$related_sparql=$related_sparql."<ul class=\"action-links\"><i class=\"icon-li icon-chevron-right\"></i><li class=\"level-$level\"><span>$rel_label</span>".l($object->label, "islandora/object/".$hit['value']);
 					    $related_sparql_closeure.='</li></ul>';
 						}
 						
 						
 					}
-				$related_sparql_results[]=array('#type'=>'markup','#markup'=>$related_sparql.$related_sparql_closeure);	
+				$related_sparql_results[]=array('#type'=>'markup','#markup'=>$related_sparql.$related_sparql_closeure."</div>");	
 			}
 			
 			
