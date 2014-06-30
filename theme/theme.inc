@@ -870,7 +870,7 @@ EOQ;
 						//If the Ontology is nice written...the this makes wonders:
 						$splitedlabel=implode(' ',preg_split('/(?=[A-Z])/', $rel_label, -1, PREG_SPLIT_NO_EMPTY));
 						$rel_label=!empty($splitedlabel)?$splitedlabel:$rel_label;
-						$related_sparql=$related_sparql."<ul class=\"action-links\"><i class=\"icon-li icon-chevron-right\"></i><li class=\"level-$level\"><span>$rel_label</span>".l($object->label, "islandora/object/".$hit['value']);
+						$related_sparql=$related_sparql."<ul class=\"action-links\"><li><i class=\"icon-li icon-chevron-right\"></i><span class=\"islandora-red-biodiversidad-info\">$rel_label</span> to ".l($object->label, "islandora/object/".$hit['value']);
 					    $related_sparql_closeure.='</li></ul>';
 						}
 						
