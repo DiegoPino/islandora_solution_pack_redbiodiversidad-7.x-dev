@@ -55,7 +55,9 @@ $query_processor->solrQuery = format_string(
 )
 );
 $query_processor->solrStart = 0;
-//$query_processor->solrLimit = 1000;//no limit better for now, leaflet can manage aprox 50.000 cluster points concurrent.
+$query_processor->solrLimit = 10000;
+
+//limit to 10000 for now, leaflet can manage aprox 50.000 cluster points concurrent.
 //Let's add some base restrictions to comply with Solr module permissiones
 		
 $xacml_restrictions=islandora_red_biodiversidad_getxacml_solrquery_restrictions();
