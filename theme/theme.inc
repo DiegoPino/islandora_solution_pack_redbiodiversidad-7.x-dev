@@ -26,7 +26,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	$islandora_object = $variables['islandora_object'];
 	$object_pid = $islandora_object->id;
 	drupal_set_title($islandora_object->label);
-		
+	$pathtopoints=array();
 		
 	$mappings = array(
 		'location' => array(
@@ -134,7 +134,9 @@ foreach($models  as $contentmodelpid)
 }
 //dpm($result);
 //It it´s not a location model object what we are visiting the we must reverse the paths($result) and remove everything until we get to a location model
-if (!(array_intersect(array('biodiversity:LocationCModel'), $models))) {
+if (!empty($result))
+{
+if (!(array_intersect(array('biodiversity:LocationCModel'), $models)))  {
 
 
 	foreach ($result as $ontologie=>&$graphs2)
@@ -354,6 +356,9 @@ EOQ;
 	//dpm($pathtopoints);
 	$pathtopoints=array_map("unserialize", array_unique(array_map("serialize", $pathtopoints)));
 //End sparql
+
+}//end check for $results, if no ontology is given or no paths then we won´t get anything from up there. 
+
 $locations2=array();
 $locations3=array();
 		
