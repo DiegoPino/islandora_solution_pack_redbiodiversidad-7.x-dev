@@ -326,8 +326,9 @@ EOQ;
 					if (($hit['type']=='pid'))
 					{
 						
-						//dpm('agregando');
-						$object = $islandora_object->repository->getObject($hit['value']);
+						
+					    try {
+					    $object = $islandora_object->repository->getObject($hit['value']);
 						$model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
 					    $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
 						
@@ -336,6 +337,18 @@ EOQ;
 						//$model_label=str_replace('biodiversity:','dwc:',$model_label);
 						$model_label=str_replace('CModel','',$model_label)."s";
 						$pathtopoints[$pathoflocation_pid][]=array('type' => 'point','popup' => l($object->label, 'islandora/object/'.$hit['value']),'clusterGroup'=> $model_label);
+						
+					    }
+					    catch (RepositoryException $e) {
+					   
+					        watchdog_exception('Islandora Red de Biodiversidad', $e, 'Got an exception while trying to get relation for @pid to @targetpid on @rel on map', array(
+						        '@pid' => $object_pid, '@targetpid' => $hit['value'], '@rel'=>$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0]
+						      ), WATCHDOG_ERROR);
+					  
+						}
+						
+						
+						
 						
 					}										
 						
@@ -719,6 +732,9 @@ $o='o';
 $s='s';
 $query="";
 $relationsandcmodels_sparqlmapping_hash=array();//This structure is a hash map between Sparql Variables and rels+cmodels form our paths so we don`t ahve to extract this info from Mulgara.
+if (!empty($result))
+{
+
 foreach ($result as $ontologie=>$graphs)
 {
 			
@@ -866,18 +882,33 @@ EOQ;
 						
 					if ($hit['type']=='pid')	
 						{
+							$object_label="";
+							$object_link="";
 							$level++;
+						    try {
+						    $object = $islandora_object->repository->getObject($hit['value']);
+							$object_label=$object->label;
+							$object_link=l($object_label, "islandora/object/".$hit['value']);
+						    }
+						    catch (RepositoryException $e) {
+						   
+						        watchdog_exception('Islandora Red de Biodiversidad', $e, 'Got an exception while trying to get relation for @pid to @targetpid on @rel', array(
+							        '@pid' => $pid, '@targetpid' => $hit['value'], '@rel'=>$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0]
+							      ), WATCHDOG_ERROR);
+						    $object_label = "";
+							$object_link="Non longer existing object (".$hit['value'].")";
+							}
 							
-						$object = $islandora_object->repository->getObject($hit['value']);
+						
 						$model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
 						$relation=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0];	
 						$rel_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/',$relation, $m)? $m[2]: $relation;
 						
 						$rel_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $rel_label, $m)? $m[2]: $rel_label;	
-						//If the Ontology is nice written...the this makes wonders:
+						//If the Ontology is nice written...then this makes wonders:
 						$splitedlabel=implode(' ',preg_split('/(?=[A-Z])/', $rel_label, -1, PREG_SPLIT_NO_EMPTY));
 						$rel_label=!empty($splitedlabel)?$splitedlabel:$rel_label;
-						$related_sparql=$related_sparql."<ul class=\"action-links\"><li><i class=\"icon-li icon-chevron-right\"></i><span class=\"islandora-red-biodiversidad-info\">$rel_label</span> to ".l($object->label, "islandora/object/".$hit['value']);
+						$related_sparql=$related_sparql."<ul class=\"action-links\"><li><i class=\"icon-li icon-chevron-right\"></i><span class=\"islandora-red-biodiversidad-info\">$rel_label</span> to ".$object_link;
 					    $related_sparql_closeure.='</li></ul>';
 						}
 						
@@ -892,10 +923,19 @@ EOQ;
 				
 				
 		}
-			$variables['related'] = $related;
 			
-			$variables['related_sparql_results'] = drupal_render($related_sparql_results);
+			$variables['related'] = $related;
+			if (count($related_sparql_results)>0)
+				{
+				$variables['related_sparql_results'] = drupal_render($related_sparql_results);
+				}
+			else
+				{
+				$variables['related_sparql_results'] = t('There are no related objects from or to this one.');	
+				}	
 			//dpm($variables['related_sparql_results']);
+	}	
+		
 		}
 
 
