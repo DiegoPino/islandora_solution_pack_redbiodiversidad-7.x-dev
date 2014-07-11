@@ -50,9 +50,15 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
    * @see IslandoraBatchImporter::getNumber()
    */
   public function getNumber() {
-  
-	  error_log("total de registros a importar".count($this->file['object_info']),0);
-	     return count($this->file['object_info']); //Devuelve el numero de registros totales
+    
+	 $file_contents = file_get_contents(drupal_realpath($this->file['object_info']->uri));
+	 $data=unserialize($file_contents); 
+	 $numdata=count($data);
+	 unset($data);
+	 unset($file_contents);
+	  
+	  error_log("total de registros a importar".$numdata,0);
+	     return $numdata; //Devuelve el numero de registros totales
 	   
   }
 
@@ -231,8 +237,7 @@ if (module_exists('islandora_ontologies'))
 			//ns Namespace
 			//localname property local name
 			//allowsmore (Boolean) TRUE if possible...if this key is absent means the we can´t add this relation
-			//Max: if max==1 the only allow one of this relations. In Owl lite max can be only 0 or 1...
-			//If case of dupicate objects and max==1 we can´t discard/join new objects because we could end with two relations to the same...we check this in getingestinfo
+			//If case of dupicate objects we can´t discard/join new objects because we could end with two relations to the same...should we check this in getingestinfo?
 			}
 		}
 	    // Test implementation, try to use ontologies, if ontologie module is enabled
@@ -245,12 +250,12 @@ if (module_exists('islandora_ontologies'))
 		//Must: we need the object->id to be defined during getIngestInfo, not on preprocess?
 		
 	
-	$object_realinfo=static::getIngestInfo($excel_file,$contentmodels_xml_proccessing_data,$content_models,$form_state['values']['namespace']); 
+	$objects_realinfo=static::getIngestInfo($excel_file,$contentmodels_xml_proccessing_data,$content_models,$form_state['values']['namespace']); 
 	//@todo mark the excel file for deleting
 	$file = array( //No really a file...but i keep using this name because the parent class defined this structure as such....
       'pid_namespace' => $form_state['values']['namespace'],
       'content_model' => $contentmodels_xml_proccessing_data,//In this case multiple....
-      'object_info' => $object_realinfo,
+      'object_info' => $objects_realinfo, //July 2014, This is the uri of the file that contains the serialized data, no longer passed as an array, too huge for the queue DB.
       'processed_objects' => array(),
     );
     return $file;
@@ -363,7 +368,7 @@ if (module_exists('islandora_ontologies'))
 				//Now we got for every cmodel a list of fields present in this excel file. great. Now fill the info. One row can generate multiple objects.	
 				//Also check for duplicates.
 				
-					$objectcount=0;	     
+				$objectcount=0;	     
 			 	for ($fila = 2; $fila <= (int)$highestRow; $fila++)
 			 		{
 					$thisrow=array();//we empty this every row...it´s just an acumulator of what we have for every row
@@ -493,9 +498,17 @@ if (module_exists('islandora_ontologies'))
 				 if (sizeof($file)==0)
 				 	{
 				 	drupal_set_message(t('This excel files does not contain enough data for this CMODEL(s)'));
-				 	}
+				 	return;
+					}
 					//return it anyway...empty or not
-			     	return $file;	//info...not te input file...i should have used $info instead...but i left this so readers can keep track of variables in the original class definition...		
+			     	//July 2014. We are having serious trouble importing large datasets. The reason. Drupals Batch serializes the whole preprocessor. That means our $file array gets inserted as a whole thing inside the queue DB.
+					//In case we are dealing with 1000+ rows, this array is huge, and we get a PDO exception. It matters nothing that islandora then processes every object as a individual entitity.
+					//Solution: we will have to write this array to disk serialized. Then on every getOne request open the file, get a record, re-serialize and write to disk again. I really don´t like this approach.
+					
+					$toDisk = serialize($file);
+					$newfileName='dwc_gbif_importer_preprocesseddata_'.time().'txt';
+					$newfile = file_save_data($toDisk,'public://' .$newfileName);
+					return $newfile;	//info...not the input file...i should have used $info instead...but i left this so readers can keep track of variables in the original class definition...		
 				
  		    	
 				}
@@ -513,17 +526,21 @@ if (module_exists('islandora_ontologies'))
   public function preprocess() {
     $preprocessed = array();
     $item_class = $this->itemClass;
-	
-    $total = $this->getNumber();
+ 	
+	$file_contents = file_get_contents(drupal_realpath($this->file['object_info']->uri));
+    $wholedata=unserialize($file_contents); 		
+    $total = count($wholedata);
 	//$internal_setID_counter=0;
 	$date = date_create();
 	//$this->setId=1;
+	$tempfile=$this->file;
+	$tempfile['object_info']=$wholedata;//July 2014. This looks messy. Iknow the getone should do the work, but opening the file and serializing for every getone is getting over my max execution time limit. So i will try it this way,
+	error_log(var_export($this->connection,true),0);
 	
 	//return $preprocessed;
     for ($i = 0; $i < $total; $i++) {
-      $item = $item_class::getOne($this->file);
+      $item = $item_class::getOne($tempfile);
       if ($item) {
-		//$internal_setID_counter++;
         $this->parameters['namespace'] = $this->getNamespace($item);
         $preprocessed[] = $object = new IslandoraImporterBatchObject($this->connection, $item, $this->parameters);
         $object->addRelationships();
@@ -536,16 +553,14 @@ if (module_exists('islandora_ontologies'))
   	  	$object->relationships->add($rels['ns'], $rels['localname'], $rels['targetobject'],RELS_TYPE_URI);	
   	  	}
 		
-		//$object->object_info=$item;//Solo pasaremos el objeto actual...esto está mal en la implementación parent!
-		$this->addToDatabase($object, $object->getResources());
-		/*if ($internal_setID_counter==50)//Diego Pino, Excel files can be large. Set group of 50 records to a batch set so we don´t run out of memory in Drupal or get PDO errors
-			{
-			$this->setId++;
-			$internal_setID_counter=0;
-			}*/
-      }
+		$this->addToDatabase($object, array());
+		
+		unset($item);
+		unset($object);
+	  }
     }
-	
+	unset ($tempfile);
+	unset ($wholedata);
     return $preprocessed;
   }
 }
@@ -601,25 +616,32 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
   	  	}
 	  
 	  public static function getOne(&$info) {//remember...no really a file.but an array of info...so i will just change this name....it´s my implementation of the class anyway
-		$record = array();
-		$key = key($info['object_info']);
-		$record = array(//A.k.a source chunk..
-	      'pid_namespace' => $info['pid_namespace'],
-	      'data' => $info['object_info'][$key]['data'],
-	      'content_model' => $info['object_info'][$key]['cmodel'],
-	      'dwc2dc' => $info['content_model'][$info['object_info'][$key]['cmodel']]['dwc2dc'],//every cmodel has a different one
-		  'template'=>	$info['content_model'][$info['object_info'][$key]['cmodel']]['template'],
-		  'titlefield'=> $info['content_model'][$info['object_info'][$key]['cmodel']]['title'],
-		  'localrels'=>$info['object_info'][$key]['localrels'],
-		  'pid'=>$info['object_info'][$key]['pid'],
-		);
-		 
-			
-	    unset($info['object_info'][$key]);//Ok, we got one, unset this from the  big big source
-	    return (empty($record) ? FALSE : new static($record));
 		
-	    
+		
+  		$record = array();
+		$key = key($info['object_info']);
+  		$record = array(//A.k.a source chunk..
+  	      'pid_namespace' => $info['pid_namespace'],
+  	      'data' => $info['object_info'][$key]['data'],
+  	      'content_model' => $info['object_info'][$key]['cmodel'],
+  	      'dwc2dc' => $info['content_model'][$info['object_info'][$key]['cmodel']]['dwc2dc'],//every cmodel has a different one
+  		  'template'=>	$info['content_model'][$info['object_info'][$key]['cmodel']]['template'],
+  		  'titlefield'=> $info['content_model'][$info['object_info'][$key]['cmodel']]['title'],
+  		  'localrels'=>$info['object_info'][$key]['localrels'],
+  		  'pid'=>$info['object_info'][$key]['pid'],
+  		);
+		 	
+  	    unset($info['object_info'][$key]);//Ok, we got one, unset this from the  big big source
+  	    return (empty($record) ? FALSE : new static($record));		    
 	  }
+	  
+	  /**
+	   * Generates a MODS document representing the imported data.
+	   *
+	   * @see IslandoraImportObject::getMODS()
+	   */
+	  public function getMODS()
+	  {}
 	  
 	  
 	  protected function getDwC()//Usaremos esta función para crear un DwC XML a partir de cada fila entregada por el excel
@@ -732,56 +754,12 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 	        t('Failed to produce DC record for @pid.'),
 	      );
 	    }
-	    $obtained_mods = $this->getMODS();
-	    if ($obtained_mods) {
-	      $name = file_create_filename('MODS record.xml', 'public://');
-	      $files[] = $file = file_save_data($obtained_mods, $name);
-	      $datastreams[] = array(
-	        'dsid' => 'MODS',
-	        'label' => 'MODS Record',
-	        'mimetype' => 'text/xml',
-	        'control_group' => 'M',
-	        'datastream_file' => file_create_url($file->uri),
-			'file' => $file,
-			
-	      );
-	    }
-	    else {
-	      $errors[] = array(
-	        t('Failed to produce MODS record for @pid.'),
-	      );
-	    }
+	    
         //error_log("mis errores generando datastreams",var_export($errors,true),0);
 	    return $datastreams;
 	  }
 
-	  /**
-	   * Generates a MODS document representing the imported data.
-	   *
-	   * @see IslandoraImportObject::getMODS()
-	   */
-	  public function getMODS() {
-	    if ($this->mods === NULL) {
-	     	 $xml = $this->getDC();
-			 $title=$this->getTitle();
-		  	 if ($this->isDC($xml)) {//verifico si el DC quedo bien hecho
-				// error_log("mi XSLT para MODS".var_export(self::$DC2MODS,true),0);
-	 	        $this->mods = static::runXSLTransform(array('input' => $xml, 'xsl' => self::$DC2MODS));
-	 	        
-			 } if (empty($this->mods)) { 
-			 $this->mods = <<<EOXML
-<mods xmlns:mods="http://www.loc.gov/mods/v3" xmlns="http://www.loc.gov/mods/v3">
-  <titleInfo>
-    <title>$title</title>
-  </titleInfo>
-</mods>
-EOXML;
-			 
-		  }
-		  
-	}	 
-	    return $this->mods;
-	  }
+	  
 
 	  /**
 	   * Generate DC to describe the imported data.
