@@ -316,17 +316,16 @@ EOQ;
 					}
 				}	
 			}
-			//If the path has a location, then harvest all other objects and add it to the array.
+			//If the path has a location, then harvest all other objects and add it to the array key of this location. 
+			//If not assume direct relation to this object, means a path thats goes in another direction of our object is the center of a star =) nice deduction of myself!.
+			//This also means that if there are relations to a location starting from here then we must assume that all objects  that go in any other direction are related to all found locations and not a particular one.
 			if ($harvestthispath)
 			{
 				//dpm("entrando");
 				foreach($result as $sparqlvar=>$hit)
-				{			
-					
+				{								
 					if (($hit['type']=='pid'))
 					{
-						
-						
 					    try {
 					    $object = $islandora_object->repository->getObject($hit['value']);
 						$model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
