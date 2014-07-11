@@ -6,6 +6,7 @@
 		<dwc:scientificName></dwc:scientificName>
 		<dwc:nomenclaturalCode></dwc:nomenclaturalCode>
 		<dwc:taxonomicStatus></dwc:taxonomicStatus>
+		<dwc:kingdom></dwc:kingdom>
 		<dwc:phylum></dwc:phylum>
 		<dwc:class></dwc:class>
 		<dwc:order></dwc:order>

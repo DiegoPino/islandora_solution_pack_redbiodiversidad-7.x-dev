@@ -17,6 +17,7 @@
 		<dwc:recordedBy></dwc:recordedBy>
 		<dwc:recordNumber></dwc:recordNumber>
 		<dwc:individualID/>
+		<dwc:individualCount/>
 		<dwc:sex></dwc:sex>
 		<dwc:lifeStage></dwc:lifeStage>
 		<dwc:reproductiveCondition></dwc:reproductiveCondition>

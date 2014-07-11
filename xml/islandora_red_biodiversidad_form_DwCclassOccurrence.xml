@@ -684,6 +684,39 @@ For specimens this is the equivalent of the name of a collector, or list of name
 								</properties>
 								<children/>
 							</element>
+							<element name="individualCount">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Individual Count</title>
+									<description>The number of individuals represented present at the time of the Occurrence.</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:DarwinRecordSet/dwc:Occurrence</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:individualCount</value>
+										</create>
+										<read>
+											<path>/dwr:DarwinRecordSet/dwc:Occurrence/dwc:individualCount</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
 							<element name="sex">
 								<properties>
 									<type>select</type>
