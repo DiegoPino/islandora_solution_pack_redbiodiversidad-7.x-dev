@@ -23,26 +23,6 @@ function islandora_red_biodiversidad_ingest__red_biodiversidad_ds_composite_data
   $ds_composite_datastream->setContentFromFile("$module_path/xml/islandora_red_biodiversidad_ds_composite_model.xml", FALSE);
   $islandora_object->ingestDatastream($ds_composite_datastream);
 }
-/**
- * This function will add an OWL datastream to an object(Content Model)
- * In this solution pack we are using a simililar to EMC's aproach, defining allowed relations(classes) on Content Model level
- * Using ontologies we can describe biodiversity relations for our needs
- * The ontologies are 
- *
- * @param AbstractObject $islandora_object
- *   The object to add the DS composite datastream to.
- * @see http://sourceforge.net/apps/mediawiki/ecm/index.php?title=Ontology_Language
- */
-function islandora_red_biodiversidad_ingest__red_biodiversidad_owl_datastream(AbstractObject $islandora_object) {
-  $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
-  $owl_datastream = $islandora_object->constructDatastream('OWL', 'X');
-  $owl_datastream->label = 'DS-COMPOSITE-MODEL';
-  $owl_datastream->mimetype = 'text/xml';
-  $owl_datastream->setContentFromFile("$module_path/rdf/islandora_red_biodiversidad_owl.rdf", FALSE);
-  $islandora_object->ingestDatastream($owl_datastream);
-}
-
-
 
 /**
  * This function will add the islandora:sp_red_biodiversidad content model to an object.
@@ -302,7 +282,7 @@ function islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr($cmodel_pid)
 		//so check if it´s starts with our $institutioncode...this could be changed many times by the administrator, but it´s the only way to be semi-sure.
 		if (0 !== strpos($lastID, ' $institutioncode:')) {
 			$lastID="";
-			//it does not begin with our PID, so set it emtpy and let the next code handle it
+			//it does not begin with our PID, so set it empty and let the next code handle it
 		}
 	}
 	
