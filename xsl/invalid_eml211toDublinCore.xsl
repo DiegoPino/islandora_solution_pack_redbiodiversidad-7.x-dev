@@ -79,6 +79,7 @@
     </xsl:if>
     
     <xsl:call-template name="type"></xsl:call-template>
+    <xsl:call-template name="source"></xsl:call-template>
 
     <xsl:for-each select="eml:eml/eml:dataset//eml:physical/eml:dataFormat">
       <xsl:element name="dc:format">
@@ -212,6 +213,16 @@
     <xsl:value-of select="eml:southBoundingCoordinate" /> S
   </xsl:template>
 
+  <xsl:template name="source">
+    <xsl:element name="dc:source">
+      <xsl:choose>
+        <xsl:when test="eml:eml/eml:additionalMetadata/eml:metadata/eml:gbif/eml:collectionIdentifier">
+        <xsl:value-of select="eml:eml/eml:additionalMetadata/eml:metadata/eml:gbif/eml:collectionIdentifier"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:element>
+  </xsl:template>
+  
   <xsl:template name="coverageTemporal">
     <xsl:choose>
       <xsl:when test="eml:singleDateTime">
@@ -224,5 +235,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+  
+  
 
 </xsl:stylesheet>

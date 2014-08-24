@@ -498,7 +498,7 @@ http://wiki.tdwg.org/twiki/bin/view/DarwinCore/BasisOfRecord</description>
 						<children>
 							<element name="eventDate">
 								<properties>
-									<type>textfield</type>
+									<type>datepicker</type>
 									<access>true</access>
 									<required>false</required>
 									<title>Event Date</title>
@@ -1086,8 +1086,269 @@ http://wiki.tdwg.org/twiki/bin/view/DarwinCore/BasisOfRecord</description>
 								</properties>
 								<children/>
 							</element>
+							<element name="minimumElevationInMeters">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Minimum Elevation In Meters</title>
+									<tree>TRUE</tree>
+									<description>The lower limit of the range of elevation (altitude, usually above sea level), in meters.
+										Example: "100". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:minimumElevationInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:minimumElevationInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="maximumElevationInMeters">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Maximum Elevation In Meters</title>
+									<tree>TRUE</tree>
+									<description>The upper limit of the range of elevation (altitude, usually above sea level), in meters.
+										Example: "200". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:maximumElevationInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:maximumElevationInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>						
+							<element name="minimumDepthInMeters">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Minimum Depth In Meters</title>
+									<tree>TRUE</tree>
+									<description>The lesser depth of a range of depth below the local surface, in meters.
+										Example: "100". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:minimumDepthInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:minimumDepthInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="maximumDepthInMeters">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Maximum Depth In Meters</title>
+									<tree>TRUE</tree>
+									<description>The greater depth of a range of depth below the local surface, in meters.
+										Example: "200". For discussion see http://code.google.com/p/darwincore/wiki/Location
+								</description>
+									<actions>
+										<create>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:maximumDepthInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:maximumDepthInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="minimumDistanceAboveSurfaceInMeters">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Minimum Distance Above Surface In Meters</title>
+									<tree>TRUE</tree>
+									<description>The lesser distance in a range of distance from a reference surface in the vertical direction, in meters. Use positive values for locations above the surface, negative values for locations below. If depth measures are given, the reference surface is the location given by the depth, otherwise the reference surface is the location given by the elevation.
+										Example: 1.5 meter sediment core from the bottom of a lake (at depth 20m) at 300m elevation; VerbatimElevation: "300m" MinimumElevationInMeters: "300", MaximumElevationInMeters: "300", VerbatimDepth: "20m", MinimumDepthInMeters: "20", MaximumDepthInMeters: "20", minimumDistanceAboveSurfaceInMeters: "0", maximumDistanceAboveSurfaceInMeters: "-1.5". For discussion see http://code.google.com/p/darwincore/wiki/Location
+									</description>
+									<actions>
+										<create>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:minimumDistanceAboveSurfaceInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:minimumDistanceAboveSurfaceInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							<element name="maximumDistanceAboveSurfaceInMeters">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Maximum Distance Above Surface In Meters</title>
+									<tree>TRUE</tree>
+									<description>
+									The greater distance in a range of distance from a reference surface in the vertical direction, in meters. Use positive values for locations above the surface, negative values for locations below. If depth measures are given, the reference surface is the location given by the depth, otherwise the reference surface is the location given by the elevation.
+									Example: 1.5 meter sediment core from the bottom of a lake (at depth 20m) at 300m elevation; VerbatimElevation: "300m" MinimumElevationInMeters: "300", MaximumElevationInMeters: "300", VerbatimDepth: "20m", MinimumDepthInMeters: "20", MaximumDepthInMeters: "20", minimumDistanceAboveSurfaceInMeters: "0", maximumDistanceAboveSurfaceInMeters: "-1.5". For discussion see http://code.google.com/p/darwincore/wiki/Location
+									</description>
+									<actions>
+										<create>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:maximumDistanceAboveSurfaceInMeters</value>
+										</create>
+										<read>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:maximumDistanceAboveSurfaceInMeters</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
+							
+							
+							<element name="georeferenceProtocol">
+								<properties>
+									<type>textfield</type>
+									<access>TRUE</access>
+									<required>FALSE</required>
+									<title>Georeference Protocol</title>
+									<description>
+										It is recommended to give a citation (publication or URL) to the resource describing the methods used to determine the georeference (coordinates AND uncertainty, or footprint).
+										Good resources on methods include:
+										1. Chapman, A.D. and J. Wieczorek (eds). 2006. Guide to Best Practices for Georeferencing. Copenhagen: Global Biodiversity Information Facility. Accessible from http://www.gbif.org/orc/?doc_id=1288
+										2. MaNIS/HerpNet/ORNIS Georeferencing Guidelines.(HTML) Accessible from http://manisnet.org/GeorefGuide.html
+										3. Georeferencing Quick Reference Guide. (PDF) Accessible from http://manisnet.org/GeoreferencingQuickReferenceGuide.pdf
+									</description>
+									<tree>TRUE</tree>
+									<actions>
+										<create>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+											<context>document</context>
+											<schema/>
+											<type>element</type>
+											<prefix>dwc</prefix>
+											<value>dwc:georeferenceProtocol</value>
+										</create>
+										<read>
+											<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:georeferenceProtocol</path>
+											<context>document</context>
+										</read>
+										<update>
+											<path>self::node()</path>
+											<context>self</context>
+										</update>
+										<delete>
+											<path>self::node()</path>
+											<context>self</context>
+										</delete>
+									</actions>
+								</properties>
+								<children/>
+							</element>
 						</children>
 					</element>
+					
+					
+					
+					
+					
+					
+					
+					
+					
 					<element name="dwc_fields_taxon">
 						<properties>
 							<type>fieldset</type>
@@ -1468,6 +1729,234 @@ http://wiki.tdwg.org/twiki/bin/view/DarwinCore/BasisOfRecord</description>
 							</element>
 						</children>
 					</element>
+					
+					<element name="dwc_fields_identification">
+						<properties>
+							<type>fieldset</type>
+							<access>true</access>
+							<required>false</required>
+							<title>Identification terms</title>
+							<tree>true</tree>
+						</properties>
+						<children>
+					<element name="identifiedBy">
+						<properties>
+							<type>textfield</type>
+							<access>true</access>
+							<required>false</required>
+							<title>Identified By</title>
+							<autocomplete_path>islandora/entities/autocomplete/disambiguated</autocomplete_path>
+							<description>
+								A list (concatenated and separated) of names of people, groups, or organizations who assigned the Taxon to the subject.
+								Examples: "James L. Patton", "Theodore Pappenfuss; Robert Macey". For discussion see http://code.google.com/p/darwincore/wiki/Identification
+							</description>	
+							<tree>true</tree>
+							<actions>
+								<create>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+									<context>document</context>
+									<schema/>
+									<type>element</type>
+									<prefix>dwc</prefix>
+									<value>dwc:identifiedBy</value>
+								</create>
+								<read>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:identifiedBy</path>
+									<context>document</context>
+								</read>
+								<update>
+									<path>self::node()</path>
+									<context>self</context>
+								</update>
+								<delete>
+									<path>self::node()</path>
+									<context>self</context>
+								</delete>
+							</actions>
+						</properties>
+						<children/>
+					</element>
+					<element name="dateIdentified">
+						<properties>
+							<type>datepicker</type>
+							<access>true</access>
+							<required>false</required>
+							<title>Date Identified</title>
+							<tree>true</tree>
+							<description>
+								The date on which the subject was identified as representing the Taxon. Recommended best practice is to use an encoding scheme, such as ISO 8601:2004(E).
+								Examples: "1963-03-08T14:07-0600" is 8 Mar 1963 2:07pm in the time zone six hours earlier than UTC, "2009-02-20T08:40Z" is 20 Feb 2009 8:40am UTC, "1809-02-12" is 12 Feb 1809, "1906-06" is Jun 1906, "1971" is just that year, "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z" is the interval between 1 Mar 2007 1pm UTC and 11 May 2008 3:30pm UTC, "2007-11-13/15" is the interval between 13 Nov 2007 and 15 Nov 2007. For discussion see http://code.google.com/p/darwincore/wiki/Identification
+							</description>
+							<actions>
+								<create>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+									<context>document</context>
+									<schema/>
+									<type>element</type>
+									<prefix>dwc</prefix>
+									<value>dwc:dateIdentified</value>
+								</create>
+								<read>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:dateIdentified</path>
+									<context>document</context>
+								</read>
+								<update>
+									<path>self::node()</path>
+									<context>self</context>
+								</update>
+								<delete>
+									<path>self::node()</path>
+									<context>self</context>
+								</delete>
+							</actions>
+						</properties>
+						<children/>
+					</element>
+					<element name="identificationReferences">
+						<properties>
+							<type>textarea</type>
+							<access>true</access>
+							<required>false</required>
+							<title>Identification References</title>
+							<tree>true</tree>
+							<description>
+								A list (concatenated and separated) of references (publication, global unique identifier, URI) used in the Identification.
+							Example: "Aves del Noroeste Patagonico. Christie et al. 2004.". For discussion see http://code.google.com/p/darwincore/wiki/Identification
+								</description>
+							<actions>
+								<create>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+									<context>document</context>
+									<schema/>
+									<type>element</type>
+									<prefix>dwc</prefix>
+									<value>dwc:identificationReferences</value>
+								</create>
+								<read>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:identificationReferences</path>
+									<context>document</context>
+								</read>
+								<update>
+									<path>self::node()</path>
+									<context>self</context>
+								</update>
+								<delete>
+									<path>self::node()</path>
+									<context>self</context>
+								</delete>
+							</actions>
+						</properties>
+						<children/>
+					</element>
+					<element name="identificationRemarks">
+						<properties>
+							<type>textarea</type>
+							<access>TRUE</access>
+							<required>FALSE</required>
+							<title>Identification Remarks</title>
+							<description>Comments or notes about the Identification.
+							Example: "Distinguished between Anthus correndera and Anthus hellmayri based on the comparative lengths of the uñas.". For discussion see http://code.google.com/p/darwincore/wiki/Identification
+							</description>
+							<tree>TRUE</tree>
+							<actions>
+								<create>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+									<context>document</context>
+									<schema/>
+									<type>element</type>
+									<prefix>dwc</prefix>
+									<value>dwc:identificationRemarks</value>
+								</create>
+								<read>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:identificationRemarks</path>
+									<context>document</context>
+								</read>
+								<update>
+									<path>self::node()</path>
+									<context>self</context>
+								</update>
+								<delete>
+									<path>self::node()</path>
+									<context>self</context>
+								</delete>
+							</actions>
+						</properties>
+						<children/>
+					</element>
+					<element name="identificationQualifier">
+						<properties>
+							<type>textfield</type>
+							<access>TRUE</access>
+							<required>FALSE</required>
+							<title>Identification Qualifier</title>
+							<description>A brief phrase or a standard term ("cf.", "aff.") to express the determiner's doubts about the Identification.
+							Examples: 1) For the determination "Quercus aff. agrifolia var. oxyadenia", identificationQualifier would be "aff. agrifolia var. oxyadenia" with accompanying values "Quercus" in genus, "agrifolia" in specificEpithet, "oxyadenia" in infraspecificEpithet, and "var." in rank. 2) For the determination "Quercus agrifolia cf. var. oxyadenia", identificationQualifier would be "cf. var. oxyadenia " with accompanying values "Quercus" in genus, "agrifolia" in specificEpithet, "oxyadenia" in infraspecificEpithet, and "var." in rank. For discussion see http://code.google.com/p/darwincore/wiki/Identification
+						   </description>
+							<tree>TRUE</tree>
+							<actions>
+								<create>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+									<context>document</context>
+									<schema/>
+									<type>element</type>
+									<prefix>dwc</prefix>
+									<value>dwc:identificationQualifier</value>
+								</create>
+								<read>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:identificationQualifier</path>
+									<context>document</context>
+								</read>
+								<update>
+									<path>self::node()</path>
+									<context>self</context>
+								</update>
+								<delete>
+									<path>self::node()</path>
+									<context>self</context>
+								</delete>
+							</actions>
+						</properties>
+						<children/>
+					</element>
+					<element name="typeStatus">
+						<properties>
+							<type>textfield</type>
+							<access>TRUE</access>
+							<required>FALSE</required>
+							<title>Type Status</title>
+							<description>A list (concatenated and separated) of nomenclatural types (type status, typified scientific name, publication) applied to the subject. 
+								Example: "holotype of Ctenomys sociabilis. Pearson O. P., and M. I. Christie. 1985. Historia Natural, 5(37):388". For discussion see http://code.google.com/p/darwincore/wiki/Identification</description>
+							<tree>TRUE</tree>
+							<actions>
+								<create>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord</path>
+									<context>document</context>
+									<schema/>
+									<type>element</type>
+									<prefix>dwc</prefix>
+									<value>dwc:typeStatus</value>
+								</create>
+								<read>
+									<path>/dwr:SimpleDarwinRecordSet/dwr:SimpleDarwinRecord/dwc:typeStatus</path>
+									<context>document</context>
+								</read>
+								<update>
+									<path>self::node()</path>
+									<context>self</context>
+								</update>
+								<delete>
+									<path>self::node()</path>
+									<context>self</context>
+								</delete>
+							</actions>
+						</properties>
+						<children/>
+					</element>
+				</children>
+			</element>
+					
+					
+					
 				</children>
 			</element>
 		</children>

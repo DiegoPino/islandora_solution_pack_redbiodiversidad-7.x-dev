@@ -36,6 +36,12 @@
 			<dwc:verbatimLocality/>
 			<dwc:decimalLatitude></dwc:decimalLatitude>
 			<dwc:decimalLongitude></dwc:decimalLongitude>
+			<dwc:minimumElevationInMeters/>
+			<dwc:maximumElevationInMeters/>
+			<dwc:minimumDepthInMeters/>
+			<dwc:maximumDepthInMeters/>
+			<dwc:minimumDistanceAboveSurfaceInMeters/>
+			<dwc:maximumDistanceAboveSurfaceInMeters/>
 			<dwc:taxonID></dwc:taxonID>
 			<dwc:scientificName></dwc:scientificName>
 			<dwc:kingdom></dwc:kingdom>
@@ -48,5 +54,11 @@
 			<dwc:specificEpithet></dwc:specificEpithet>
 			<dwc:vernacularName></dwc:vernacularName>
 			<dwc:taxonRemarks></dwc:taxonRemarks>
+			<dwc:identifiedBy></dwc:identifiedBy>
+			<dwc:dateIdentified></dwc:dateIdentified>
+			<dwc:identificationReferences></dwc:identificationReferences>
+			<dwc:identificationRemarks></dwc:identificationRemarks>
+			<dwc:identificationQualifier></dwc:identificationQualifier>
+			<dwc:typeStatus></dwc:typeStatus>
 		</SimpleDarwinRecord>
 	</SimpleDarwinRecordSet>

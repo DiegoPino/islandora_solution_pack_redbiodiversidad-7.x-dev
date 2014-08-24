@@ -32,3 +32,8 @@ function islandora_red_biodiversidad_source_collection_form(array $form, array &
   
   
 }
+function islandora_red_biodiversidad_source_collection_form_submit(array $form, array &$form_state) {
+  $form_state['islandora']['shared_storage']['source_collection'] = $form_state['values']['collection'];
+  //We set our source collection. This will be set as collectionId value in the ingest form in the metadata section
+  
+}

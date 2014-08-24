@@ -70,6 +70,17 @@ function islandora_red_biodiversidad_menu() {
     'access callback' => 'islandora_red_biodiversidad_access',
     'access arguments' => array(2),
   );
+  $items['islandora/object/%islandora_object/dwc_archive'] = array(
+    'weight' => 4,
+    'title' => 'DwC-Archive',
+    'description' => t('Manage Darwin Core Archive Generation'),
+    'file' => 'includes/manage_dwca.inc',
+    'page callback' =>'islandora_red_biodiversidad_dwcarchive_manage',
+    'page arguments' => array(2),
+    'type' => MENU_LOCAL_TASK,
+    'access callback' => 'islandora_red_biodiversidad_generate_dwca_access',
+    'access arguments' => array(2),
+  );
 
   return $items;
 }
@@ -117,6 +128,19 @@ function islandora_red_biodiversidad_collection_access($islandora_object) {
  
   return FALSE;
 }
+//Handles Darwin Core Archive generation access
+function islandora_red_biodiversidad_generate_dwca_access($islandora_object) {
+    if (!isset($islandora_object)) {
+      return FALSE;
+    }
+    $models = $islandora_object->models;
+    if (array_intersect(array('biodiversity:DWCACModel'), $models)) {
+     return (islandora_object_access(ISLANDORA_ADD_DS, $islandora_object) && islandora_object_access(ISLANDORA_METADATA_EDIT, $islandora_object) && islandora_object_access(ISLANDORA_METADATA_EDIT, $islandora_object));
+    }
+    return FALSE;
+}
+
+
 /**
  * This is the callback function defined in the menu array of this module.
  *
@@ -172,16 +196,28 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_coll
  * Implements hook_preprocess_theme().
  *
  * We have implemented several preprocessors in this module this one is
- * for the piggyback tabbed view
  *
  * This is a Drupal hook, not supplied by islandora.
  */
 
 
 function islandora_red_biodiversidad_biodiversity_biodiversityCModel_islandora_view_object($object,$page_number, $page_size) {  
-  $output = theme('islandora_dwc', array('islandora_object' => $object));
+    //because we have a common CMODEL for every object from this solution pack, we must de the check inside instead o making another hook beacuse they could(and do!) overlap
+	
+	$models = $object->models;
+    if (array_intersect(array('biodiversity:DWCACModel'), $models)) {
+	 $output = theme('islandora_dwca', array('islandora_object' => $object));
+	}
+	else
+	{
+	  $output = theme('islandora_dwc', array('islandora_object' => $object));	
+	}
+
+  
   return array('' => $output);
+  
 }
+
 /**
 * Implements hook_CMODEL_PID_islandora_view_object().
 *
@@ -196,6 +232,8 @@ function islandora_red_biodiversidad_biodiversity_biodiversityCModel_collection_
   $output = theme('islandora_red_biodiversidad', array('islandora_object' => $object));
   return array('' => $output);
 }
+
+
 /**
  * Implements hook_theme().
  *
@@ -227,6 +265,13 @@ function islandora_red_biodiversidad_theme($existing, $type, $theme, $path) {
       'template' => 'theme/islandora-red-biodiversidad-tab-related',
       'variables' => array('islandora_object' => NULL),
     ),
+      'islandora_dwca' => array(
+       'file' => 'theme/theme.inc',
+  	  'template' => 'theme/slandora-red-biodiversidad-dwca',
+        'variables' => array('islandora_object' => NULL),
+      ),
+	
+	
   );
 }
 
@@ -671,6 +716,16 @@ function islandora_red_biodiversidad_form_alter(&$form, &$form_state, $form_id) 
 					}
 				break;
 				case 'biodiversity:DWCACModel':
+				//Enable only when debugging!
+				//dpm($form_state['islandora']['step_storage']);
+				//dpm($form_state['islandora']['shared_storage']);
+				//dpm($form['additionalMetadata']['metadata']['gbif']);
+				if (isset($form['additionalMetadata']['metadata']['gbif']['collectionIdentifier']))
+					{
+					 $form['additionalMetadata']['metadata']['gbif']['collectionIdentifier']['#value']=$form_state['islandora']['shared_storage']['source_collection'];		
+					}
+				
+				
 				if (isset($form['eml_packageid']))//First check if it´s still there!
 					{
 					$form['eml_packageid']['#value']='system'; //@TODO we will get this and other values from a global configuration value	
@@ -941,6 +996,31 @@ function islandora_red_biodiversidad_validateandpopulate(&$form, &$form_state)
 			return array('#type' => 'ajax', '#commands' => $commands);
 		
 }
+
+
+/**
+*QR code support function
+*We are generating a QR code (printable) to be added to the actual paper version of a occurrence
+*@param string $pid
+*@return a svg representation of the object's absolut URL+ PID
+*/
+function islandora_red_biodiversidad_pidtoQR($pid)
+	{ 
+	include('phpqrcode/qrlib.php'); 
+	$dataText=url(NULL, array('absolute' => TRUE))."/islandora/object/".urlencode($pid);
+	
+	$svgTagId   = 'qr'+$pid; 
+	$saveToFile = false; 
+	$imageWidth = 250; // px 
+     
+	    // SVG file format support 
+	    $svgCode = QRcode::svg($dataText,$saveToFile, QR_ECLEVEL_L, 4); 
+	  
+	    return $svgCode; 
+		
+	}	
+
+
 /**
 *Enciclopedia Of life support function
 *Using a query we can get additional info for our biodiversity:taxonCmodel objects.
@@ -1028,15 +1108,51 @@ function islandora_red_biodiversidad_eol_getdata($query)
 /**
  * Implements hook_islandora_datastream_alter().
  * We need to alter the  data for the  biodiversity:DWCACModel from the ingested EML stream. We don´t have the Object ID prior to ingesting and we need this value in the EML!
+ * We also add dateStamp inside EML 
  */
 function islandora_red_biodiversidad_biodiversity_DWCACModel_EML_islandora_datastream_alter(AbstractObject $object, AbstractDatastream $datastream, array &$context) {
 	
   $modified=false;
   switch ($context['action']) {
     case 'ingest':
-	case 'modify':
-	//EML
+	$dom= new DOMDocument;
+	$dom->loadXML($datastream->content);
+	$dom->preserveWhiteSpace = false;
+	$emlnode=$dom->getElementsByTagName('eml');
+	foreach ($emlnode as $item) {
+		if ($item->getAttribute('packageId')=='system')//system - Our super secret word for "just replace this value with the object's ID"
+			{
+			$link = url('islandora/object/'.$object->id, array('absolute' => TRUE));
+			$item->setAttribute('packageId', $object->id);
+			$alternateid=$dom->getElementsByTagName('alternateIdentifier');
+			foreach($alternateid as $item2)
+				{
+				$item2->nodeValue=$link;
+				}
+			
+			$modified=TRUE;
+			}
+	}
+	$datestamp=$dom->getElementsByTagName('dateStamp');
+  
+	foreach($datestamp as $item3)
+			{	
+			$item3->nodeValue=date("Y-m-d\TH:i:s\Z",time());	
+			$modified=TRUE;
+			}
+	if 	($modified)
+		{
+		$modifiedEML=$dom->saveXML();
+		$datastream->setContentFromString($modifiedEML);
+		
+		}
 	
+	
+	
+	break;
+	
+	case 'modify':
+	//EML		
 	if (sizeof($context['params']['dsString'])>0)
 		{
 		$dom= new DOMDocument;
@@ -1044,23 +1160,35 @@ function islandora_red_biodiversidad_biodiversity_DWCACModel_EML_islandora_datas
 		$dom->preserveWhiteSpace = false;
 		$emlnode=$dom->getElementsByTagName('eml');
 		foreach ($emlnode as $item) {
-			if ($item->getAttribute('packageId')=='system')//system - Our super secret word for "just replace this value with the objects ID"
+			if ($item->getAttribute('packageId')=='system')//system - Our super secret word for "just replace this value with the object's ID"
 				{
-				$link = url("", array('absolute' => TRUE)).'islandora/'.urlencode($object->id);
+				$link = url('islandora/object/'.$object->id, array('absolute' => TRUE));
 				$item->setAttribute('packageId', $object->id);
 				$alternateid=$dom->getElementsByTagName('alternateIdentifier');
+				
 				foreach($alternateid as $item2)
 					{
 					$item2->nodeValue=$link;
 					}
-				$modifiedEML=$dom->saveXML();
 				$modified=TRUE;
 				}
 		}
+		$datestamp=$dom->getElementsByTagName('dateStamp');
+      
+		foreach($datestamp as $item3)
+				{	
+				
+				$item3->nodeValue=date("Y-m-d\TH:i:s\Z",time());	
+			
+				$modified=TRUE;
+				}
+		
+		
 	if 	($modified)
 		{
+		$modifiedEML=$dom->saveXML();	
 		$context['params']['dsString']=$modifiedEML;
-		//$datastream->setContentFromFile('public://eml'.$object->id.'.xml');
+		
 		}
 	}
       break;

@@ -133,7 +133,7 @@ foreach($models  as $contentmodelpid)
 	  
 }
 //dpm($result);
-//It it´s not a location model object what we are visiting the we must reverse the paths($result) and remove everything until we get to a location model
+//If it´s not a location model object what we are visiting the we must reverse the paths($result) and remove everything until we get to a location model
 if (!empty($result))
 {
 if (!(array_intersect(array('biodiversity:LocationCModel'), $models)))  {
@@ -318,7 +318,7 @@ EOQ;
 			}
 			//If the path has a location, then harvest all other objects and add it to the array key of this location. 
 			//If not assume direct relation to this object, means a path thats goes in another direction of our object is the center of a star =) nice deduction of myself!.
-			//This also means that if there are relations to a location starting from here then we must assume that all objects  that go in any other direction are related to all found locations and not a particular one.
+			//This also means that if there are relations to a location starting from here then we must assume that all objects that go in any other direction are related to all found locations and not a particular one.
 			if ($harvestthispath)
 			{
 				//dpm("entrando");
@@ -360,7 +360,7 @@ EOQ;
 				
 		}
 		//dpm($results);
-
+        //dpm($relationsandcmodels_sparqlmapping_hash);
 
 
 	}
@@ -376,13 +376,12 @@ $locations3=array();
 		
 		
 $j=0;
-$clustergroup='Locs';
+$clustergroup='';
 foreach ($json['response']['docs'] as $key=>$choice) {
 $j++;
 //dpm($choice);
 
 if ((isset($choice[$mappings['location']['latlong_lat']])) && (isset($choice[$mappings['location']['latlong_long']]))) {
-//$coords = explode(",", $choice[$mappings['location']['latlong']][0]); not needed anymore
 if ($choice['PID']==$object_pid)
 	{
 	$clustergroup='Current Object Location';	
@@ -444,20 +443,24 @@ drupal_add_js('misc/collapse.js');
 module_load_include('inc', 'islandora', 'includes/datastream');
 module_load_include('inc', 'islandora', 'includes/utilities');
 module_load_include('inc', 'islandora', 'includes/metadata');
-$module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
-
-drupal_add_css("$module_path/css/islandora_red_biodiversidad.css");
 $islandora_object = $variables['islandora_object'];
 $object_pid = $islandora_object->id;
 //Let´s get our primary content model
 $title="";
 $variables['eol_render_element']=array();
-	 
-	
-	
-	  	
-  
-  
+
+$module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
+$module_path2 =drupal_get_path('module', 'islandora');
+
+drupal_add_js(array(
+  'islandora' => array(
+    'print_img' => $module_path2 . '/images/print-icon.png'),
+    ), array(
+      'type' => 'setting'));
+
+drupal_add_js(array('islandora' => array('print_link' => 'islandora/object/' . $object_pid . '/print_object')), array('type' => 'setting'));
+drupal_add_js($module_path2 . '/js/add_print.js');
+drupal_add_css("$module_path/css/islandora_red_biodiversidad.css");	 
   
 if (isset($islandora_object['DwC']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DwC']))
 { 
@@ -667,12 +670,46 @@ $variables['description'] = islandora_retrieve_description_markup($islandora_obj
    
 if (isset($islandora_object['TN']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['TN'])) {
 $variables['islandora_thumbnail_url'] = url("islandora/object/{$islandora_object->id}/datastream/TN/view");
+
 	   
 }
-   
-  
+//QR generation
+if (in_array('biodiversity:OccurrenceCModel',$islandora_object->models))
+{   
+$variables['QR']=islandora_red_biodiversidad_pidtoQR($object_pid);
+} 
   
 }
+/* Preprocess for DWC-A
+/* Here we transform Darwin Core to HTML using XLST for displaying */
+function islandora_red_biodiversidad_preprocess_islandora_dwca(array &$variables) {
+	drupal_add_js('misc/form.js');
+	drupal_add_js('misc/collapse.js');
+	module_load_include('inc', 'islandora', 'includes/datastream');
+	module_load_include('inc', 'islandora', 'includes/utilities');
+	module_load_include('inc', 'islandora', 'includes/metadata');
+	$module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
+	drupal_add_css("$module_path/css/islandora_red_biodiversidad.css");
+	$islandora_object = $variables['islandora_object'];
+	$object_pid = $islandora_object->id;
+	$variables['parent_collections'] = islandora_get_parents_from_rels_ext($islandora_object);
+	$variables['metadata'] = islandora_retrieve_metadata_markup($islandora_object);
+	$variables['description'] = islandora_retrieve_description_markup($islandora_object);
+   
+	if (isset($islandora_object['TN']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['TN'])) {
+		$variables['islandora_thumbnail_url'] = url("islandora/object/{$islandora_object->id}/datastream/TN/view");
+	}
+  
+  
+  
+	if (isset($islandora_object['DWCA']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DWCA']))
+	{ 
+		$variables['dwca-link'] = l(t('Download Zipped DWC-A'), "islandora/object/{$islandora_object->id}/datastream/DWCA/download");
+	}
+	
+}
+
+
 /*
 Having an Ontology defined or not, we display related objects on a tab for every Object belonging to his solution pack provided CMODELS
 */
@@ -699,12 +736,14 @@ foreach($models  as $contentmodelpid)
 	//dpm($contentmodelpid);
 	if ($cache = cache_get('islandora_ontologies_adjacency'.$contentmodelpid))
 	{	
-		//dpm('cache hit');
+		
 		$result=$cache->data;
-		//dpm('hit');
+		
+		
 	}		
 	else
 	{
+		//If no cache present we get the full graph paths for this ContentModel
 		$fullgraph=islandora_ontologies_get_graph_path($contentmodelpid);
 		if (count($fullgraph)>0)
 		{
@@ -712,12 +751,15 @@ foreach($models  as $contentmodelpid)
 			{
 				if (count($localgraph)>0)
 				{
+					//Having the paths for every assoicated ontologies, we traverse this structure using getdepthfirst. This way we get an array with every "road" or consecutive "edges" a.k.a relations 
+					//that connect this type of Content Model (origin) to every other one in the full Graph. This will be used to make a composite Sparql Query
 					$g = new islandora_ontologies_adjacency_graph($localgraph);
 					$result[$ontologiepid]=$g->getdepthFirst("info:fedora/".$contentmodelpid);
+				
 				}
 				
 			}
-						
+				//lastly we set the cache. This is necesarry because we don´t wan´t to recalculate every time the same structure. Only if a Ontology changes, or new ones are added, the cache is cleaned.		
 			cache_set('islandora_ontologies_adjacency'.$contentmodelpid, $result, 'cache');	
 			
 		}
@@ -833,8 +875,7 @@ foreach ($result as $ontologie=>$graphs)
 EOQ;
 		
 	
-			//dpm($fullquery);
-			//dpm($relationsandcmodels_sparqlmapping_hash);
+			
 		
 		
 		
@@ -860,8 +901,8 @@ EOQ;
 		}
 	}*/
 	
- 
-	//dpm($fullquery);
+    
+	$related_sparql_results=array();
 	$connection = islandora_get_tuque_connection();
 	$escaped_pid = str_replace(':', '_', $pid);
 	if (($connection) && !empty($fullquery)){
@@ -870,6 +911,9 @@ EOQ;
 			$results = $connection->repository->ri->sparqlQuery($fullquery);
 			
 				$related_sparql_results=array();
+				
+				//dpm(array("resultado sparqlquery",$results));
+				
 				
 				foreach ($results as $result) {
 				    $related_sparql_closeure="";
@@ -907,7 +951,7 @@ EOQ;
 						//If the Ontology is nice written...then this makes wonders:
 						$splitedlabel=implode(' ',preg_split('/(?=[A-Z])/', $rel_label, -1, PREG_SPLIT_NO_EMPTY));
 						$rel_label=!empty($splitedlabel)?$splitedlabel:$rel_label;
-						$related_sparql=$related_sparql."<ul class=\"action-links\"><li><i class=\"icon-li icon-chevron-right\"></i><span class=\"islandora-red-biodiversidad-info\">$rel_label</span> to ".$object_link;
+						$related_sparql=$related_sparql."<ul class=\"action-links\"><li><i class=\"icon-li icon-chevron-right\"></i><span class=\"islandora-red-biodiversidad-info\">$rel_label</span>: ".$object_link;
 					    $related_sparql_closeure.='</li></ul>';
 						}
 						
@@ -927,6 +971,10 @@ EOQ;
 			if (count($related_sparql_results)>0)
 				{
 				$variables['related_sparql_results'] = drupal_render($related_sparql_results);
+				$variables['vlot'] =islandora_ontologies_build_vlot(array(), array(), $height = '400px');
+				//dpm($variables['vlot']);	
+				$variables['vlot']=drupal_render($variables['vlot']);
+				
 				}
 			else
 				{
@@ -939,7 +987,7 @@ EOQ;
 
 
 
-		function islandora_red_biodiversidad_preprocess_darwincore(array &$variables) {
+function islandora_red_biodiversidad_preprocess_darwincore(array &$variables) {
 			module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
 			module_load_include('inc', 'islandora', 'includes/metadata');
 			//module_load_include('inc', 'islandora_entities', 'includes/entities_rss');

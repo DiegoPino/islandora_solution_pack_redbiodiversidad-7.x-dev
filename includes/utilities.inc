@@ -183,6 +183,33 @@ function  islandora_red_biodiversidad_content_model_tohuman(AbstractObject $fedo
 
 }
 /**
+ * This function just returns every CMODEL implemented by this Solution Pack using the islandora_required_objects hook.
+
+ */
+
+function islandora_red_biodiversidad_list_implemented_cmodels(IslandoraTuque $connection)
+	{
+	$objectlist=array();
+	$info=islandora_red_biodiversidad_islandora_required_objects($connection);
+    if (isset($info['islandora_red_biodiversidad']['objects']))
+		{
+		foreach ($info['islandora_red_biodiversidad']['objects'] as $object) 
+			{
+			$existing_object = islandora_object_load($object->id);
+			if ($existing_object) 
+				{
+				if (array_intersect(array('fedora-system:ContentModel-3.0'), $existing_object->models)) 
+					{
+					$objectlist[$existing_object->id]=array('pid'=>$existing_object->id, 'label'=>$existing_object->label);//Same structure as islandora_get_content_models();
+	    			}		
+				}
+			}
+		}	
+	return $objectlist;
+}
+
+
+/**
  * Gets the max Main ID for a Darwin Core Class Stream. It requires that this field is indexed as "_s" (string) in Solr. We can´t use multivalued fields for sorting. 
 * @param a cmodel_pid from this module
 * @see  /solrconfig/DwC_to_solr.xslt and schema.xml. We store very dwcore field as _s and the later copy it to _ms and _mt  for tokenized access(like needed by autocomplete).

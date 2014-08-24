@@ -22,6 +22,13 @@
       <?php endif; ?>
     <dd></dd>
 </dl>
+<dl class="islandora-object-qr">
+    <dt>
+      <?php if (isset($variables['QR'])): ?>
+        <?php print $variables['QR']; ?>
+      <?php endif; ?>
+    <dd></dd>
+</dl>
   <?php if ($variables['parent_collections']): ?>
     <div class="islandora-red-biodiversidad-content">
       <h2><?php print t('In collections'); ?></h2>
