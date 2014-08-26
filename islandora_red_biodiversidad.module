@@ -267,7 +267,7 @@ function islandora_red_biodiversidad_theme($existing, $type, $theme, $path) {
     ),
       'islandora_dwca' => array(
        'file' => 'theme/theme.inc',
-  	  'template' => 'theme/slandora-red-biodiversidad-dwca',
+  	  'template' => 'theme/islandora-red-biodiversidad-dwca',
         'variables' => array('islandora_object' => NULL),
       ),
 	
