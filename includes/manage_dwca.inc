@@ -452,6 +452,7 @@ function islandora_red_biodiversidad_dwcarchive_create_metadata($dwc_fields)
 
 function islandora_red_biodiversidad_dwcarchive_get_related(AbstractObject $object,$cmodel_star)
 {
+	module_load_include('inc', 'islandora_ontologies','includes/utilities');
 	$pid=$object->id;
 	if ($cache = cache_get('islandora_ontologies_adjacency'.$cmodel_star))
 		{	
