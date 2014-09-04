@@ -964,7 +964,8 @@ EOQ;
 						
 						
 						$rel_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $rel_label, $m)? $m[2]: $rel_label;	
-						
+						if ($object)
+							{
 						if (isset($previous_object))	
 							{
 							if (!(isset($vlot_settings[$previous_object]['relates_to'][$object->id])))
@@ -987,6 +988,7 @@ EOQ;
 							}
 						
 						$previous_object=$object->id; //now set previous as current
+							}
 						$splitedlabel=implode(' ',preg_split('/(?=[A-Z])/', $rel_label, -1, PREG_SPLIT_NO_EMPTY));
 						$rel_label=!empty($splitedlabel)?$splitedlabel:$rel_label;
 						//If the Ontology is nice written...then this makes wonders:
