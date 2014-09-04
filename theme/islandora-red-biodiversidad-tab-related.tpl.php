@@ -18,15 +18,17 @@
 
     <?php if($variables['related_sparql_results']): ?>
       <div>
+  		<?php if(isset($variables['vlot'])): ?>
+		<h2><?php print t('Related Darwin Core Objects Graph'); ?></h2>
+  		<div>
+  			<?php print $variables['vlot'];?>
+  		</div>
+  		<?php endif; ?>
         <h2><?php print t('Related Darwin Core Objects'); ?></h2>
 		<div>
 			<?php print $variables['related_sparql_results'];?>
 		</div>
-		<?php if(isset($variables['vlot'])): ?>
-		<div>
-			<?php print $variables['vlot'];?>
-		</div>
-		<?php endif; ?>
+		
         <ul>
           <?php foreach ($related as $item): ?>
             <li><?php print $item['relation']; ?>

@@ -154,6 +154,14 @@ function islandora_red_biodiversidad_generate_dwca_access($islandora_object) {
  *   the rendered output
  */
 
+function islandora_red_biodiversidad_islandora_view_print_object($islandora_object)
+	{
+	$output = theme('islandora_red_biodiversidad_print', array('islandora_object' =>$islandora_object,'islandora_content'=>NULL));		
+	return $output;	
+	} 
+
+
+
 function islandora_red_biodiversidad_map_display($islandora_object) {
   $output = theme('islandora_red_biodiversidad_map',
     array('islandora_object' => $islandora_object,'results'=>NULL));
@@ -203,6 +211,16 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_coll
 
 function islandora_red_biodiversidad_biodiversity_biodiversityCModel_islandora_view_object($object,$page_number, $page_size) {  
     //because we have a common CMODEL for every object from this solution pack, we must de the check inside instead o making another hook beacuse they could(and do!) overlap
+    $path = drupal_get_path('module', 'islandora');
+    drupal_add_js(array(
+      'islandora' => array(
+        'print_img' => $path . '/images/print-icon.png'),
+        ), array(
+          'type' => 'setting'));
+
+    drupal_add_js(array('islandora' => array('print_link' => 'islandora/object/' . $object->id . '/print_object')), array('type' => 'setting'));
+    drupal_add_js($path . '/js/add_print.js');
+	
 	
 	$models = $object->models;
     if (array_intersect(array('biodiversity:DWCACModel'), $models)) {
@@ -251,8 +269,10 @@ function islandora_red_biodiversidad_theme($existing, $type, $theme, $path) {
 	  'render element'=>'eol_render_element',
     ),
     'islandora_red_biodiversidad_print' => array(
+	  'file' => 'theme/print.inc',
       'template' => 'theme/islandora-red-biodiversidad-print',
-      'variables' => array('islandora_content' => NULL),
+      'variables' => array('islandora_object' => NULL, 'content' => NULL,
+        'islandora_content' => NULL)
     ),
     // Themes the output of the  tab.
     'islandora_red_biodiversidad_map' => array(
@@ -755,6 +775,58 @@ function islandora_red_biodiversidad_form_alter(&$form, &$form_state, $form_id) 
 		form_error($element, t('You must enter a valid Decimal Longitud'));	
 		}
 		}
+
+
+function islandora_red_biodiversidad_islandora_ontologies_vlot_info() {
+		
+		return array('islandora_red_biodiversidad'=>array(
+			 'biodiversity:TaxonCModel'=>array(		
+	         	'cmodel_label' => 'Taxon',
+	         	'color' => 'rgb(130,172,144)',
+				),
+			'biodiversity:OccurrenceCModel'=>array(		
+			    'cmodel_label' => 'Occurrence',
+			    'color' => 'rgb(249,160,27)',
+				),	
+			'biodiversity:EventCModel'=>array(		
+				'cmodel_label' => 'Event',
+				'color' => 'rgb(239,117,32)',
+			 	),
+			'biodiversity:LocationCModel'=>array(		
+				'cmodel_label' => 'Location',
+				'color' => 'rgb(48,52,53)',
+				 ),
+	 		'biodiversity:IdentificationCModel'=>array(		
+	 			'cmodel_label' => 'Identification',
+	 			'color' => 'rgb(142,163,174)',
+	 			 ),
+	 	 	'biodiversity:MaterialSampleCModel'=>array(		
+	 	 		'cmodel_label' => 'MaterialSample',
+	 	 		'color' => 'rgb(199,217,227)',
+	 	 		 ),
+	 	 	 'biodiversity:GeologicalContextCModel'=>array(		
+	 	 	 	'cmodel_label' => 'GeologicalContext',
+	 	 	 	'color' => 'rgb(194,157,138)',
+	 	 	 	),
+   	 	 	 'biodiversity:SimpledwcCModel'=>array(		
+   	 	 	 	'cmodel_label' => 'MaterialSample',
+   	 	 	 	'color' => 'rgb(219,216,198)',
+   	 	 	 	),
+      	 	 'default'=>array(		
+      	 	 	 'cmodel_label' => 'Object',
+      	 	 	 'color' => 'rgb(126,135,129)',
+      	 	 	 ),
+			 )
+		);
+		
+		
+	}	
+	
+
+
+		/**
+		*Leaflet Map styles
+		*/
 function islandora_red_biodiversidad_leaflet_map_info() {
 		  return array(
 		    'islandora_red_biodiversidad' => array(
@@ -782,6 +854,7 @@ function islandora_red_biodiversidad_leaflet_map_info() {
 			    'maxClusterRadius' => 80,
 			    'addRegionToolTips' => TRUE,
 				'layerControl' => TRUE,
+				'zoomControl' =>TRUE,
 		      ),
 		      'attribution' => array(
 		        'prefix' => '',
@@ -801,6 +874,22 @@ function islandora_red_biodiversidad_leaflet_map_info() {
 		          'attribution' => '© stamen.com',
 		          ),
 		        ),
+		        'ESRI Ocean' => array(
+				'type' => 'xyz',		          
+		          'urlTemplate' => 'http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}',
+		          'options' => array(
+		          'attribution' => 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+				  'maxZoom:'=>13,
+		          ),
+		        ),
+		        'ESRI DeLorme' => array(
+				'type' => 'xyz',		          
+		          'urlTemplate' => 'http://server.arcgisonline.com/ArcGIS/rest/services/Specialty/DeLorme_World_Base_Map/MapServer/tile/{z}/{y}/{x}',
+		          'options' => array(
+		          'attribution' => 'Tiles &copy; Esri &mdash; Copyright: &copy;2012 DeLorme',
+				  'maxZoom:'=>11,
+		          ),
+		        ),			
 		      ),
 		    ),
 		  );

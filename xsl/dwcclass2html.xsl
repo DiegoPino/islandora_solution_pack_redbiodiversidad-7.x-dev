@@ -20,11 +20,10 @@
         </article>
 
     </xsl:template>
-
+     
     <xsl:template name="taxonterms" match="/dwr:DarwinRecordSet/dwc:*/*">
         <xsl:if test="normalize-space(.)">
-            <dt class="term">
-                
+            <dt class="term">  
                 <xsl:value-of select="local-name()"/>
             </dt>
             <dd class="termvalue">
@@ -34,8 +33,12 @@
                             <xsl:value-of select="text()"/>
                         </a>
                     </xsl:when>
-                    <xsl:otherwise>
-                        
+                <xsl:when test="name()='dwc:dynamicProperties'">
+                    <xsl:call-template name="split">
+  					  <xsl:with-param name="pText" select="."/>
+   					</xsl:call-template>
+                </xsl:when>                       
+                    <xsl:otherwise>     
                         <a href="../search/{text()}?type=dismax" target="_self">
                 <xsl:value-of select="."/>
                         </a>
@@ -46,6 +49,25 @@
 
         </xsl:if>
     </xsl:template>
+    
+<xsl:template name="split">
+  <xsl:param name="pText" select="."/>
+  <xsl:if test="string-length($pText)">
+   <xsl:if test="not($pText=.)">
+      <br/>
+      <a href="../search/{substring-before(concat($pText,','),',')}?type=dismax" target="_self">
+   <xsl:value-of select="substring-before(concat($pText,','),',')"/>
+      </a>
+       </xsl:if>
+   <xsl:call-template name="split">
+    <xsl:with-param name="pText" select="substring-after($pText, ',')"/>
+   </xsl:call-template>
+  </xsl:if>
+ </xsl:template>  
+   
+  
+    
+    
     <xsl:template name="dcterms" match="/dwr:DarwinRecordSet/dcterms:*/*">
         <xsl:if test="normalize-space(.)">
             <dt class="term">

@@ -40,7 +40,7 @@
           layers[key] = map_layer;
 
           // add the layer to the map
-          if (i >= 0) {
+          if (i == 1) {
             lMap.addLayer(map_layer);
           }
           i++;

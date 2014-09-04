@@ -171,7 +171,7 @@ function  islandora_red_biodiversidad_content_model_tohuman(AbstractObject $fedo
 	   return($model_label);
     }
 	elseif (array_intersect(array('biodiversity:SimpledwcCModel'), $models)) {
-	    $model_label="SimpleDarwinCore";
+	    $model_label="Simple Darwin Core";
 	    return($model_label);
     }
 	elseif (array_intersect(array('biodiversity:DWCACModel'), $models)) {
