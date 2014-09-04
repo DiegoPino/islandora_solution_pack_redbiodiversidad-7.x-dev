@@ -923,6 +923,7 @@ EOQ;
 					
 					$list=array();
 					$level=0;
+					$object=null;
 					foreach($result as $sparqlvar=>$hit)
 					{
 						
