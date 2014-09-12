@@ -54,10 +54,18 @@
   <xsl:param name="pText" select="."/>
   <xsl:if test="string-length($pText)">
    <xsl:if test="not($pText=.)">
-      <br/>
-      <a href="../search/{substring-before(concat($pText,','),',')}?type=dismax" target="_self">
+   	<xsl:variable name="querywithslashes" select="substring-before(concat($pText,','),',')" />
+    <xsl:variable name="querywithoutslashes">       
+    <xsl:call-template name="string-replace-all">
+      <xsl:with-param name="text" select="$querywithslashes"/>
+      <xsl:with-param name="replace" select="string('/')"/>
+      <xsl:with-param name="by" select="'~slsh~'"/>
+    </xsl:call-template>
+    </xsl:variable>
+      <a href="../search/dwc.dynamicProperties_mlt%3A%28%22{$querywithoutslashes}%22%29" target="_self">
    <xsl:value-of select="substring-before(concat($pText,','),',')"/>
       </a>
+       <br/>
        </xsl:if>
    <xsl:call-template name="split">
     <xsl:with-param name="pText" select="substring-after($pText, ',')"/>
@@ -65,6 +73,25 @@
   </xsl:if>
  </xsl:template>  
    
+   <xsl:template name="string-replace-all">
+  <xsl:param name="text"/>
+  <xsl:param name="replace"/>
+  <xsl:param name="by"/>
+  <xsl:choose>
+    <xsl:when test="contains($text,$replace)">
+      <xsl:value-of select="substring-before($text,$replace)"/>
+      <xsl:value-of select="$by"/>
+      <xsl:call-template name="string-replace-all">
+        <xsl:with-param name="text" select="substring-after($text,$replace)"/>
+        <xsl:with-param name="replace" select="$replace"/>
+        <xsl:with-param name="by" select="$by"/>
+      </xsl:call-template>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="$text"/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
   
     
     
