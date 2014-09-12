@@ -159,9 +159,8 @@
 		 //Add a Marker Cluster group swicher
 		for (var index in clusterLayers)
 						{
-							console.log(index);
-						markers_byclusterGroup[clusterGroup]
 						
+						//markers_byclusterGroup[clusterGroup]
 						overlayMaps[index] = new L.layerGroup().addTo(lMap);
 						}	   
 		 // console.log(cats);
