@@ -401,8 +401,9 @@
 															<prefix>NULL</prefix>
 															<value>keyword</value>
 														</create>
-														<read><path>eml:keyword</path>7
-												<context>parent</context></read>
+														<read><path>eml:keyword</path>
+														<context>parent</context>
+													     </read>
 														<update>
 															<path>self::node()</path>
 															<context>self</context>
@@ -4635,6 +4636,28 @@
 													<title>Cite</title>
 													<default_value/>
 													<description/>
+						                            <actions>
+						                              <create>
+						                                <path>self::node()</path>
+						                                <context>parent</context>
+						                                <schema/>
+						                                <type>element</type>
+						                                <prefix>NULL</prefix>
+						                                <value>citation</value>
+						                              </create>
+						                              <read>
+						                                <path>eml:citation</path>
+						                                <context>parent</context>
+						                              </read>
+						                              <update>
+						                                <path>self::node()</path>
+						                                <context>self</context>
+						                              </update>
+						                              <delete>
+						                                <path>self::node()</path>
+						                                <context>self</context>
+						                              </delete>
+						                            </actions>
 												</properties>
 												<children>
 													<element name="citation">
@@ -4651,12 +4674,12 @@
 																	<path>self::node()</path>
 																	<context>parent</context>
 																	<schema/>
-																	<type>element</type>
+																	<type>xml</type>
 																	<prefix>NULL</prefix>
-																	<value>citation</value>
+																	<value>%value%</value>
 																</create>
 																<read>
-																	<path>eml:citation</path>
+																	<path>self::node()</path>
 																	<context>parent</context>
 																</read>
 																<update>
@@ -4664,12 +4687,12 @@
 																	<context>self</context>
 																</update>
 																<delete>
-																	<path>self::node()</path>
-																	<context>self</context>
+																	NULL
 																</delete>
 															</actions>
 														</properties>
-													</element>
+														<children/>
+														</element>											
 													<element name="citation_id">
 														<properties>
 															<type>textfield</type>
@@ -4682,7 +4705,7 @@
 															<description>A URI, DOI or other persistent identifier for the  citation</description>
 															<actions>
 																<create>
-																	<path>eml:citation</path>
+																	<path>self::node()</path>
 																	<context>parent</context>
 																	<schema/>
 																	<type>attribute</type>
@@ -4690,7 +4713,7 @@
 																	<value>identifier</value>
 																</create>
 																<read>
-																	<path>eml:citation/@identifier</path>
+																	<path>@identifier</path>
 																	<context>parent</context>
 																</read>
 																<update>
@@ -4698,12 +4721,13 @@
 																	<context>self</context>
 																</update>
 																<delete>
-																	<path>self::node()</path>
-																	<context>self</context>
+																	NULL
 																</delete>
 															</actions>
 														</properties>
+													<children/>
 													</element>
+												
 												</children>
 											</element>
 										</children>
