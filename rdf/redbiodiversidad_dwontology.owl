@@ -14,7 +14,8 @@
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	 xmlns:foaf="http://xmlns.com/foaf/0.1/">
     <owl:Ontology rdf:about="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3">
         <rdfs:comment>This Ontology (OWL Lite) defines Biodiversity Fedora Commons Content Models as classes and describes relationes between these </rdfs:comment>
     </owl:Ontology>
@@ -162,6 +163,20 @@
         <rdfs:comment xml:lang="en">One Taxon can be subject of multiple identifications</rdfs:comment>
         <owl:inverseOf rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifiedAs"/>
     </owl:ObjectProperty>
+	
+	<!-- FOAF -->
+    <owl:ObjectProperty rdf:about="http://xmlns.com/foaf/0.1/depiction"  rdfs:label="depiction" rdfs:comment="A depiction of some thing.">
+      <rdfs:isDefinedBy rdf:resource="http://xmlns.com/foaf/0.1/"/>
+      <owl:inverseOf rdf:resource="http://xmlns.com/foaf/0.1/depicts"/>
+    </owl:ObjectProperty>
+	
+	
+    <owl:ObjectProperty rdf:about="http://xmlns.com/foaf/0.1/depicts"  rdfs:label="depicts" rdfs:comment="A thing depicted in this representation.">
+      <rdfs:isDefinedBy rdf:resource="http://xmlns.com/foaf/0.1/"/>
+      <owl:inverseOf rdf:resource="http://xmlns.com/foaf/0.1/depiction"/>
+    </owl:ObjectProperty>
+	
+	
     
 
 
@@ -199,6 +214,8 @@
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
+	
+   
     
 
 
@@ -224,6 +241,9 @@
     <!-- info:fedora/biodiversity:MaterialSampleCModel -->
 
     <owl:Class rdf:about="info:fedora/biodiversity:MaterialSampleCModel"/>
+	
+	<!-- info:fedora/islandora:sp_basic_image -->
+	<owl:Class rdf:about="info:fedora/islandora:sp_basic_image"/>
     
 
 
@@ -271,6 +291,12 @@
                 <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://xmlns.com/foaf/0.1/depicts"/>
+                <owl:allValuesFrom rdf:resource="info:fedora/islandora:sp_basic_image"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -282,6 +308,12 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#taxonOfId"/>
                 <owl:allValuesFrom rdf:resource="info:fedora/biodiversity:IdentificationCModel"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://xmlns.com/foaf/0.1/depicts"/>
+                <owl:allValuesFrom rdf:resource="info:fedora/islandora:sp_basic_image"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
