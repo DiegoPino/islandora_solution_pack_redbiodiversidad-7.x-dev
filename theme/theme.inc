@@ -132,7 +132,7 @@ foreach($models  as $contentmodelpid)
 	   
 	  
 }
-//dpm($result);
+
 //If it´s not a location model object what we are visiting the we must reverse the paths($result) and remove everything until we get to a location model
 if (!empty($result))
 {
@@ -277,10 +277,13 @@ EOQ;
 
 	//dpm($fullquery);
 	$repository = $islandora_object->repository;
-	
+	$current_is_location=false;
 
-	
- 
+    //There is a speciall case: If the object we are currently vistiting is a location, then in our graph paths there will be no locationcmodel! (it´s our starting point). It´s obvios, but we must show in this case all the info.
+	if (in_array('biodiversity:LocationCModel',$islandora_object->models))
+	{
+	$current_is_location=true;
+	}
 	//dpm($fullquery);
 	$connection = islandora_get_tuque_connection();
 	//$escaped_pid = str_replace(':', '_', $pid);
@@ -298,24 +301,38 @@ EOQ;
 			$list=array();
 			
 			$harvestthispath=false;
-			//Precheck if location is in path. If so, then process objects for this location.
-			foreach($result as $sparqlvar=>$hit)
-			{	
-				if ($hit['type']=='pid')	
+			//Precheck if location is in path. If so, then process objects for this location. If the current Object belongs to LocationCMODEL, the all paths starting from it are related, so we must compute an exception
+			if  ($current_is_location)
 				{
-					
-					if ($relationsandcmodels_sparqlmapping_hash[$sparqlvar][0]=='info:fedora/biodiversity:LocationCModel')
+				if (!array_key_exists($islandora_object->id,$pathtopoints))
 					{
-						//dpm("encontrado!");
-						if (!array_key_exists($hit['value'],$pathtopoints))
+					$pathtopoints[$islandora_object->id]=array();
+				    }
+					$harvestthispath=true;
+					$pathoflocation_pid=$islandora_object->id;	
+					
+				}
+			else
+				{	
+				foreach($result as $sparqlvar=>$hit)
+				{	
+					if ($hit['type']=='pid')	
+					{
+						if ($relationsandcmodels_sparqlmapping_hash[$sparqlvar][0]=='info:fedora/biodiversity:LocationCModel')
 						{
-							$pathtopoints[$hit['value']]=array();
+						
+							if (!array_key_exists($hit['value'],$pathtopoints))
+							{
+								$pathtopoints[$hit['value']]=array();
+							}
+							$harvestthispath=true;
+							$pathoflocation_pid=$hit['value'];
 						}
-						$harvestthispath=true;
-						$pathoflocation_pid=$hit['value'];
-					}
-				}	
-			}
+					
+					}	
+				}
+			
+			 }
 			//If the path has a location, then harvest all other objects and add it to the array key of this location. 
 			//If not assume direct relation to this object, means a path thats goes in another direction of our object is the center of a star =) nice deduction of myself!.
 			//This also means that if there are relations to a location starting from here then we must assume that all objects that go in any other direction are related to all found locations and not a particular one.
@@ -388,7 +405,7 @@ if ($choice['PID']==$object_pid)
 	}
 	else
 	{
-	$clustergroup='All locations';	
+	$clustergroup='All locations in this Repository';	
 	}	
 
 
@@ -452,6 +469,31 @@ $variables['eol_render_element']=array();
 $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
 
 drupal_add_css("$module_path/css/islandora_red_biodiversidad.css");	 
+
+$datastreams = array();
+foreach ($islandora_object as $ds) {
+  try {
+    $pid = $islandora_object->id;
+    $id = $ds->id;
+    $label = $ds->label;
+    $download_path = islandora_datastream_get_url($ds, 'download');
+    $datastreams[$id]['id'] = $id;
+    $datastreams[$id]['label'] = $label;
+    $datastreams[$id]['label_link'] = islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $ds) ?
+      l($label, $download_path) :
+      $label;
+    $datastreams[$id]['download_url'] = $download_path;
+    $datastreams[$id]['mimetype'] = $ds->mimetype;
+    $datastreams[$id]['size'] = islandora_datastream_get_human_readable_size($ds);
+    $datastreams[$id]['created_date'] = $ds->createdDate->format("Y-m-d");
+    $datastreams[$id]['class'] = drupal_strtolower(preg_replace('/[^A-Za-z0-9]/', '-', $id));
+  }
+  catch (RepositoryException $e) {
+
+  }
+}
+$variables['datastreams'] = $datastreams;
+
   
 if (isset($islandora_object['DwC']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DwC']))
 { 
@@ -462,7 +504,7 @@ $xsl->load($module_path.'/xsl/'.$transform);
 $xslt = new XSLTProcessor();
 $xslt->importStyleSheet($xsl);
 $html = $xslt->transformToXML(simplexml_load_string($dwc));
-$variables['islandora_dwc_html'] = $html;
+$variables['islandora_dwc_html'] = '<article><dl class="dl-horizontal">'.$html.'</dl></article>';
 	
 if (in_array('biodiversity:TaxonCModel',$islandora_object->models))
 {
@@ -490,7 +532,8 @@ if (!empty($title))
 				
 			
 	$eoldata=islandora_red_biodiversidad_eol_getdata($title);
-			
+	if (!empty($eoldata))	
+		{	
 	$eoldata=array_filter($eoldata);
 	foreach($eoldata as $key=>$values)
 	{
@@ -504,11 +547,13 @@ if (!empty($title))
 			case 'references':
 			$eoldatapre['eol_3']=array(
 				'#type' => 'fieldset',
+				'#id' => 'eol-references',
 				'#tree' => TRUE,
 				'#title'=>t('Bibliographic References'),
-				'#attributes' => array('class' => array('collapsible', 'collapsed')),
 				'#group' => 'eol_info',
-						
+		        '#collapsible' => TRUE,
+		        '#collapsed' => TRUE,	
+				'#weight'=>3,	
 				'content' => 
 				array(
 					'#markup' => t(''),
@@ -528,11 +573,13 @@ if (!empty($title))
 			case 'synonyms':
 			$eoldatapre['eol_2']=array(
 				'#type' => 'fieldset',
+				'#id' => 'eol-synonyms',
 				'#tree' => TRUE,
 				'#title'=>t('Synonyms'),
-				'#attributes' => array('class' => array('collapsible', 'collapsed')),
 				'#group' => 'eol_info',
-						
+		        '#collapsible' => TRUE,
+		        '#collapsed' => TRUE,	
+				'#weight'=>2,		
 				'content' => 
 				array(
 					'#markup' => t(''),
@@ -550,7 +597,7 @@ if (!empty($title))
 			if(count($tmp_acum)>0)
 			{
 				$tmp=implode(", ",$tmp_acum);	
-				$tmp="</p>".$tmp."</p>";
+				$tmp="<p>".$tmp."</p>";
 			}	
 			else
 			{
@@ -562,14 +609,17 @@ if (!empty($title))
 			case 'vernacularNames':
 			$eoldatapre['eol_1']=array(
 				'#type' => 'fieldset',
+				'#id' => 'eol-vernacular',
 				'#tree' => TRUE,
 				'#title'=>t('Vernacular Names'),
-				'#attributes' => array('class' => array('collapsible', 'collapsed')),
 				'#group' => 'eol_info',
 				'content' => 
 				array(
 					'#markup' => t(''),
 				),
+		        '#collapsible' => TRUE,
+		        '#collapsed' => TRUE,	
+				'#weight'=>1,	
 			);
 					
 					
@@ -582,7 +632,7 @@ if (!empty($title))
 			if(count($tmp_acum)>0)
 			{
 				$tmp=implode(", ",$tmp_acum);	
-				$tmp="</p>".$tmp."</p>";
+				$tmp="<p>".$tmp."</p>";
 			}	
 			else
 			{
@@ -595,11 +645,13 @@ if (!empty($title))
 			case 'dataObjects':
 			$eoldatapre['eol_0']=array(
 				'#type' => 'fieldset',
+				'#id' => 'eol-overview',
 				'#tree' => TRUE,
 				'#title'=>t('Overview'),
-				'#attributes' => array('class' => array('collapsible')),
 				'#group' => 'eol_info',
-						
+		        '#collapsible' => TRUE,
+		        '#collapsed' => FALSE,	
+				'#weight'=> -2,		
 				'content' => 
 				array(
 					'#markup' => t(''),
@@ -639,15 +691,15 @@ if (!empty($title))
 			      
 		$eoldatahtml['fieldset_eol']['#type'] = 'vertical_tabs';
 		$eoldatahtml['fieldset_eol']['#group'] = 'eol_info';
-			
+			$eoldatahtml['fieldset_eol']['#weight']=1;
 			
 			
 		$variables['eol_render_element']= drupal_render($eoldatahtml);
 	}
+		}	
 			
 			
-			
-	//$variables['eoldata']=islandora_red_biodiversidad_eol_getdata($query);
+	
 }
 }
 	

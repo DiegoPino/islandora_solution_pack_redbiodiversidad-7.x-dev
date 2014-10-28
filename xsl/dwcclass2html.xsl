@@ -13,12 +13,7 @@
     <xsl:output method="html" encoding="UTF-8" indent="yes"/>
 
     <xsl:template match="/">
-        <article>
-            <dl>
             <xsl:apply-templates/>
-            </dl>
-        </article>
-
     </xsl:template>
      
     <xsl:template name="taxonterms" match="/dwr:DarwinRecordSet/dwc:*/*">
