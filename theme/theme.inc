@@ -1040,13 +1040,14 @@ EOQ;
 					
 							}
 						
+						
 						$previous_object=$object->id; //now set previous as current
 							}
 						$splitedlabel=implode(' ',preg_split('/(?=[A-Z])/', $rel_label, -1, PREG_SPLIT_NO_EMPTY));
 						$rel_label=!empty($splitedlabel)?$splitedlabel:$rel_label;
 						//If the Ontology is nice written...then this makes wonders:
 						
-						$related_sparql=$related_sparql."<ul class=\"action-links\"><li><i class=\"icon-li icon-chevron-right\"></i><span class=\"islandora-red-biodiversidad-info\">$rel_label</span>: ".$object_link;
+						$related_sparql=$related_sparql."<ul><li class=\"fa-hover\"><i class=\"fa fa-arrow-right fa-x2\"></i><span class=\"islandora-red-biodiversidad-info\">$rel_label</span>: ".$object_link;
 					    $related_sparql_closeure.='</li></ul>';
 						}
 						
@@ -1066,9 +1067,14 @@ EOQ;
 			if (count($related_sparql_results)>0)
 				{
 				$vlot_graph_style=islandora_ontologies_vlot_get_info('islandora_red_biodiversidad'); //@see hook_islandora_ontologies_vlot_info and islandora_ontologies_vlot_get_info
-				//dpm($vlot_graph_style);
-				//dpm($vlot_settings);
-				$variables['related_sparql_results'] = drupal_render($related_sparql_results);
+				
+				
+				//$treelist = new islandora_ontologies_adjacency_graph_to_html($vlot_settings);
+				//$treelisthtml=$treelist->getdepthFirst($islandora_object->id);
+				
+			
+				//$variables['related_sparql_results'] = $treelisthtml;//
+				$variables['related_sparql_results']=drupal_render($related_sparql_results);
 				$variables['vlot'] =islandora_ontologies_build_vlot($vlot_graph_style, $vlot_settings, '924','800');
 			
 				$variables['vlot']=drupal_render($variables['vlot']);
