@@ -736,7 +736,30 @@ function islandora_red_biodiversidad_preprocess_islandora_dwca(array &$variables
 	$variables['parent_collections'] = islandora_get_parents_from_rels_ext($islandora_object);
 	$variables['metadata'] = islandora_retrieve_metadata_markup($islandora_object);
 	$variables['description'] = islandora_retrieve_description_markup($islandora_object);
-   
+	
+	$datastreams = array();
+	foreach ($islandora_object as $ds) {
+	  try {
+	    $pid = $object_pid;
+	    $id = $ds->id;
+	    $label = $ds->label;
+	    $download_path = islandora_datastream_get_url($ds, 'download');
+	    $datastreams[$id]['id'] = $id;
+	    $datastreams[$id]['label'] = $label;
+	    $datastreams[$id]['label_link'] = islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $ds) ?
+	      l($label, $download_path) :
+	      $label;
+	    $datastreams[$id]['download_url'] = $download_path;
+	    $datastreams[$id]['mimetype'] = $ds->mimetype;
+	    $datastreams[$id]['size'] = islandora_datastream_get_human_readable_size($ds);
+	    $datastreams[$id]['created_date'] = $ds->createdDate->format("Y-m-d");
+	    $datastreams[$id]['class'] = drupal_strtolower(preg_replace('/[^A-Za-z0-9]/', '-', $id));
+	  }
+	  catch (RepositoryException $e) {
+
+	  }
+	}
+	$variables['datastreams'] = $datastreams;
 	if (isset($islandora_object['TN']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['TN'])) {
 		$variables['islandora_thumbnail_url'] = url("islandora/object/{$islandora_object->id}/datastream/TN/view");
 	}
@@ -747,6 +770,7 @@ function islandora_red_biodiversidad_preprocess_islandora_dwca(array &$variables
 	{ 
 		$variables['dwca-link'] = l(t('Download Zipped DWC-A'), "islandora/object/{$islandora_object->id}/datastream/DWCA/download");
 	}
+	
 	
 }
 
@@ -984,7 +1008,8 @@ EOQ;
 							$object_label="";
 							$object_link="";
 							$level++;
-						    try { //@TODO if an object no longer exists, then we should just stop iterating over this path, because sparql could not have traveled any deeper
+						    try { //if an object no longer exists, then we should just stop iterating over this path, because sparql could not have traveled any deeper
+								///@TODO NOV-2014 we must take in account external entities as an option.
 						 		$object = $islandora_object->repository->getObject($hit['value']);
 								$object_label=$object->label;
 								$object_link=l($object_label, "islandora/object/".$hit['value']);
