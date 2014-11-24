@@ -121,7 +121,7 @@
    <field name="inStock" type="boolean" indexed="true" stored="true" />
 
    <field name="store" type="location" indexed="true" stored="true"/>
-
+   
    <!-- Common metadata fields, named specifically to match up with
      SolrCell metadata when parsing rich documents such as Word, PDF.
      Some fields are multiValued only because Tika currently may return
@@ -165,7 +165,12 @@
    <field name="payloads" type="payloads" indexed="true" stored="true"/>
 
    <field name="_version_" type="long" indexed="true" stored="true"/>
+   <!-- fields for DWC latlong types
 
+   <field name="dwc.latlong_full" type="tdouble" indexed="true" stored="true"/>
+   --> 
+
+   
    <!--
      Some fields such as popularity and manu_exact could be modified to
      leverage doc values:
@@ -188,7 +193,7 @@
    <dynamicField name="*_s"  type="string"  indexed="true"  stored="true" />
    <dynamicField name="*_ms" type="string"  indexed="true"  stored="true" multiValued="true"/>
    <dynamicField name="*_mt"  type="text_general"    indexed="true"  stored="true" multiValued="true"/> 
-  <dynamicField name="*_ss" type="string"  indexed="true"  stored="true" multiValued="true"/>
+   <dynamicField name="*_ss" type="string"  indexed="true"  stored="true" multiValued="true"/>
    <dynamicField name="*_l"  type="long"   indexed="true"  stored="true"/>
    <dynamicField name="*_ls" type="long"   indexed="true"  stored="true"  multiValued="true"/>
    <dynamicField name="*_t"  type="text_general"    indexed="true"  stored="true"/>
@@ -202,7 +207,7 @@
    <dynamicField name="*_ds" type="double" indexed="true"  stored="true"  multiValued="true"/>
 
    <!-- Type used to index the lat and lon components for the "location" FieldType -->
-   <dynamicField name="*_coordinate"  type="tdouble" indexed="true"  stored="false" />
+   <dynamicField name="*_coordinate"  type="tdouble" indexed="true"  stored="true" />
 
    <dynamicField name="*_dt"  type="date"    indexed="true"  stored="true"/>
    <dynamicField name="*_dts" type="date"    indexed="true"  stored="true" multiValued="true"/>
@@ -231,6 +236,7 @@
    
    <!-- For GSearch 2.6 -->
    <field name="PID" type="string" indexed="true" stored="true" required="true" /> 
+   <field name="PID_uri" type="string" indexed="true" stored="true"/>
    <field name="dc.description" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <dynamicField name="*" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
  </fields>
