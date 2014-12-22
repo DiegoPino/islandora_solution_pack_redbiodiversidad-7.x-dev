@@ -236,7 +236,7 @@
 									<access>TRUE</access>
 									<default_value>Red de Biodiversidad Chile</default_value>
 									<required>FALSE</required>
-									<title>Rights Holder</title>
+									<title>Date Modified</title>
 									<tree>TRUE</tree>
 									<actions>
 										<create>
