@@ -237,6 +237,7 @@
    <!-- For GSearch 2.6 -->
    <field name="PID" type="string" indexed="true" stored="true" required="true" /> 
    <field name="PID_uri" type="string" indexed="true" stored="true"/>
+   <field name="OBJECT_server_uri" type="string" indexed="true" stored="true"/>
    <field name="dc.description" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <dynamicField name="*" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
  </fields>
