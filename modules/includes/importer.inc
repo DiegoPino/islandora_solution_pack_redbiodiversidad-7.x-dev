@@ -78,12 +78,28 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
     if (isset($parent['COLLECTION_POLICY'])) {
       $policy_stream = $parent['COLLECTION_POLICY'];
       $policy = new CollectionPolicy($policy_stream->content);
-
       $cm_options = array();
       $ns_options = array(NULL => t('Default namespace'));
       foreach ($policy->getContentModels() as $pid => $info) {
-        $cm_options[$pid] = array('title' => $info['name']);
-
+        $cm_options[$pid] =	array(
+			'title' => $info['name'],
+	        'collection' => array( 
+	  		  'data'=> array(
+	        		'#type' => 'textfield',
+	        	  	'#size' => 40,
+					'#attributes'=>'',
+	        	  	'#description' => t('Enter collection name or PID, leave blank to use only parent Collection'),
+	       	   		'#autocomplete_path' => 'import_entity_csv/autocomplete', //reusing import entity csv autocomplete
+	  				'#value'=>'',
+	        	  	'#required' => TRUE,
+					'#message'=>'',
+	  				'#name'=> 'dest_collection['.$pid.']',
+					'#id'=>'dest_collection_'.md5($pid),
+	  			)
+	  		)
+		 	);
+	   
+	  
         $cm_namespace = $info['namespace'];
         if (!empty($cm_namespace)) {
           $cm_namespace = $info['namespace'];
@@ -97,7 +113,10 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
         }
       }
     }
-
+    
+	
+	
+	
     return array(
       'fs' => array(
         '#type' => 'fieldset',
@@ -110,19 +129,19 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
             'file_validate_extensions' => array('xls','xlsx'),
           ),
         ),
-        'fs' => array(
+        'fs2' => array(
           '#type' => 'fieldset',
           '#title' => t('Content Model'),
           '#description' => t('The content model(s) to assign to the imported objects.'),
           'content_model' => array(
             '#type' => 'tableselect',
-            '#header' => array('title' => t('Name')),
+            '#header' => array('title' => t('Name'),'collection'=>t('Additional destination collection')),
             '#multiple' => TRUE,
             '#options' => $cm_options,
           ),
 		  'extrainfo'=>array(
               '#type' => 'markup',
-              '#value' =>'<div><em>Note:</em>The excel File must contain a sheet named "Occurrence". Every column named different as a DWC XML schema field will be included as comma separated pair "columnheader=value" inside dwc:dynamicProperties xml field</div>',
+              '#value' =>'<div><em>Note:</em>'.t('The excel File must contain a sheet named "Occurrence". Every column named different as a DWC XML schema field will be included as comma separated pair "columnheader=value" inside dwc:dynamicProperties xml field').'</div>',
 		  ),
         ),
         'namespace' => array(
@@ -131,6 +150,9 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
           '#description' => t('The namespace in which the imported objects will be created.'),
           '#options' => $ns_options,
         ),
+		'dest_collection' => array( 
+			'#type' => 'value', 
+		),
         'submit' => array(
           '#type' => 'submit',
           '#value' => t('Import'),
@@ -151,10 +173,63 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 
     $content_models = array_filter($form_state['values']['content_model']);
     if (empty($content_models)) {
-      form_set_error('content_model', t('Need to select at least one content model.'));
+      form_set_error('content_model', t('Need to select at least one Content Model for your new objects.'));
     }
-
-    return !empty($form_state['values']['file']) && !empty($content_models);
+	
+	if (empty($form_state['values']['namespace']))
+		{
+		  form_set_error('namespace', t('Need to select a namespace for your new object\'s PIDs.'));	
+			
+		}
+	//Now check if the additional destination Collection exists.
+	
+	$dest_collection =  array_filter($form_state['values']['dest_collection']);
+	$dest_errors=array();
+	foreach($content_models as $cmodel)
+		{		
+			$dest_collection_access=false;
+			$pid=$dest_collection[$cmodel];
+			if (($form_state['storage']['parent_pid']!=$pid) && !(empty($pid))) //if it's the same as the parent collection the no check required, 
+				{
+					$form_state['complete form']['fs']['fs2']['content_model']['#options'][$cmodel]['collection']['data']['#value']=$pid;	
+					$islandora_object=islandora_object_load($pid); 
+					if ($islandora_object)
+						{
+			    		$models = $islandora_object->models;
+			    		if (array_intersect(array('islandora:collectionCModel'), $models)) 
+							{
+			      	  	  	$dest_collection_access=islandora_object_access(ISLANDORA_MANAGE_PROPERTIES, $islandora_object);
+							if ($dest_collection_access)
+								{
+								$form_state['complete form']['fs']['fs2']['content_model']['#options'][$cmodel]['collection']['data']['#attributes']['class']=array();	
+								
+								}
+							else
+								{
+								 form_set_error('dest_collection['.$pid.']', t('Sorry, the choosen Object %s is not a Collection', array('%s' => $pid)));	
+								$dest_errors[]=true;
+								}	
+			    			}
+						else
+							{
+					 	     form_set_error('dest_collection['.$pid.']', t('Sorry, the choosen Object %s is not a Collection', array('%s' => $pid)));
+							 $form_state['complete form']['fs']['fs2']['content_model']['#options'][$cmodel]['collection']['data']['#attributes']['class'][] = 'error'; 	
+							$dest_errors[]=true;
+							}
+						}
+					else //Object does not exist
+						{
+						 $form_state['complete form']['fs']['fs2']['content_model']['#options'][$cmodel]['collection']['data']['#attributes']['class'][] = 'error'; 
+						 form_set_error('dest_collection['.$pid.']', t('Sorry, the choosen Colecction Object %s does not exists', array('%s' => $pid)));	
+	 				     $dest_errors[]=true;
+							
+						}	
+			
+				}
+	
+		}
+		
+    return (!empty($form_state['values']['file']) && !empty($content_models) && !empty($form_state['values']['namespace']) && empty($dest_errors));
   }
 
   /**
@@ -172,13 +247,16 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
     // Cast to an array, in case there are none?
     $content_models = array_filter((array) $form_state['values']['content_model']);
     //We will define all the transform data here, in case we must deal with separate content models inside a same excel row!
-    
+    $dest_collection =  $form_state['values']['dest_collection'];
+	
+	
 	$red_biodiversidad_transform_path = drupal_get_path('module', 'islandora_red_biodiversidad') . '/xsl';
 	$transform_path = drupal_get_path('module', 'gbifexcel_importer') . '/xsl';
 	$red_biodiversidad_template_path = drupal_get_path('module', 'islandora_red_biodiversidad') . '/xml';
     $contentmodels_xml_proccessing_data=array(
         'biodiversity:OccurrenceCModel' => array(
           'title' => 'occurrenceID',
+		  'dest_collection'=>$dest_collection['biodiversity:OccurrenceCModel'],
 		  'title_alt' => array('collectionID','collectionCode','catalogNumber'),	
 		  'template' => $red_biodiversidad_template_path.'/dwc_occurrence_template.xml',
 		  'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassoccurrence2dc.xsl',
@@ -186,30 +264,35 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
         'biodiversity:LocationCModel' => array(
           'title' => 'locationID',
 		  'title_alt' => array('locality'),
+		  'dest_collection'=>$dest_collection['biodiversity:LocationCModel'],
 		  'template' => $red_biodiversidad_template_path.'/dcterms_location_template.xml',
 		  'dwc2dc' => $red_biodiversidad_transform_path.'/dctermsclasslocation2dc.xsl',
         ),
         'biodiversity:IdentificationCModel' => array(
            'title' => 'identificationID',
 		   'title_alt'=>array('identifiedBy','dateIdentified'),
+		   'dest_collection'=>$dest_collection['biodiversity:IdentificationCModel'],
 		   'template' => $red_biodiversidad_template_path.'/dwc_identification_template.xml',
 		   'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassidentification2dc.xsl',
         ),
         'biodiversity:EventCModel' => array(
            'title' => 'eventID',
 		   'title_alt'=>array('fieldNumber','eventDate'),
+		   'dest_collection'=>$dest_collection['biodiversity:EventCModel'],
 		   'template' => $red_biodiversidad_template_path.'/dwc_event_template.xml',
 		   'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassevent2dc.xsl',
         ),
         'biodiversity:SimpledwcCModel' => array(
             'title' => 'occurrenceID', //Sames as OccurrenceCModel
 			'title_alt'=> array('basisOfRecord','catalogNumber'),
+			'dest_collection'=>$dest_collection['biodiversity:SimpledwcCModel'],
 		    'template' => $red_biodiversidad_template_path.'/dwc_simple_template.xml',
 		    'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclass2dc.xsl',
         ),
         'biodiversity:TaxonCModel' => array(
           'title' => 'taxonID',	
 		  'title_alt'=> array('scientificName'),
+		  'dest_collection'=>$dest_collection['biodiversity:TaxonCModel'],
 		  'template' => $red_biodiversidad_template_path.'/dwc_taxon_template.xml',
 		  'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclasstaxon2dc.xsl',
     ),
@@ -223,7 +306,7 @@ if (module_exists('islandora_ontologies'))
 	foreach($contentmodels_xml_proccessing_data as $content_model=>$data)
 		{
 		
-		//We are going to try to be smart...get the last ID (dwc:class id) from Solr. If ID is absent from our Excel, the increment this one
+		//We are going to try to be smart...get the last ID (dwc:class id) from Solr. If ID is absent from our Excel, then increment this one
 		$lastid=islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr($content_model);
 		$contentmodels_xml_proccessing_data[$content_model]['lastIDfromSolr']=$lastid[1];
 		
@@ -452,6 +535,16 @@ if (module_exists('islandora_ontologies'))
 					//Collect what we have for this row and build relations...
 					foreach($thisrow as $cmodel => $objectcountid)
 						{
+							//Check if we have and additional destination Collection defined for this object's CMODEL, if so, add this relation here
+						if  (!empty($content_models_with_processing_info[$cmodel]['dest_collection'])) //not optimal, should be check only once?
+							{
+								$file[$objectcountid]['localrels'][]=array(
+									'localname'=>'isMemberOfCollection',
+									'ns'=>FEDORA_RELS_EXT_URI,
+									'targetobject'=>$content_models_with_processing_info[$cmodel]['dest_collection'],	
+								);	
+							
+							}
 						//Iterate over possible localrels.	
 						if (isset($rels_index_cmodel_to_cmodel[$cmodel]))
 							{
@@ -534,8 +627,8 @@ if (module_exists('islandora_ontologies'))
 	$date = date_create();
 	//$this->setId=1;
 	$tempfile=$this->file;
-	$tempfile['object_info']=$wholedata;//July 2014. This looks messy. Iknow the getone should do the work, but opening the file and serializing for every getone is getting over my max execution time limit. So i will try it this way,
-	error_log(var_export($this->connection,true),0);
+	$tempfile['object_info']=$wholedata;//July 2014. This looks messy. I know the getone should do the work, but opening the file and serializing for every getone is getting over my max execution time limit. So i will try it this way,
+	//error_log(var_export($this->connection,true),0);
 	
 	//return $preprocessed;
     for ($i = 0; $i < $total; $i++) {
@@ -550,8 +643,16 @@ if (module_exists('islandora_ontologies'))
   	  	$localrels=$item->getRels();
 	  foreach ($localrels as $rels)
   	  	{
-  	  	$object->relationships->add($rels['ns'], $rels['localname'], $rels['targetobject'],RELS_TYPE_URI);	
-  	  	}
+		if ($rels['ns']==FEDORA_RELS_EXT_URI)
+			{
+			$object->relationships->add($rels['ns'], $rels['localname'], $rels['targetobject']);		
+			}
+		else
+			{
+			$object->relationships->add($rels['ns'], $rels['localname'], $rels['targetobject'],RELS_TYPE_URI);	
+			}
+		
+		}
 		
 		$this->addToDatabase($object, array());
 		
