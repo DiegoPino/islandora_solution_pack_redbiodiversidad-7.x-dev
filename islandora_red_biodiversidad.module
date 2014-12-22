@@ -210,16 +210,16 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_coll
 
 
 function islandora_red_biodiversidad_biodiversity_biodiversityCModel_islandora_view_object($object,$page_number, $page_size) {  
-    //because we have a common CMODEL for every object from this solution pack, we must de the check inside instead o making another hook beacuse they could(and do!) overlap
+    //because we have a common CMODEL for every object from this solution pack, we must do the check inside instead o making another hook beacuse they could(and do!) overlap
     $path = drupal_get_path('module', 'islandora');
-    drupal_add_js(array(
+   /* drupal_add_js(array(
       'islandora' => array(
         'print_img' => $path . '/images/print-icon.png'),
         ), array(
-          'type' => 'setting'));
+          'type' => 'setting'));*/
 
     drupal_add_js(array('islandora' => array('print_link' => 'islandora/object/' . $object->id . '/print_object')), array('type' => 'setting'));
-    drupal_add_js($path . '/js/add_print.js');
+    //drupal_add_js($path . '/js/add_print.js');
 	
 	
 	$models = $object->models;
@@ -1284,4 +1284,13 @@ function islandora_red_biodiversidad_biodiversity_DWCACModel_EML_islandora_datas
 
    
   		}
+}
+function  islandora_red_biodiversidad_user_presave(&$edit, $account, $category) {
+   /* dpm($edit);
+	dpm($account);
+	dpm($category);*/
+	if ($account->is_new) {
+       // $claim = $account->name.'/claims';
+       // $edit['graph_claim'] = $claim;
+    }
 }
