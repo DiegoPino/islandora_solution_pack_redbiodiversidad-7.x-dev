@@ -286,6 +286,7 @@ EOQ;
 	}
 	//dpm($fullquery);
 	$connection = islandora_get_tuque_connection();
+	
 	//$escaped_pid = str_replace(':', '_', $pid);
 	if (($connection) && !empty($fullquery)){
 		
@@ -816,7 +817,7 @@ foreach($models  as $contentmodelpid)
 			{
 				if (count($localgraph)>0)
 				{
-					//Having the paths for every assoicated ontologies, we traverse this structure using getdepthfirst. This way we get an array with every "road" or consecutive "edges" a.k.a relations 
+					//Having the paths for every associated ontologies, we traverse this structure using getdepthfirst. This way we get an array with every "road" or consecutive "edges" a.k.a relations 
 					//that connect this type of Content Model (origin) to every other one in the full Graph. This will be used to make a composite Sparql Query
 					$g = new islandora_ontologies_adjacency_graph($localgraph);
 					$result[$ontologiepid]=$g->getdepthFirst("info:fedora/".$contentmodelpid);
@@ -838,12 +839,12 @@ This is a special case, because in theory we could haven Ontologies for all CMOD
 
 */
 $current_objects_cmodel=array_diff($models, array('fedora-system:FedoraObject-3.0'), array('biodiversity:biodiversityCModel')); //
-
+//dpm($result);
 
 $o='o';
 $s='s';
 $query="";
-$relationsandcmodels_sparqlmapping_hash=array();//This structure is a hash map between Sparql Variables and rels+cmodels form our paths so we don`t ahve to extract this info from Mulgara.
+$relationsandcmodels_sparqlmapping_hash=array();//This structure is a hash map between Sparql Variables and rels+cmodels form our paths so we don`t have to extract this info from Mulgara.
 if (!empty($result))
 {
 
@@ -949,9 +950,9 @@ EOQ;
 			
 		
 		
-		
-	}
-
+//dpm($fullquery);		
+}
+	
 
 	$repository = $islandora_object->repository;
 	$related = array();
@@ -976,6 +977,7 @@ EOQ;
 	$related_sparql_results=array();
 	$connection = islandora_get_tuque_connection();
 	$escaped_pid = str_replace(':', '_', $pid);
+	//dpm($relationsandcmodels_sparqlmapping_hash);
 	if (($connection) && !empty($fullquery)){
 		
 
@@ -1027,21 +1029,21 @@ EOQ;
 						
 						
 						$model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
-						$relation=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0];	
-					    //Make CMODEL something people can actually read 
+						$relation=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0];	//Aca hay que revisar....pueden ser varios y estoy sacando el primero
+					    //dpm($hit);
+						
+						//Make CMODEL something people can actually read 
 					    $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
 						//$model_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $model_label, $m)? $m[2]: $model_label;
 						
-						
-						
 						$rel_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/',$relation, $m)? $m[2]: $relation;
 						
-						
-						
+									
 						//Now add this object as adjacent to the previous one, if not already done
-						
-						
+											
 						$rel_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $rel_label, $m)? $m[2]: $rel_label;	
+						
+						
 						if ($object)
 							{
 						if (isset($previous_object))	
