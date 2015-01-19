@@ -42,6 +42,12 @@
   <xsl:variable name="HOST">localhost</xsl:variable>
   <xsl:variable name="PORT">8080</xsl:variable>
   <xsl:variable name="PID" select="/foxml:digitalObject/@PID"/>
+  <!-- These values are used to distinguish same PID objects in a Solr Cloud configuration, 
+   Every Repository inside a Solr Cloud common Collection should have a unique URL and Institution Name. So modify to fit your needs
+  added by Diego Pino N -->
+  <xsl:variable name="siteName">My Awesome Institution</xsl:variable>
+  <xsl:variable name="siteUrl">http://myawesomdomain.edu</xsl:variable> 
+
   <!--  Used for indexing other objects.
   <xsl:variable name="FEDORA" xmlns:java_string="xalan://java.lang.String" select="substring($FEDORASOAP, 1, java_string:lastIndexOf(java_string:new(string($FEDORASOAP)), '/'))"/>
   -->
@@ -114,6 +120,8 @@
             <add>
               <xsl:apply-templates select="/foxml:digitalObject" mode="indexFedoraObject">
                 <xsl:with-param name="PID" select="$PID"/>
+		 <xsl:with-param name="siteName" select="$siteName"/>
+		 <xsl:with-param name="siteUrl" select="$siteUrl"/>
               </xsl:apply-templates>
             </add>
             <!-- Newspaper graph example.
@@ -175,6 +183,8 @@
   <!-- Index an object -->
   <xsl:template match="/foxml:digitalObject" mode="indexFedoraObject">
     <xsl:param name="PID"/>
+    <xsl:param name="siteName"/>
+    <xsl:param name="siteUrl"/>
 
     <doc>
       <!-- put the object pid into a field -->
@@ -184,6 +194,14 @@
       <field name="PID_uri">
 	<xsl:value-of select="concat('info:fedora/',$PID)"/>
       </field>
+      <field name="PID_fullurl">
+	<xsl:value-of select="concat($siteUrl,'/islandora/object/',$PID)"/>
+      </field>
+      <field name="siteName">
+	<xsl:value-of select="$siteName"/>
+      </field>
+
+
       <!-- These templates are in the islandora_transforms -->
       <xsl:apply-templates select="foxml:objectProperties/foxml:property"/>
       <xsl:apply-templates select="/foxml:digitalObject" mode="index_object_datastreams"/>

@@ -237,9 +237,13 @@
    <!-- For GSearch 2.6 -->
    <field name="PID" type="string" indexed="true" stored="true" required="true" /> 
    <field name="PID_uri" type="string" indexed="true" stored="true"/>
-   <field name="OBJECT_server_uri" type="string" indexed="true" stored="true"/>
    <field name="dc.description" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
    <dynamicField name="*" type="text_fgs"  indexed="true"  stored="true" multiValued="true"/>
+   <!-- For Solr Cloud, diego pino -->
+   <field name="PID_fullurl" type="string" indexed="true" stored="true" required="true"/>  
+   <field name="siteName" type="string" indexed="true" stored="true" required="true"/>
+
+
  </fields>
 
 
@@ -250,7 +254,8 @@
    <!-- For GSearch 2.6 -->
    <!-- <uniqueKey>id</uniqueKey> -->
  
-   <uniqueKey>PID</uniqueKey>
+ <!-- Not any more!, diego pino  <uniqueKey>PID</uniqueKey> -->
+ <uniqueKey>PID_fullurl</uniqueKey>
  
 
  <!-- DEPRECATED: The defaultSearchField is consulted by various query parsers when
