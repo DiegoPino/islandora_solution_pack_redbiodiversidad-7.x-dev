@@ -210,14 +210,9 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_coll
 
 
 function islandora_red_biodiversidad_biodiversity_biodiversityCModel_islandora_view_object($object,$page_number, $page_size) {  
-    //because we have a common CMODEL for every object from this solution pack, we must do the check inside instead o making another hook beacuse they could(and do!) overlap
+    //because we have a common CMODEL for every object from this solution pack, we must do the check inside instead of making another hook beacuse they could(and do!) overlap
     $path = drupal_get_path('module', 'islandora');
-   /* drupal_add_js(array(
-      'islandora' => array(
-        'print_img' => $path . '/images/print-icon.png'),
-        ), array(
-          'type' => 'setting'));*/
-
+  
     drupal_add_js(array('islandora' => array('print_link' => 'islandora/object/' . $object->id . '/print_object')), array('type' => 'setting'));
     //drupal_add_js($path . '/js/add_print.js');
 	
@@ -703,7 +698,7 @@ function islandora_red_biodiversidad_biodiversity_DWCACModel_islandora_ingest_st
 
 /**
  * implements hook_form_alter
- * We want to alter the metadatasetp form values based on global configurations for a particular content 
+ * We want to alter the metadataset form values based on global configurations for a particular content 
  * model but xml forms do not get an unique FORM ID?(all id`s are islandora_ingest_form) so we must check for content model and step id
  * @note there is other way but for now stick to this method beacuse it works! 
 */

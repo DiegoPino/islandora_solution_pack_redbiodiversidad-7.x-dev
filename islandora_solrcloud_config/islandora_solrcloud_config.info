@@ -1,0 +1,7 @@
+name = Islandora Solr Cloud display profile
+description = Display profiles for Islandora Solr that handles external objects only present in a common Solr Cloud Collection
+dependencies[] = islandora_solr
+files[] = includes/cloud_results.inc
+package = Islandora Search
+version = 7.x-dev
+core = 7.x

@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Implementations of installation hooks.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function islandora_solrcloud_config_uninstall() {
+
+  // Removing variables.
+  $variables = array(
+    'islandora_solr_cloud_profile_externalfields',
+  );
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
+}

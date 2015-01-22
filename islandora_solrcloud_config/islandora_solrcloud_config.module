@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * @file
+ * Configuration module for Islandora Solr.
+ */
+
+/**
+ * Implements hook_islandora_solr_primary_display().
+ */
+function islandora_solrcloud_config_islandora_solr_primary_display() {
+  return array(
+    'solrcloud' => array(
+      'name' => t('Solrcloud Aware'),
+      'module' => 'islandora_solrcloud_config',
+      'file' => 'includes/cloud_results.inc',
+      'class' => "IslandoraSolrResultsCloud",
+      'function' => "displayResults",
+      'description' => t("Display search results taking external objects in account"),
+    ),
+  );
+}
+
+/**
+ * Implements hook_islandora_solr_secondary_display().
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function islandora_solrcloud_config_menu() {
+  $items['admin/islandora/search/islandora_solr/solrcloud'] = array(
+    'title' => 'Solrcloud Settings',
+    'description' => 'Configure Solrcloud search settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_solrcloud_config_admin_solrcloud_settings'),
+    'access arguments' => array('administer islandora solr'),
+    'file' => 'includes/admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_islandora_solr_results_alter().
+ */
+
+function islandora_solrcloud_config_islandora_solr_results_alter(&$search_result, $query_processor) {
+  dpm('alterando');
+  foreach ($search_result as $object_index => $object_result) {
+    if (isset($search_result[$object_index]['solr_doc']['PID_fullurl']) && !empty($search_result[$object_index]['solr_doc']['PID_fullurl']))
+      {
+      if (url_is_external($search_result[$object_index]['solr_doc']['PID_fullurl']))
+        {
+        $search_result[$object_index]['object_url']=$search_result[$object_index]['solr_doc']['PID_fullurl'];
+        if ($search_result[$object_index]['thumbnail_url']!=drupal_get_path('module', 'islandora_solr') . '/images/defaultimg.png')
+          {
+          $search_result[$object_index]['thumbnail_url'] = $search_result[$object_index]['object_url'] . '/datastream/TN/view';
+          }
+         }
+  }   }
+  
+}
+
+
+
+/**
+ * Implements hook_theme().
+ */
+/*function islandora_solrcloud_config_theme() {
+  $path = drupal_get_path('module', 'islandora_solrcloud_config');
+
+  return array(
+    'islandora_solr_cloud' => array(
+      'path' => $path . '/theme',
+      'template' => 'islandora-solr-cloud',
+      'variables' => array('results' => NULL, 'elements' => array()),
+    ),
+  );
+}*/
+
+/**
+ * Implements hook_islandora_solr_query().
+ *
+ * Takes the current results limit (admin default or from url parameter) and
+ * finds the closed number that is dividable by 4 and 3, so when the layout is
+ * sized down in a responsive layout, the last row of results won't show
+ * 'trailing' results.
+ */
+/*function islandora_solrcloud_config_islandora_solr_query($islandora_solr_query) {
+
+  // We're dealing with the grid display.
+  if ($islandora_solr_query->display == 'grid') {
+    // Set results limit.
+    $limit = $islandora_solr_query->solrLimit;
+    // Not dividable yet.
+    $dividable = FALSE;
+    while ($dividable == FALSE) {
+      // Dividable by 4 and 3.
+      if (($limit % 4) == 0 && ($limit % 3) == 0) {
+        $dividable = TRUE;
+        $solr_limit = $limit;
+      }
+      $limit++;
+    }
+    // Set new limit.
+    $islandora_solr_query->solrLimit = $solr_limit;
+  }
+}*/
