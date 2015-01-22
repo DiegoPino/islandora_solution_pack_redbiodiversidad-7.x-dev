@@ -46,8 +46,7 @@ function islandora_solrcloud_config_menu() {
  */
 
 function islandora_solrcloud_config_islandora_solr_results_alter(&$search_result, $query_processor) {
-  dpm('alterando');
-  foreach ($search_result as $object_index => $object_result) {
+   foreach ($search_result as $object_index => $object_result) {
     if (isset($search_result[$object_index]['solr_doc']['PID_fullurl']) && !empty($search_result[$object_index]['solr_doc']['PID_fullurl']))
       {
       if (url_is_external($search_result[$object_index]['solr_doc']['PID_fullurl']))
@@ -57,7 +56,7 @@ function islandora_solrcloud_config_islandora_solr_results_alter(&$search_result
           {
           $search_result[$object_index]['thumbnail_url'] = $search_result[$object_index]['object_url'] . '/datastream/TN/view';
           }
-         }
+        }
   }   }
   
 }
