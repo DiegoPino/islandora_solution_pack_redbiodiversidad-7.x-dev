@@ -1,5 +1,4 @@
 <?php
-
 /**
 * @file
 * Theme hooks.
@@ -847,7 +846,7 @@ $query="";
 $relationsandcmodels_sparqlmapping_hash=array();//This structure is a hash map between Sparql Variables and rels+cmodels form our paths so we don`t have to extract this info from Mulgara.
 if (!empty($result))
 {
-
+ 
 foreach ($result as $ontologie=>$graphs)
 {
 			
@@ -994,8 +993,8 @@ EOQ;
 			
 				
 				foreach ($results as $result) {//iterate over every computed path
-				    $related_sparql_closeure="";
-					$related_sparql="<div>$islandora_object->label".t(' relates via:');
+				  $related_sparql_closeure="";
+					//$related_sparql="<div>$islandora_object->label".t(' relates via:');
 					//store current step in this path as previous object's id
 					$previous_object=$islandora_object->id;
 					
@@ -1070,17 +1069,18 @@ EOQ;
 						
 						$previous_object=$object->id; //now set previous as current
 							}
-						$splitedlabel=implode(' ',preg_split('/(?=[A-Z])/', $rel_label, -1, PREG_SPLIT_NO_EMPTY));
-						$rel_label=!empty($splitedlabel)?$splitedlabel:$rel_label;
+						//$splitedlabel=implode(' ',preg_split('/(?=[A-Z])/', $rel_label, -1, PREG_SPLIT_NO_EMPTY));
+						//$rel_label=!empty($splitedlabel)?$splitedlabel:$rel_label;
 						//If the Ontology is nice written...then this makes wonders:
 						
-						$related_sparql=$related_sparql."<ul><li class=\"fa-hover\"><i class=\"fa fa-arrow-right fa-x2\"></i><span class=\"islandora-red-biodiversidad-info\">$rel_label</span>: ".$object_link;
-					    $related_sparql_closeure.='</li></ul>';
+						//$related_sparql=$related_sparql."<ul><li class=\"fa-hover\"><i class=\"fa fa-arrow-right fa-x2\"></i><span class=\"islandora-red-biodiversidad-info\">$rel_label</span>: ".$object_link;
+					    //$related_sparql_closeure.='</li></ul>';
 						}
 						
 						
 					}
-				$related_sparql_results[]=array('#type'=>'markup','#markup'=>$related_sparql.$related_sparql_closeure."</div>");	
+				//$related_sparql_results[]=array('#type'=>'markup','#markup'=>$related_sparql.$related_sparql_closeure."</div>");
+        $related_sparql_results[]=array('#type'=>'markup','#markup'=>"<div></div>");
 			}
 		
 			
@@ -1096,13 +1096,10 @@ EOQ;
 				$vlot_graph_style=islandora_ontologies_vlot_get_info('islandora_red_biodiversidad'); //@see hook_islandora_ontologies_vlot_info and islandora_ontologies_vlot_get_info
 				
 				
-				//$treelist = new islandora_ontologies_adjacency_graph_to_html($vlot_settings);
-				//$treelisthtml=$treelist->getdepthFirst($islandora_object->id);
-				
 			
-				//$variables['related_sparql_results'] = $treelisthtml;//
-				$variables['related_sparql_results']=drupal_render($related_sparql_results);
-				$variables['vlot'] =islandora_ontologies_build_vlot($vlot_graph_style, $vlot_settings, '924','800');
+			
+				$variables['related_sparql_results']="";//drupal_render($related_sparql_results);""
+				$variables['vlot'] =islandora_ontologies_build_vlot($vlot_graph_style, $vlot_settings, '840','800');
 			
 				$variables['vlot']=drupal_render($variables['vlot']);
 				
@@ -1111,7 +1108,7 @@ EOQ;
 				{
 				$variables['related_sparql_results'] = t('There are no related objects from or to this one.');	
 				}	
-			//dpm($variables['related_sparql_results']);
+		
 	}	
 		
 		}
