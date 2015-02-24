@@ -15,16 +15,18 @@
 ?>
 <div class="islandora-related-objects islandora">
   <div class="islandora-related-content-wrapper clearfix">
+    <div>
+      <h2><?php print t('Related Darwin Core Objects Graph'); ?></h2>
       <div>
-  		<?php if(isset($variables['vlot'])): ?>
-		<h2><?php print t('Related Darwin Core Objects Graph'); ?></h2>
-  		<div>
-  			<?php print $variables['vlot'];?>
-  		</div>
-  		<?php endif; ?>
-    
+        <?php if (!empty($variables['related_sparql_results'])):?>
+          <p>
+            <?php print $variables['related_sparql_results'];?>
+          </p>
+        <?php endif; ?> 
+        <?php if(isset($variables['vlot'])): ?> 
+          <?php print $variables['vlot'];?>
+        <?php endif; ?>
       </div>
+    </div>
   </div>
 </div>
-
-

@@ -780,63 +780,60 @@ Having an Ontology defined or not, we display related objects on a tab for every
 */
 
 function islandora_red_biodiversidad_preprocess_islandora_dwc_related(array &$variables) {
-$module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
-module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+  $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
+  module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
   
 
   
-$islandora_object = $variables['islandora_object'];
+  $islandora_object = $variables['islandora_object'];
 
-$pid = $islandora_object->id;
-drupal_set_title($islandora_object->label);
-$result=array();
+  $pid = $islandora_object->id;
+  drupal_set_title($islandora_object->label);
+  $result=array();
 
-if (module_exists('islandora_ontologies'))
-{
+  if (module_exists('islandora_ontologies'))
+  {
 		
-module_load_include('inc', 'islandora_ontologies', 'includes/utilities');
-$models = $islandora_object->models;
-foreach($models  as $contentmodelpid)
-{
-	//dpm($contentmodelpid);
-	if ($cache = cache_get('islandora_ontologies_adjacency'.$contentmodelpid))
-	{	
-		
-		$result=$cache->data;
-		
-		
-	}		
-	else
-	{
-		//If no cache present we get the full graph paths for this ContentModel
-		$fullgraph=islandora_ontologies_get_graph_path($contentmodelpid);
-		if (count($fullgraph)>0)
-		{
-			foreach ($fullgraph as $ontologiepid=>$localgraph)
-			{
-				if (count($localgraph)>0)
-				{
-					//Having the paths for every associated ontologies, we traverse this structure using getdepthfirst. This way we get an array with every "road" or consecutive "edges" a.k.a relations 
-					//that connect this type of Content Model (origin) to every other one in the full Graph. This will be used to make a composite Sparql Query
-					$g = new islandora_ontologies_adjacency_graph($localgraph);
-					$result[$ontologiepid]=$g->getdepthFirst("info:fedora/".$contentmodelpid);
+  module_load_include('inc', 'islandora_ontologies', 'includes/utilities');
+  $models = $islandora_object->models;
+  foreach($models  as $contentmodelpid)
+  {
+  	if ($cache = cache_get('islandora_ontologies_adjacency'.$contentmodelpid))
+  	{	
+  		$result=$cache->data;
+    }		
+  	else
+  	{
+  		//If no cache present we get the full graph paths for this ContentModel
+  		$fullgraph=islandora_ontologies_get_graph_path($contentmodelpid);
+  		if (count($fullgraph)>0)
+  		{
+  			foreach ($fullgraph as $ontologiepid=>$localgraph)
+  			{
+  				if (count($localgraph)>0)
+  				{
+  					//Having the paths for every associated ontologies, we traverse this structure using getdepthfirst. This way we get an array with every "road" or consecutive "edges" a.k.a relations 
+  					//that connect this type of Content Model (origin) to every other one in the full Graph. This will be used to make a composite Sparql Query
+  					$g = new islandora_ontologies_adjacency_graph($localgraph);
+  					$result[$ontologiepid]=$g->getdepthFirst("info:fedora/".$contentmodelpid);
 				
-				}
+  				}
 				
-			}
-				//lastly we set the cache. This is necesarry because we don´t wan´t to recalculate every time the same structure. Only if a Ontology changes, or new ones are added, the cache is cleaned.		
-			cache_set('islandora_ontologies_adjacency'.$contentmodelpid, $result, 'cache');	
+  			}
+  				//lastly we set the cache. This is necesarry because we don´t wan´t to recalculate every time the same structure. Only if a Ontology changes, or new ones are added, the cache is cleaned.		
+  			cache_set('islandora_ontologies_adjacency'.$contentmodelpid, $result, 'cache');	
 			
-		}
-	}	
+  		}
+  	}	
 			
 	   
 	  
-}
+  }
 /* We also need for this solution pack our actual main CMODEL for the current Object.
 This is a special case, because in theory we could haven Ontologies for all CMODELS, incluiding fedora-system
 
 */
+
 $current_objects_cmodel=array_diff($models, array('fedora-system:FedoraObject-3.0'), array('biodiversity:biodiversityCModel')); //
 //dpm($result);
 
@@ -860,7 +857,8 @@ foreach ($result as $ontologie=>$graphs)
 		foreach($rels as $cmodel=>$rel)
 		{
 			$querytmp="";	
-			$otmp="";			
+			$otmp="";
+      $otmp_extras="";			
 				
 			if (array_key_exists(0,$rel))
 			{
@@ -869,50 +867,55 @@ foreach ($result as $ontologie=>$graphs)
 				if ($cur>0)
 					{
 					    
-				    $relationsandcmodels_sparqlmapping_hash[$sparql_object]=array($cmodel,$current_rel);
+				  $relationsandcmodels_sparqlmapping_hash[$sparql_object]=array($cmodel,$current_rel);
 					$sparql_object="";	
 					$current_rel="";
+          $otmp_extras="";
 					}
 				
 				
 				if (($cur==0) && ($paths==0))
 				{
-					$otmp="<info:fedora/$pid>";	
+					$otmp="<info:fedora/$pid>";
+         
 				}
 				else
 				{				
 								
-					if 	($cur==0)
+					if ($cur==0)
 						{
-						$otmp="UNION {<info:fedora/$pid>";	
-						}	
+						$otmp="\n UNION {<info:fedora/$pid>";	
+            }	
 					else
 						{	
 						if ($cur>1)
 							{
-							$otmp="}";	
+    				  $otmp="}";	
 							}
-						$otmp.="optional  { ?".$o.$cur."_$paths";
-						
+            $otmp.= " optional { ?".$o.$cur."_$paths";
 						}
 				}	
-				
+          $cur_extras=$cur+1;
+          $otmp_extras=".";
+          $otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:label> ?".$s.$cur_extras."_".$paths."_label .\n\r";
+          //@TODO this is throwing an REPO except<fedora-model:state>y runs fine through the risearch web interface...why?
+          //$otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:state> <info:fedora/fedora-system:def/model#Active> .";
 					$query.=" $otmp <".$rel[0];
 					$cur++;
-					$query.="> ?$s$cur"."_$paths"."\r\n";
+					$query.="> ?$s$cur"."_$paths $otmp_extras";
+                 
 					$sparql_object=$s.$cur."_$paths";	
 				    
 					
 					$current_rel=$rel;
 					
 					
-						//	{$query.="}";}
-					if ($cur==sizeof($rels)-1) 
+				if ($cur==sizeof($rels)-1) 
 					{
-						$query.='}';
+            $query.="}";
 						if ($cur>1)
 							{
-						$query.='}';
+						$query.="}";
 							}
 						
 					
@@ -935,21 +938,21 @@ foreach ($result as $ontologie=>$graphs)
 		
 	}	
 
-	$fullquery = <<<EOQ
-	
-	SELECT DISTINCT * 
-	FROM <#ri>
-	WHERE {{
-		$query
-		}
+$fullquery = <<<EOQ
 
+SELECT DISTINCT * 
+FROM <#ri>
+WHERE {
+        {
+        $query
+      }
 EOQ;
 		
-	
+//@TODO xacml filter still missing. 	
 			
 		
 		
-//dpm($fullquery);		
+
 }
 	
 
@@ -974,114 +977,84 @@ EOQ;
 	
     
 	$related_sparql_results=array();
+  $vlot_settings=array(); //this array holds the node and edges data for the vlot Javscript belonging to islandora_ontologies
 	$connection = islandora_get_tuque_connection();
 	$escaped_pid = str_replace(':', '_', $pid);
 	//dpm($relationsandcmodels_sparqlmapping_hash);
-	if (($connection) && !empty($fullquery)){
+  if (($connection) && !empty($fullquery)){
 		
 
-			$results = $connection->repository->ri->sparqlQuery($fullquery);
+    $results = $connection->repository->ri->sparqlQuery($fullquery);
 			
-				$related_sparql_results=array();
+    $related_sparql_results=array();
 				
-				$vlot_settings=array(); //this array holds the node and edges data for the vlot Javscript belonging to islandora_ontologies
-				//@TODO make all related objects functions in islandora_ontologies module and not in this particular one.
-				$current_contentmodel_vlot=preg_match('/^(.*[\/\#])([^\/\#]+)$/',$current_objects_cmodel[0], $m)? $m[2]: $current_objects_cmodel[0]; //Using the current`s object main CMODEL for this solution Pack. It´s an array, so fetch only the first one...should be only one present, but who knows!
+  
+    //@TODO make all related objects functions in islandora_ontologies module and not in this particular one.
+    $current_contentmodel_vlot=preg_match('/^(.*[\/\#])([^\/\#]+)$/',$current_objects_cmodel[0], $m)? $m[2]: $current_objects_cmodel[0]; //Using the current`s object main CMODEL for this solution Pack. It´s an array, so fetch only the first one...should be only one present, but who knows!
 				
 				
-				$vlot_settings[$islandora_object->id]=array('relates_to'=>array(),'label'=>$islandora_object->label,'nodetype'=>'current_node','node_cmodel'=>$current_contentmodel_vlot,'link'=>"");//We are constructing and adjacency graph(again) from Sparql results and this is our current object
+    $vlot_settings[$islandora_object->id]=array('relates_to'=>array(),'label'=>$islandora_object->label,'nodetype'=>'current_node','node_cmodel'=>$current_contentmodel_vlot,'link'=>"");//We are constructing and adjacency graph(again) from Sparql results and this is our current object
 			
 				
-				foreach ($results as $result) {//iterate over every computed path
-				  $related_sparql_closeure="";
-					//$related_sparql="<div>$islandora_object->label".t(' relates via:');
-					//store current step in this path as previous object's id
-					$previous_object=$islandora_object->id;
+    foreach ($results as $result) {//iterate over every computed path
+      $related_sparql_closeure="";
+      //store current step in this path as previous object's id
+      $previous_object=$islandora_object->id;
 					
-					$list=array();
-					$level=0;
-					$object=null;
-					foreach($result as $sparqlvar=>$hit)
-					{
+      $list=array();
+      $level=0;
+      $object=null;
+      foreach($result as $sparqlvar=>$hit)
+      {
 						
-					if ($hit['type']=='pid')	
-						{
-							$object_label="";
-							$object_link="";
-							$level++;
-						    try { //if an object no longer exists, then we should just stop iterating over this path, because sparql could not have traveled any deeper
-								///@TODO NOV-2014 we must take in account external entities as an option.
-						 		$object = $islandora_object->repository->getObject($hit['value']);
-								$object_label=$object->label;
-								$object_link=l($object_label, "islandora/object/".$hit['value']);
-						   	 	
-								}
-						    catch (RepositoryException $e) 
-								{
-						        watchdog_exception('Islandora Red de Biodiversidad', $e, 'Got an exception while trying to get relation for @pid to @targetpid on @rel', array(
-							        '@pid' => $pid, '@targetpid' => $hit['value'], '@rel'=>$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0]
-							      ), WATCHDOG_ERROR);
-						    	  $object_label = "";
-								  $object_link="Non longer existing object (".$hit['value'].")";
-								  unset($previous_object);//means we start over
-								}
+        if ($hit['type']=='pid')	
+        {
+          $object_label="";
+          $object_link="";
+          $level++;
+          //We are not longer getting label from Fedora directly. This was causing a big I/O problem on large GRAPHS. So we assume Mulgara is right and the label is returned from there now.
+          //If the object does not longer exists, then clicking on it will give trigger the correct "Not found", but handling this here was a nightmare
+					$object_label=$result[$sparqlvar.'_label']['value'];
+          $object_pid=$hit['value'];
 						
+          $model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
+          $relation=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0];	//Aca hay que revisar....pueden ser varios y estoy sacando el primero
 						
-						$model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
-						$relation=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0];	//Aca hay que revisar....pueden ser varios y estoy sacando el primero
-					    //dpm($hit);
+          //Make CMODEL something people can actually read 
+          $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
+          //$model_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $model_label, $m)? $m[2]: $model_label;
 						
-						//Make CMODEL something people can actually read 
-					    $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
-						//$model_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $model_label, $m)? $m[2]: $model_label;
-						
-						$rel_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/',$relation, $m)? $m[2]: $relation;
+          $rel_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/',$relation, $m)? $m[2]: $relation;
 						
 									
-						//Now add this object as adjacent to the previous one, if not already done
+          //Now add this object as adjacent to the previous one, if not already done
 											
-						$rel_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $rel_label, $m)? $m[2]: $rel_label;	
+          $rel_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $rel_label, $m)? $m[2]: $rel_label;	
 						
 						
-						if ($object)
-							{
-						if (isset($previous_object))	
-							{
-							if (!(isset($vlot_settings[$previous_object]['relates_to'][$object->id])))
-								{
-								$vlot_settings[$previous_object]['relates_to'][$object->id]=array($relation=>$rel_label);
-								}
-							else
-								{
-								if (!isset($vlot_settings[$previous_object]['related'][$object->id][$relation]))
-									{
-									$vlot_settings[$previous_object]['relates_to'][$object->id][$relation]=$rel_label;
-									}
-								}	
-							}
-						//Now check if this node is already defined or not. We don´t wan´t to overwrite if it´s already there
-						if (!isset($vlot_settings[$object->id]))
-							{
-							$vlot_settings[$object->id]=array('relates_to'=>array(),'label'=>$object->label,'node_cmodel'=>$model_label,'nodetype'=>'node','link'=>url("islandora/object/{$object->id}",array('absolute'=>TRUE)));
-					
-							}
-						
-						
-						$previous_object=$object->id; //now set previous as current
-							}
-						//$splitedlabel=implode(' ',preg_split('/(?=[A-Z])/', $rel_label, -1, PREG_SPLIT_NO_EMPTY));
-						//$rel_label=!empty($splitedlabel)?$splitedlabel:$rel_label;
-						//If the Ontology is nice written...then this makes wonders:
-						
-						//$related_sparql=$related_sparql."<ul><li class=\"fa-hover\"><i class=\"fa fa-arrow-right fa-x2\"></i><span class=\"islandora-red-biodiversidad-info\">$rel_label</span>: ".$object_link;
-					    //$related_sparql_closeure.='</li></ul>';
-						}
-						
-						
-					}
-				//$related_sparql_results[]=array('#type'=>'markup','#markup'=>$related_sparql.$related_sparql_closeure."</div>");
-        $related_sparql_results[]=array('#type'=>'markup','#markup'=>"<div></div>");
-			}
+            if (isset($previous_object))	
+            {
+              if (!(isset($vlot_settings[$previous_object]['relates_to'][$object_pid])))
+              {
+                $vlot_settings[$previous_object]['relates_to'][$object_pid]=array($relation=>$rel_label);
+              }
+              else
+              {
+                if (!isset($vlot_settings[$previous_object]['related'][$object_pid][$relation]))
+                {
+                  $vlot_settings[$previous_object]['relates_to'][$object_pid][$relation]=$rel_label;
+                }
+              }	
+            }
+            //Now check if this node is already defined or not. We don´t wan´t to overwrite if it´s already there
+            if (!isset($vlot_settings[$object_pid]))
+            {
+              $vlot_settings[$object_pid]=array('relates_to'=>array(),'label'=>$object_label,'node_cmodel'=>$model_label,'nodetype'=>'node','link'=>url("islandora/object/{$object_pid}",array('absolute'=>TRUE)));
+            }
+            $previous_object=$object_pid; //now set previous as current
+          }
+      }
+    }
 		
 			
 			
@@ -1091,27 +1064,20 @@ EOQ;
 		}
 			
 			$variables['related'] = $related;
-			if (count($related_sparql_results)>0)
+			if (count($vlot_settings)>1) //onyle one points to the current object (starting object of the graph)
 				{
 				$vlot_graph_style=islandora_ontologies_vlot_get_info('islandora_red_biodiversidad'); //@see hook_islandora_ontologies_vlot_info and islandora_ontologies_vlot_get_info
-				
-				
-			
-			
-				$variables['related_sparql_results']="";//drupal_render($related_sparql_results);""
+				$variables['related_sparql_results']=t('!count Objects in "@label" relations Path',array('!count' => count($vlot_settings),'@label' => $islandora_object->label));
 				$variables['vlot'] =islandora_ontologies_build_vlot($vlot_graph_style, $vlot_settings, '840','800');
-			
 				$variables['vlot']=drupal_render($variables['vlot']);
-				
 				}
 			else
 				{
-				$variables['related_sparql_results'] = t('There are no related objects from or to this one.');	
+				$variables['related_sparql_results'] = t('There are no related Darwin Core objects from or to this one.');	
 				}	
 		
 	}	
-		
-		}
+}
 
 
 

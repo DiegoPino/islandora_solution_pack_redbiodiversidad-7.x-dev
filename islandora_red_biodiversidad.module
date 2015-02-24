@@ -1281,7 +1281,8 @@ function islandora_red_biodiversidad_biodiversity_DWCACModel_EML_islandora_datas
   		}
 }
 function  islandora_red_biodiversidad_user_presave(&$edit, $account, $category) {
-   /* dpm($edit);
+  //@TODO this function will create personall collections for researchers (like a Collections group template)
+  /* dpm($edit);
 	dpm($account);
 	dpm($category);*/
 	if ($account->is_new) {

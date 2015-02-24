@@ -251,7 +251,7 @@ function islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr($cmodel_pid)
       'biodiversity:TaxonCModel' => array(
         'field' => 'dwc.taxonID',
 		'default' => 'taxon',
-		//We should not be calling this function on ingest. Rarely Taxon ID are defined as new(there is almost always a unique existing ID from GBIF, EOL, etc). Also if we already have one of those in our solr the incrementing it would be a very bad idea! But we implemented some fallback anyway for our import module. Our People-scientist never give taxons and unique ID!
+		//We should not be calling this function on ingest. Rarely Taxon ID are defined as new(there is almost always a unique existing ID from GBIF, EOL, etc). Also if we already have one of those in our solr, then incrementing it would be a very bad idea! But we implemented some fallback anyway for our import module. Our People-scientist never give taxons an unique ID!
 	),
     );
  	
