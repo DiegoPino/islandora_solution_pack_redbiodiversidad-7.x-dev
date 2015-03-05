@@ -874,6 +874,7 @@ foreach ($result as $ontologie=>$graphs)
 		$cur=0;
 		$current_rel="";
 		$sparql_object="";	
+    $allcmodels=array_keys($rels);//Need this to allow look ahead viewing during foreach
 		foreach($rels as $cmodel=>$rel)
 		{
 			$querytmp="";	
@@ -904,14 +905,16 @@ foreach ($result as $ontologie=>$graphs)
 						{	
 						if ($cur>1)
 							{
-    				  $otmp='}';
+    				  $otmp='';
 							}
             $otmp.= " optional { ?".$o.$cur."_$paths";
 						}
 				
           $cur_extras=$cur+1;
           $otmp_extras=".";
-          $otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:label> ?".$s.$cur_extras."_".$paths."_label .\n\r";
+          $otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:label> ?".$s.$cur_extras."_".$paths."_label ;\n\r";
+          $nextcmodel=$allcmodels[$cur+1];
+          $otmp_extras.="<fedora-model:hasModel> <{$nextcmodel}> ." ; //Lets add also cmodel check. Why? because sometimes relations alone are ambiguos and do generate cycles. But cmodel+relations are acyclic in our implementation
           //@TODO this is throwing an REPO except<fedora-model:state>, runs fine through the risearch web interface...why?
           //$otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:state> <info:fedora/fedora-system:def/model#Active> .";
 					$query.=" $otmp <".$rel[0];
@@ -926,10 +929,15 @@ foreach ($result as $ontologie=>$graphs)
 					
 				if ($cur==sizeof($rels)-1) 
 					{
+            
             $query.="}";
+              
 						if ($cur>1)
 							{
-						$query.="}";
+              for($i=1;$i<sizeof($rels)-1;$i++)
+                {
+                $query.="}";
+                }  
 							}
             $individual_queries[]=$query;
             $query="";
