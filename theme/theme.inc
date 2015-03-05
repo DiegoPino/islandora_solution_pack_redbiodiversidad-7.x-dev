@@ -860,10 +860,10 @@ $relationsandcmodels_sparqlmapping_hash=array();//This structure  stores a hash 
 //where this sequence starts in every single path. Then i decide which one i'm going to travel first (getting all intermediate solutions) and on which ones i'm going to travel but only bind to the variables after this solution. Does this makes sense? Yes!
 
 
-
+$individual_queries=array();
 if (!empty($result))
 {
-$individual_queries=array();		
+		
 	 
 foreach ($result as $ontologie=>$graphs)
 {
@@ -972,7 +972,7 @@ $queryfilter = "FILTER({$queryfilterstring})";
 }
 if (user_access('administer site configuration'))
   {
-    dpm($result);
+  dpm($result);
   dpm($individual_queries);
   dpm($relationsandcmodels_sparqlmapping_hash);
   }
