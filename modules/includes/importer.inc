@@ -399,7 +399,7 @@ if (module_exists('islandora_ontologies'))
 					
 	   	    	$rowHeaders = $sheet->rangeToArray('A1:'.$highestColumn.'1', NULL, TRUE, TRUE,FALSE);//Devuelve los titulos de cada columna
 				
-				//Ok, now me hust see which fields belong to which cmodel, just intersect the array preserving the original row data.
+				//Ok, now we must see which fields belong to which cmodel, just intersect the array preserving the original row data.
 				
 				$rowHeaders_utf8=array_map('stripslashes',$rowHeaders[0]);
 				$rowHeaders_utf8=array_map('utf8_encode',$rowHeaders_utf8);
@@ -422,7 +422,7 @@ if (module_exists('islandora_ontologies'))
 						$existing_fields_inheader[$cmodels]=$tmpexistingfields;	//we preserve the excel row keys
 						//we will use this structure to keep track of md5 to avoid duplicates
 						$md5_index_by_cmodel[$cmodels]=array();//Fill this up
-						//se what possible relations we can use and remap them so we can acces them more easely
+						//see what possible relations we can use and remap them so we can acces them more easilly
 						foreach($content_models_with_processing_info[$cmodels]['localrel'] as $ontologie => $prop)//We can´t deal with multiple ontologies here...@todo fix it somehow..
 							{
 								foreach($prop as $propname=>$propinfo)
@@ -474,27 +474,29 @@ if (module_exists('islandora_ontologies'))
 						
 					foreach($existing_fields_inheader as  $cmodel => $cmheaders)
 						{
-							
-							$datoscombinados=array_combine($cmheaders,array_intersect_key($rowData[0],$cmheaders));
-							
-							
-							if ($cmodel=='biodiversity:OccurrenceCModel')
-								{
-								if (sizeof($whatsleft)>0)
-									{
-									$nondwcfields=array_combine($whatsleft,array_intersect_key($rowData[0],$whatsleft));	
-									$nondwcfieldsasarrayvalues=array();
-									foreach ($nondwcfields as $key => $values)
-										{
-										 $nondwcfieldsasarrayvalues[] = $key.'='.$values;	
-										}
-										if (sizeof( $nondwcfieldsasarrayvalues)>0)
-											{
-											$datoscombinados['dynamicProperties']=implode(",",$nondwcfieldsasarrayvalues);
-										    }
-									}	
-								}
-						 
+							$datoscombinadostmp=array();
+              $datoscombinados=array();
+							$datoscombinadostmp=array_combine($cmheaders,array_intersect_key($rowData[0],$cmheaders));
+							$datoscombinadostmp=array_map('trim',(array) $datoscombinadostmp); //This removes pre and post whitespaces in each member
+              $datoscombinados=array_filter((array) $datoscombinadostmp, 'strlen');//This filters out FALSE, NULL, '', but leaves 0 in place
+              if (sizeof($datoscombinados)>0) { //Only check for $whatsleft if we got values, we can't define a DWC record based only on extra values
+  							if ($cmodel=='biodiversity:OccurrenceCModel')
+  								{
+  								if (sizeof($whatsleft)>0)
+  									{
+  									$nondwcfields=array_combine($whatsleft,array_intersect_key($rowData[0],$whatsleft));	
+  									$nondwcfieldsasarrayvalues=array();
+  									foreach ($nondwcfields as $key => $values)
+  										{
+  										 $nondwcfieldsasarrayvalues[] = $key.'='.$values;	
+  										}
+  										if (sizeof($nondwcfieldsasarrayvalues)>0)
+  											{
+  											$datoscombinados['dynamicProperties']=implode(",",$nondwcfieldsasarrayvalues);
+  										    }
+  									}	
+  								}
+              }
 						
 						 
 						    
@@ -526,7 +528,7 @@ if (module_exists('islandora_ontologies'))
 								//error_log('We allready have this record',0);	
 								}
 							}
-						//So we store the desired cmodel and the data in one place...nice.$file aka row is used to keep track fom where the data came in the excel to make
+						//So we store the desired cmodel and the data in one place...nice.$file aka row is used to keep track from where the data came from excel 
 						
 						}
 					
