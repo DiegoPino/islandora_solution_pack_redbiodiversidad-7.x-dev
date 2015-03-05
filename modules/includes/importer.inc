@@ -187,8 +187,9 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 	$dest_errors=array();
 	foreach($content_models as $cmodel)
 		{		
-			$dest_collection_access=false;
-			$pid=$dest_collection[$cmodel];
+			$pid='';
+      $dest_collection_access=false;
+			$pid = array_key_exists($cmodel, $dest_collection) ? $dest_collection[$cmodel] : NULL;
 			if (($form_state['storage']['parent_pid']!=$pid) && !(empty($pid))) //if it's the same as the parent collection the no check required, 
 				{
 					$form_state['complete form']['fs']['fs2']['content_model']['#options'][$cmodel]['collection']['data']['#value']=$pid;	
@@ -198,7 +199,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 			    		$models = $islandora_object->models;
 			    		if (array_intersect(array('islandora:collectionCModel'), $models)) 
 							{
-			      	  	  	$dest_collection_access=islandora_object_access(ISLANDORA_MANAGE_PROPERTIES, $islandora_object);
+			      	$dest_collection_access=islandora_object_access(ISLANDORA_MANAGE_PROPERTIES, $islandora_object);
 							if ($dest_collection_access)
 								{
 								$form_state['complete form']['fs']['fs2']['content_model']['#options'][$cmodel]['collection']['data']['#attributes']['class']=array();	
@@ -456,7 +457,7 @@ if (module_exists('islandora_ontologies'))
 			 		{
 					$thisrow=array();//we empty this every row...it´s just an acumulator of what we have for every row
 					
-			 		$rowData=$sheet->rangeToArray('A' . $fila . ':' . $highestColumn.$fila, ' ', TRUE, TRUE, FALSE);//Devuelve fila por fila
+			 		$rowData=$sheet->rangeToArray('A' . $fila . ':' . $highestColumn.$fila, NULL, TRUE, TRUE, FALSE);//Devuelve fila por fila
 					$flat = trim(implode('', $rowData[0]));
 					
 					//check for empty row...if found stop there.
@@ -472,15 +473,20 @@ if (module_exists('islandora_ontologies'))
 						
 					
 						
-					foreach($existing_fields_inheader as  $cmodel => $cmheaders)
+					foreach($existing_fields_inheader as $cmodel => $cmheaders)
 						{
 							$datoscombinadostmp=array();
               $datoscombinados=array();
 							$datoscombinadostmp=array_combine($cmheaders,array_intersect_key($rowData[0],$cmheaders));
 							$datoscombinadostmp=array_map('trim',(array) $datoscombinadostmp); //This removes pre and post whitespaces in each member
               $datoscombinados=array_filter((array) $datoscombinadostmp, 'strlen');//This filters out FALSE, NULL, '', but leaves 0 in place
-              if (sizeof($datoscombinados)>0) { //Only check for $whatsleft if we got values, we can't define a DWC record based only on extra values
-  							if ($cmodel=='biodiversity:OccurrenceCModel')
+              //basisOfRecord is a common field to all different Darwin Core classes. The thing about this, is that even
+              //not defined records/empty fields (like an non registered event i.e) will always get at least one value when mapping fields to header values.
+              //This is incorrect and will get me a lot of false relations and unexisting objects. Our templates have defaults for this Record, so we will check if it's in our header
+              //if it's, then we can't relay on having > 0 data. 
+              
+              if (sizeof($datoscombinados)>1) { //Only check for $whatsleft if we got values, we can't define a DWC record based only on this extra values
+  							if (($cmodel=='biodiversity:OccurrenceCModel') || ($cmodel=='biodiversity:SimpledwcCModel'))
   								{
   								if (sizeof($whatsleft)>0)
   									{
@@ -501,7 +507,7 @@ if (module_exists('islandora_ontologies'))
 						 
 						    
 						
-						if (sizeof($datoscombinados)>0)
+						if (sizeof($datoscombinados)>1) //At least two fields...
 							{
 							//Now get an md5 representation of data	
 							$md5=md5(implode(array_values($datoscombinados)));	
@@ -640,7 +646,7 @@ if (module_exists('islandora_ontologies'))
         $preprocessed[] = $object = new IslandoraImporterBatchObject($this->connection, $item, $this->parameters);
         $object->addRelationships();
 		//Added local generated id (using uui parameter from islandoras configuration)
-		$object->id=$item->getCurrentPid();
+		    $object->id=$item->getCurrentPid();
 		//$object->addOntologiesRelationships();
   	  	$localrels=$item->getRels();
 	  foreach ($localrels as $rels)
@@ -696,7 +702,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 		$transform_path = drupal_get_path('module', 'gbifexcel_importer') . '/xsl';
 	    self::$DC2MODS = "$transform_path/simpleDC2MODS.xsl";
 		$this->DWC2DC = $this->source['dwc2dc'];
-	    $this->DWCTEMPLATE=$this->source['template'];
+	  $this->DWCTEMPLATE=$this->source['template'];
 		$this->TITLEFIELD=$this->source['titlefield'];
 		$this->rels=$this->source['localrels'];
 		$this->pid=$this->source['pid'];
