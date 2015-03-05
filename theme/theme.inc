@@ -798,6 +798,11 @@ function islandora_red_biodiversidad_preprocess_islandora_dwc_related(array &$va
   $models = $islandora_object->models;
   foreach($models  as $contentmodelpid)
   {
+		$fullgraph=islandora_ontologies_get_graph_path($contentmodelpid);
+  
+
+
+    
   	if ($cache = cache_get('islandora_ontologies_adjacency'.$contentmodelpid))
   	{	
   		$result=$cache->data;
@@ -806,7 +811,7 @@ function islandora_red_biodiversidad_preprocess_islandora_dwc_related(array &$va
   	{
   		//If no cache present we get the full graph paths for this ContentModel
   		$fullgraph=islandora_ontologies_get_graph_path($contentmodelpid);
-  		if (count($fullgraph)>0)
+ 		if (count($fullgraph)>0)
   		{
   			foreach ($fullgraph as $ontologiepid=>$localgraph)
   			{
@@ -825,12 +830,12 @@ function islandora_red_biodiversidad_preprocess_islandora_dwc_related(array &$va
 			
   		}
   	}	
-			
+		
 	   
 	  
   }
 /* We also need for this solution pack our actual main CMODEL for the current Object.
-This is a special case, because in theory we could haven Ontologies for all CMODELS, incluiding fedora-system
+This is a special case, because in theory we could haven Ontologies for all CMODELS, including fedora-system
 
 */
 
@@ -840,13 +845,28 @@ $current_objects_cmodel=array_diff($models, array('fedora-system:FedoraObject-3.
 $o='o';
 $s='s';
 $query="";
-$relationsandcmodels_sparqlmapping_hash=array();//This structure is a hash map between Sparql Variables and rels+cmodels form our paths so we don`t have to extract this info from Mulgara.
+$relationsandcmodels_sparqlmapping_hash=array();//This structure  stores a hash map between Sparql Variables and rels+cmodels form our paths so we don`t have to extract this info from Mulgara.
+//@TODO We are having some serious memory problems on Large Graphs. Even with 1000 results, the additional unbounded variables (becasuse of the great idea of making a single big sparql query) are getting
+//Tuque still to it's knees, even after switching to xmlreader(why do you store the result inside a variable Mr. Tuque, why?)
+//So we will split every path in individual Sparql query and ask a few times for this info. It's slower, but have to test how this works. We can also cache for anonymous users this info.
+//Also, on large results, we will filter some depths out, and additionally hide the labels on render, so the response is quicker.
+//Just need to define what is "large"
+
+
+//This is where path finding and graph theory meets genetics. After calculating all posible, directed not cyclic paths using DepthFirst, some of the resulting sequences (partial) sometimes repeat. This means that even
+//when the paths are unique as a whole, partial sequences of nodes and named/directed edges may be common. So what i need is to find those common partial paths for one good reason. This way i can just travel them one time and harvest their intermedial values. 
+//But for subsequent Sparql queries i don't need to bound their results anymore, i just need the values that follow after that patterns. So i get more optimal responses in terms of memory used (less unbound variables).
+//So here it comes http://en.wikipedia.org/wiki/Longest_common_subsequence_problem, LCS implementation. I threath every path item (subject predicate object) as a composite Value and add it to an array. Then i calculate LCS on this structure, and also store
+//where this sequence starts in every single path. Then i decide which one i'm going to travel first (getting all intermediate solutions) and on which ones i'm going to travel but only bind to the variables after this solution. Does this makes sense? Yes!
+
+
+
 if (!empty($result))
 {
- 
+$individual_queries=array();		
+	 
 foreach ($result as $ontologie=>$graphs)
 {
-			
 	foreach ($graphs as $paths=>$rels)
 	{
 		$o='o';
@@ -874,31 +894,25 @@ foreach ($result as $ontologie=>$graphs)
 					}
 				
 				
-				if (($cur==0) && ($paths==0))
-				{
-					$otmp="<info:fedora/$pid>";
-         
-				}
-				else
-				{				
+							
 								
 					if ($cur==0)
 						{
-						$otmp="\n UNION {<info:fedora/$pid>";	
+						$otmp="\n {<info:fedora/$pid>";	
             }	
 					else
 						{	
 						if ($cur>1)
 							{
-    				  $otmp="}";	
+    				  $otmp='}';
 							}
             $otmp.= " optional { ?".$o.$cur."_$paths";
 						}
-				}	
+				
           $cur_extras=$cur+1;
           $otmp_extras=".";
           $otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:label> ?".$s.$cur_extras."_".$paths."_label .\n\r";
-          //@TODO this is throwing an REPO except<fedora-model:state>y runs fine through the risearch web interface...why?
+          //@TODO this is throwing an REPO except<fedora-model:state>, runs fine through the risearch web interface...why?
           //$otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:state> <info:fedora/fedora-system:def/model#Active> .";
 					$query.=" $otmp <".$rel[0];
 					$cur++;
@@ -917,7 +931,8 @@ foreach ($result as $ontologie=>$graphs)
 							{
 						$query.="}";
 							}
-						
+            $individual_queries[]=$query;
+            $query="";
 					
 					}
 						
@@ -937,74 +952,63 @@ foreach ($result as $ontologie=>$graphs)
 		
 		
 	}	
+  
+//Now build a filter for those nasty unbound variables that are eatting my PHP memory
+  $queryfilter='FILTER(';
+  $queryfilterbounds=array();
+ foreach ($relationsandcmodels_sparqlmapping_hash as $key=>$value)
+   {
+     $queryfilterbounds[] = "bound(?{$key})";
+   }
+$queryfilterstring = implode(' || ', $queryfilterbounds);
+$queryfilter = "FILTER({$queryfilterstring})";
+  
 
-$fullquery = <<<EOQ
 
-SELECT DISTINCT * 
-FROM <#ri>
-WHERE {
-        {
-        $query
-      }
-EOQ;
-		
-//@TODO xacml filter still missing. 	
 			
 		
 		
 
 }
-	
-
-	$repository = $islandora_object->repository;
+if (user_access('administer site configuration'))
+  {
+    dpm($result);
+  dpm($individual_queries);
+  dpm($relationsandcmodels_sparqlmapping_hash);
+  }
 	$related = array();
-	/*$rels = $islandora_object->relationships->get(); //Note, leaving this out for now, using mulgara instead. Will prop. reuse in the future 
-	
-	foreach ($rels as $key => $rel) {
-		if (($rel['predicate']['alias'] != 'fedora') and ($rel['predicate']['alias'] != 'fedora-model')) {
-    
-			try {
-				$object = $islandora_object->repository->getObject($rel['object']['value']);
-				$model_label=islandora_red_biodiversidad_content_model_tohuman($object);
-			} catch (Exception $e) {
-				continue;
-			}
-			if ($object) {
-				$related[] = array('relation'=>$rel['predicate']['alias'].":".$rel['predicate']['value'],'object'=>$object,'model_label'=>$model_label);
-			} 
-		}
-	}*/
-	
     
 	$related_sparql_results=array();
   $vlot_settings=array(); //this array holds the node and edges data for the vlot Javscript belonging to islandora_ontologies
 	$connection = islandora_get_tuque_connection();
 	$escaped_pid = str_replace(':', '_', $pid);
 	//dpm($relationsandcmodels_sparqlmapping_hash);
-  if (($connection) && !empty($fullquery)){
-		
-
-    $results = $connection->repository->ri->sparqlQuery($fullquery);
-			
-    $related_sparql_results=array();
-				
-  
-    //@TODO make all related objects functions in islandora_ontologies module and not in this particular one.
+if (($connection)){
     $current_contentmodel_vlot=preg_match('/^(.*[\/\#])([^\/\#]+)$/',$current_objects_cmodel[0], $m)? $m[2]: $current_objects_cmodel[0]; //Using the current`s object main CMODEL for this solution Pack. It´s an array, so fetch only the first one...should be only one present, but who knows!
-				
-				
+		
     $vlot_settings[$islandora_object->id]=array('relates_to'=>array(),'label'=>$islandora_object->label,'nodetype'=>'current_node','node_cmodel'=>$current_contentmodel_vlot,'link'=>"");//We are constructing and adjacency graph(again) from Sparql results and this is our current object
-			
-				
-    foreach ($results as $result) {//iterate over every computed path
-      $related_sparql_closeure="";
-      //store current step in this path as previous object's id
+    foreach($individual_queries as $individual_query) {
+      $fullquery = <<<EOQ
+      SELECT DISTINCT * 
+      FROM <#ri>
+      WHERE $individual_query
+      
+EOQ;
+    //@TODO xacml filter still missing. 	
+    $queryresults=array();
+    $queryresults = $connection->repository->ri->sparqlQuery($fullquery);
+    dpm(sizeof($queryresults));
+    //$related_sparql_results=array();
+
+    //@TODO make related object function in islandora_ontologies module and not in this particular one.
+    foreach ($queryresults as $queryresult) {//iterate over every computed path
+     //store current step in this path as previous object's id
       $previous_object=$islandora_object->id;
 					
       $list=array();
       $level=0;
       $object=null;
-      foreach($result as $sparqlvar=>$hit)
+      foreach($queryresult as $sparqlvar=>$hit)
       {
 						
         if ($hit['type']=='pid')	
@@ -1014,7 +1018,7 @@ EOQ;
           $level++;
           //We are not longer getting label from Fedora directly. This was causing a big I/O problem on large GRAPHS. So we assume Mulgara is right and the label is returned from there now.
           //If the object does not longer exists, then clicking on it will give trigger the correct "Not found", but handling this here was a nightmare
-					$object_label=$result[$sparqlvar.'_label']['value'];
+					$object_label=$queryresult[$sparqlvar.'_label']['value'];
           $object_pid=$hit['value'];
 						
           $model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
@@ -1030,7 +1034,6 @@ EOQ;
           //Now add this object as adjacent to the previous one, if not already done
 											
           $rel_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $rel_label, $m)? $m[2]: $rel_label;	
-						
 						
             if (isset($previous_object))	
             {
@@ -1055,21 +1058,16 @@ EOQ;
           }
       }
     }
-		
-			
-			
-				
-				
-				
-		}
+  }
+}
 			
 			$variables['related'] = $related;
-			if (count($vlot_settings)>1) //onyle one points to the current object (starting object of the graph)
+			if (count($vlot_settings)>1) //only one means the current object (starting object of the graph)
 				{
 				$vlot_graph_style=islandora_ontologies_vlot_get_info('islandora_red_biodiversidad'); //@see hook_islandora_ontologies_vlot_info and islandora_ontologies_vlot_get_info
 				$variables['related_sparql_results']=t('!count Objects in "@label" relations Path',array('!count' => count($vlot_settings),'@label' => $islandora_object->label));
 				$variables['vlot'] =islandora_ontologies_build_vlot($vlot_graph_style, $vlot_settings, '840','800');
-				$variables['vlot']=drupal_render($variables['vlot']);
+				$variables['vlot']= drupal_render($variables['vlot']);
 				}
 			else
 				{
