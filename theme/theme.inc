@@ -64,7 +64,7 @@ $xacml_restrictions=islandora_red_biodiversidad_getxacml_solrquery_restrictions(
 		
 		
 $query_processor->solrParams = array(
-'fl' => $mappings['location']['latlong_lat'].",".$mappings['location']['latlong_long'].",PID,fgs_label_mt",
+'fl' => $mappings['location']['latlong_lat'].",".$mappings['location']['latlong_long'].",PID,fgs_label_mt,PID_fullurl",
 'fq' => format_string(
 '!content_model_field:"info:fedora/!content_model"', array(
 	'!content_model_field' => $content_model_field,
@@ -401,7 +401,7 @@ $point=array(
 	'lon' => (float) $choice[$mappings['location']['latlong_long']],
 	'leaflet_id' => 'point-'.$key,
 	// 'flags'=>0x01,
-	'popup' => l($choice['fgs_label_mt'][0], 'islandora/object/'.$choice['PID']),
+	'popup' => l($choice['fgs_label_mt'][0], $choice['PID_fullurl']),
 	'clusterGroup'=>$clustergroup,
 );
 if (array_key_exists($choice['PID'],$pathtopoints))
@@ -413,6 +413,7 @@ if (array_key_exists($choice['PID'],$pathtopoints))
 		{
 			$objectsinpoint['lat']=(float) $choice[$mappings['location']['latlong_lat']];
 			$objectsinpoint['lon']=(float) $choice[$mappings['location']['latlong_long']];
+      
 			array_push($locations, $objectsinpoint);	
 		}
 		
@@ -487,10 +488,10 @@ $xslt->importStyleSheet($xsl);
 $html = $xslt->transformToXML(simplexml_load_string($dwc));
 $variables['islandora_dwc_html'] = '<article><dl class="dl-horizontal">'.$html.'</dl></article>';
 	
-if (in_array('biodiversity:TaxonCModel',$islandora_object->models))
+if (array_intersect(array('biodiversity:TaxonCModel','biodiversity:SimpledwcCModel'),$islandora_object->models))
 {
 			
-if (empty($islandora_object->label) || ($islandora_object->label==$object_pid))//something is wrong with our xslt o this object was not originated from our FORM
+if (empty($islandora_object->label) || ($islandora_object->label==$object_pid) || in_array('biodiversity:SimpledwcCModel',$islandora_object->models))//something is wrong with our xslt or this object was not originated from our FORM
 {
 	$domdwc= new DOMDocument;
 	$domdwc->loadXML($dwc);
@@ -696,7 +697,7 @@ $variables['islandora_thumbnail_url'] = url("islandora/object/{$islandora_object
 	   
 }
 //QR generation
-if (in_array('biodiversity:OccurrenceCModel',$islandora_object->models))
+if (array_intersect(array('biodiversity:OccurrenceCModel','biodiversity:SimpledwcCModel'),$islandora_object->models))
 {   
 $variables['QR']=islandora_red_biodiversidad_pidtoQR($object_pid);
 } 
@@ -1015,7 +1016,7 @@ EOQ;
               }
               else
               {
-                if (!isset($vlot_settings[$previous_object]['related'][$object_pid][$relation]))
+                if (!isset($vlot_settings[$previous_object]['relates_to'][$object_pid][$relation]))
                 {
                   $vlot_settings[$previous_object]['relates_to'][$object_pid][$relation]=$rel_label;
                 }

@@ -25,9 +25,10 @@
         for (var setting in this.map.settings) {
           settings[setting] = this.map.settings[setting];
         }
-
+       
         // instantiate our new map
         var lMap = new L.Map(this.mapId, settings);
+       
         lMap.bounds = [];
 
         // add map layers
@@ -45,7 +46,7 @@
           }
           i++;
         }
-
+       
         // @RdB create marker cluster layers if leaflet.markercluster.js is included
         // There will be one cluster layer for each "clusterGroup".
         var clusterLayers = {};
@@ -84,7 +85,7 @@
         }
 
         // add features
-		var  markers_byclusterGroup = [];
+		var markers_byclusterGroup = [];
 		var overlayMaps=[];
 		var leaflet_meta=[];
 		
@@ -231,6 +232,26 @@
         // Destroy features so that an AJAX reload does not get parts of the old set.
         // Required when the View has "Use AJAX" set to Yes.
         this.features = null;
+        /* S I D E B A R   F I L T E R */
+        var sidebar = L.control.sidebar('sidebar', {
+            position: 'left'
+        });
+        /*lMap.addControl(sidebar);
+
+        setTimeout(function () {
+            sidebar.show();
+        }, 300);
+        $('#filter_control').click(function() {
+            sidebar.show();
+        });*/
+        
+        L.control.fullscreen({
+          position: 'topleft', // change the position of the button can be topleft, topright, bottomright or bottomleft, defaut topleft
+          title: 'View Map in fullscreen !', // change the title of the button, default Full Screen
+          forceSeparateButton: false, // force seperate button to detach from zoom buttons, default false
+          forcePseudoFullscreen: true // force use of pseudo full screen even if full screen API is available, default false
+        }).addTo(lMap);
+      
       });
 
       function leaflet_create_feature(feature, lMap) {

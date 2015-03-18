@@ -908,11 +908,45 @@ function  islandora_red_biodiversidad_library() {
 		      ),
 		    ), 
 		  );
+      $libraries['leaflet_sidebar'] = array(
+        'title' => 'Leaflet Sidebar',
+        'version' => 1.1,
+        'css' => array(
+          "$path/css/L.Control.Sidebar.css" => array(
+            'type' => 'file',
+            'media' => 'screen',
+          ),
+        ),
+        'js' => array(
+          array(
+            'type' => 'file',
+            'data' => "$path/js/L.Control.Sidebar.js",
+            'group' => JS_LIBRARY,
+            'preprocess' => FALSE,
+            'weight' => 1,
+          ),
+        ), 
+      ); 
+      $libraries['leaflet_fullscreen'] = array(
+        'title' => 'Leaflet Fullscreen Control',
+        'version' => 1.1,
+        'js' => array(
+          array(
+            'type' => 'file',
+            'data' => "$path/js/L.Control.FullScreen.js",
+            'group' => JS_LIBRARY,
+            'preprocess' => FALSE,
+            'weight' => 1.5,
+          ),
+        ), 
+      ); 
 
 		  return $libraries;
 		}
 function islandora_red_biodiversidad_leaflet_map_prebuild_alter(&$vars = NULL) {
 		  if (!isset($vars['map']['settings']['maxClusterRadius']) || $vars['map']['settings']['maxClusterRadius'] > 0) {
+        drupal_add_library('islandora_red_biodiversidad', 'leaflet_sidebar');
+        drupal_add_library('islandora_red_biodiversidad', 'leaflet_fullscreen');
 		    drupal_add_library('islandora_red_biodiversidad', 'leaflet_markercluster_layercontrol');
 		    $options = array('type' => 'file', 'weight' => 2);
 		    drupal_add_js(drupal_get_path('module', 'islandora_red_biodiversidad') . '/js/leaflet.markercluster.layercontrol.js', $options);

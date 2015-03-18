@@ -44,13 +44,16 @@
   
  
 <div class="islandora-red-biodiversidad islandora-red-biodiversidad-content">
-	<h2>DWC-A download available</h2>
+	<h2>DWC-A download</h2>
 	<div class="islandora-metadata-fields islandora-object-fields">
 	
   <?php if (isset($variables['dwca-link'])): ?>
     <?php print $variables['dwca-link']; ?>
-  <?php endif; ?>
-	</div>
+
+<?php else:?>
+    <?php print t('Download not available yet')?>
+	  <?php endif; ?>
+  </div>
 </div>
 </div>
   
