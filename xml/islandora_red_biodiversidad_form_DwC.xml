@@ -205,7 +205,7 @@
 									<access>true</access>
 									<default_value>Creative Commons Attribution-NonCommercial- NoDerivs 2.5 License</default_value>
 									<required>false</required>
-									<title>Rights Holder</title>
+									<title>Access Rights</title>
 									<tree>true</tree>
 									<actions>
 										<create>
@@ -1435,7 +1435,11 @@ http://wiki.tdwg.org/twiki/bin/view/DarwinCore/BasisOfRecord</description>
 									<ajax>
 										<callback>islandora_red_biodiversidad_validateandpopulate</callback>
 										<wrapper>edit-simpledarwinrecord-dwc-fields-taxon-reconciliate</wrapper>
-									</ajax>					
+								    <event>click</event>
+  									<prevent>submit click mousedown</prevent>
+  									</ajax>		
+  									<limit_validation_errors>NULL</limit_validation_errors>
+  									<submit>NULL</submit>				
 								</properties>
 								<children/>
 							</element>
@@ -1571,7 +1575,7 @@ http://wiki.tdwg.org/twiki/bin/view/DarwinCore/BasisOfRecord</description>
 								<properties>
 									<type>textfield</type>
 									<access>true</access>
-									<required>true</required>
+									<required>false</required>
 									<title>genus</title>
 									<tree>true</tree>
 									<actions>
