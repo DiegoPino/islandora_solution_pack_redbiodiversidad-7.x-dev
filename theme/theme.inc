@@ -23,7 +23,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
 	    
 	$islandora_object = $variables['islandora_object'];
-	$object_pid = $islandora_object->id;
+	$pid = $islandora_object->id;
 	drupal_set_title($islandora_object->label);
 	$pathtopoints=array();
 		
@@ -167,14 +167,11 @@ if (!(array_intersect(array('biodiversity:LocationCModel'), $models)))  {
 
 
 //dpm($result);
-$o='o';
-$s='s';
 $query="";
 $relationsandcmodels_sparqlmapping_hash=array();//This structure is a hash map between Sparql Variables and rels+cmodels form our paths so we don`t have to extract this info from Mulgara.
 $locationinpath=array();
 foreach ($result as $ontologie=>$graphs)
 {
-			
 	foreach ($graphs as $paths=>$rels)
 	{
 		$o='o';
@@ -182,12 +179,12 @@ foreach ($result as $ontologie=>$graphs)
 		$cur=0;
 		$current_rel="";
 		$sparql_object="";	
-		
-		
+    $allcmodels=array_keys($rels);//Need this to allow look ahead viewing during foreach
 		foreach($rels as $cmodel=>$rel)
 		{
 			$querytmp="";	
-			$otmp="";			
+			$otmp="";
+      $otmp_extras="";			
 				
 			if (array_key_exists(0,$rel))
 			{
@@ -195,50 +192,60 @@ foreach ($result as $ontologie=>$graphs)
 				$s=$s=='s'?'o':'s';
 				if ($cur>0)
 					{
-				$relationsandcmodels_sparqlmapping_hash[$sparql_object]=array($cmodel,$current_rel);
+					    
+				  $relationsandcmodels_sparqlmapping_hash[$sparql_object]=array($cmodel,$current_rel);
 					$sparql_object="";	
 					$current_rel="";
+          $otmp_extras="";
 					}
 				
 				
-				if (($cur==0) && ($paths==0))
-					{
-					$otmp="<info:fedora/$object_pid>";	
-					}
-				else
-				{				
+							
 								
-					if 	($cur==0)
+					if ($cur==0)
 						{
-						$otmp="UNION {<info:fedora/$object_pid>";	
-						}	
+						$otmp="\n {<info:fedora/$pid>";	
+            }	
 					else
 						{	
 						if ($cur>1)
 							{
-							$otmp="}";	
+    				  $otmp='';
 							}
-						$otmp.="optional  { ?".$o.$cur."_$paths";
-						
+            $otmp.= " optional { ?".$o.$cur."_$paths";
 						}
-				}	
 				
+          $cur_extras=$cur+1;
+          $otmp_extras=".";
+          $otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:label> ?".$s.$cur_extras."_".$paths."_label ;\n\r";
+          $nextcmodel=$allcmodels[$cur+1];
+          $otmp_extras.="<fedora-model:hasModel> <{$nextcmodel}> ." ; //Lets add also cmodel check. Why? because sometimes relations alone are ambiguos and do generate cycles. But cmodel+relations are acyclic in our implementation
+          //@TODO this is throwing an REPO except<fedora-model:state>, runs fine through the risearch web interface...why?
+          //$otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:state> <info:fedora/fedora-system:def/model#Active> .";
 					$query.=" $otmp <".$rel[0];
 					$cur++;
-					$query.="> ?$s$cur"."_$paths"."\r\n";
+					$query.="> ?$s$cur"."_$paths $otmp_extras";
+                 
 					$sparql_object=$s.$cur."_$paths";	
+				    
+					
 					$current_rel=$rel;
 					
 					
-						//	{$query.="}";}
-					if ($cur==sizeof($rels)-1) 
+				if ($cur==sizeof($rels)-1) 
 					{
-						$query.='}';
+            
+            $query.="}";
+              
 						if ($cur>1)
 							{
-						$query.='}';
+              for($i=1;$i<sizeof($rels)-1;$i++)
+                {
+                $query.="}";
+                }  
 							}
-						
+            $individual_queries[]=$query;
+            $query="";
 					
 					}
 						
@@ -249,8 +256,7 @@ foreach ($result as $ontologie=>$graphs)
 						{
 						$relationsandcmodels_sparqlmapping_hash[$sparql_object]=array($cmodel,$current_rel);	
 						}
-				}
-				
+				}		
 			}
 			
 				
@@ -259,46 +265,37 @@ foreach ($result as $ontologie=>$graphs)
 		
 		
 	}	
-
-	$fullquery = <<<EOQ
-	
-	SELECT DISTINCT * 
-	FROM <#ri>
-	WHERE {{
-		$query
-		}
-
-EOQ;
-		
-		
-		
-	}
-
-	//dpm($fullquery);
-	$repository = $islandora_object->repository;
-	$current_is_location=false;
-
-    //There is a speciall case: If the object we are currently vistiting is a location, then in our graph paths there will be no locationcmodel! (it´s our starting point). It´s obvios, but we must show in this case all the info.
-	if (in_array('biodiversity:LocationCModel',$islandora_object->models))
-	{
-	$current_is_location=true;
-	}
-	//dpm($fullquery);
+  
+}
+$current_is_location=false;
+  //There is a speciall case: If the object we are currently vistiting is a location, then in our graph paths there will be no locationcmodel! (it´s our starting point). It´s obvios, but we must show in this case all the info.
+if (in_array('biodiversity:LocationCModel',$islandora_object->models))
+{
+$current_is_location=true;
+}
+if (isset($individual_queries) && count($individual_queries)>0) {
 	$connection = islandora_get_tuque_connection();
-	
-	//$escaped_pid = str_replace(':', '_', $pid);
-	if (($connection) && !empty($fullquery)){
-		
+	$escaped_pid = str_replace(':', '_', $pid);
+	//dpm($relationsandcmodels_sparqlmapping_hash);
+if (($connection)){
+    $pathtopoints=array();
+    foreach($individual_queries as $individual_query) {
+      $fullquery = <<<EOQ
+      SELECT DISTINCT * 
+      FROM <#ri>
+      WHERE $individual_query
+      
+EOQ;
+    //@TODO xacml filter still missing. 	
+    $queryresults=array();
+    $queryresults = $connection->repository->ri->sparqlQuery($fullquery);
+    //dpm(sizeof($queryresults));
+    //$related_sparql_results=array();
 
-		$results = $connection->repository->ri->sparqlQuery($fullquery);
-			
-		$related_sparql_results=array();
-		$pathtopoints=array();
+    //@TODO make related object function in islandora_ontologies module and not in this particular one.
+    foreach ($queryresults as $queryresult) {//iterate over every computed path
 		$pathoflocation_pid="";
-		foreach ($results as $result) {
-			$related_sparql_closeure="";
-			$related_sparql="";
-			$list=array();
+		$list=array();
 			
 			$harvestthispath=false;
 			//Precheck if location is in path. If so, then process objects for this location. If the current Object belongs to LocationCMODEL, the all paths starting from it are related, so we must compute an exception
@@ -314,7 +311,7 @@ EOQ;
 				}
 			else
 				{	
-				foreach($result as $sparqlvar=>$hit)
+				foreach($queryresult as $sparqlvar=>$hit)
 				{	
 					if ($hit['type']=='pid')	
 					{
@@ -339,36 +336,24 @@ EOQ;
 			if ($harvestthispath)
 			{
 				//dpm("entrando");
-				foreach($result as $sparqlvar=>$hit)
+				foreach($queryresult as $sparqlvar=>$hit)
 				{								
 					if (($hit['type']=='pid'))
 					{
-					    try {
-					    $object = $islandora_object->repository->getObject($hit['value']);
+            $object_label="";
+            $object_link="";
+            $object_label=$queryresult[$sparqlvar.'_label']['value'];
+            $object_pid=$hit['value'];
 						$model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
-					    $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
-						
+					  $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
 						$model_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $model_label, $m)? $m[2]: $model_label;
-						
-						//$model_label=str_replace('biodiversity:','dwc:',$model_label);
 						$model_label=str_replace('CModel','',$model_label)."s";
-						$pathtopoints[$pathoflocation_pid][]=array('type' => 'point','popup' => l($object->label, 'islandora/object/'.$hit['value']),'clusterGroup'=> $model_label);
+						$pathtopoints[$pathoflocation_pid][]=array('type' => 'point','popup' => l($object_label, 'islandora/object/'.$object_pid),'clusterGroup'=> $model_label);
 						
-					    }
-					    catch (RepositoryException $e) {
-					   
-					        watchdog_exception('Islandora Red de Biodiversidad', $e, 'Got an exception while trying to get relation for @pid to @targetpid on @rel on map', array(
-						        '@pid' => $object_pid, '@targetpid' => $hit['value'], '@rel'=>$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0]
-						      ), WATCHDOG_ERROR);
-					  
-						}
+					  }
+				  }										
 						
-						
-						
-						
-					}										
-						
-				}					
+			  }					
 			$harvestthispath=false;
 			$pathoflocation_pid="";
 			}
@@ -387,7 +372,7 @@ EOQ;
 //End sparql
 
 }//end check for $results, if no ontology is given or no paths then we won´t get anything from up there. 
-
+}
 $locations2=array();
 $locations3=array();
 		
@@ -399,7 +384,7 @@ $j++;
 //dpm($choice);
 
 if ((isset($choice[$mappings['location']['latlong_lat']])) && (isset($choice[$mappings['location']['latlong_long']]))) {
-if ($choice['PID']==$object_pid)
+if ($choice['PID']==$pid)
 	{
 	$clustergroup='Current Object Location';	
 	}
@@ -444,10 +429,6 @@ array_push($locations, $point);
 	
 if (!empty($locations)) {
 $styles = module_invoke_all('leaflet_map_info'); 
-			
-		
-		
-		
 $variables['results'] =leaflet_render_map($styles['islandora_red_biodiversidad'], $locations, '500px');	
 }  
 	
@@ -821,13 +802,10 @@ function islandora_red_biodiversidad_preprocess_islandora_dwc_related(array &$va
   					//that connect this type of Content Model (origin) to every other one in the full Graph. This will be used to make a composite Sparql Query
   					$g = new islandora_ontologies_adjacency_graph($localgraph);
   					$result[$ontologiepid]=$g->getdepthFirst("info:fedora/".$contentmodelpid);
-				
   				}
-				
   			}
   				//lastly we set the cache. This is necesarry because we don´t wan´t to recalculate every time the same structure. Only if a Ontology changes, or new ones are added, the cache is cleaned.		
   			cache_set('islandora_ontologies_adjacency'.$contentmodelpid, $result, 'cache');	
-			
   		}
   	}	
 		
@@ -858,13 +836,13 @@ $relationsandcmodels_sparqlmapping_hash=array();//This structure  stores a hash 
 //But for subsequent Sparql queries i don't need to bound their results anymore, i just need the values that follow after that patterns. So i get more optimal responses in terms of memory used (less unbound variables).
 //So here it comes http://en.wikipedia.org/wiki/Longest_common_subsequence_problem, LCS implementation. I threath every path item (subject predicate object) as a composite Value and add it to an array. Then i calculate LCS on this structure, and also store
 //where this sequence starts in every single path. Then i decide which one i'm going to travel first (getting all intermediate solutions) and on which ones i'm going to travel but only bind to the variables after this solution. Does this makes sense? Yes!
+//But, not yet. We will leave this as @TODO
 
 
 $individual_queries=array();
 if (!empty($result))
 {
-		
-	 
+
 foreach ($result as $ontologie=>$graphs)
 {
 	foreach ($graphs as $paths=>$rels)
@@ -962,27 +940,13 @@ foreach ($result as $ontologie=>$graphs)
 	}	
   
 //Now build a filter for those nasty unbound variables that are eatting my PHP memory
-  $queryfilter='FILTER(';
-  $queryfilterbounds=array();
- foreach ($relationsandcmodels_sparqlmapping_hash as $key=>$value)
-   {
-     $queryfilterbounds[] = "bound(?{$key})";
-   }
-$queryfilterstring = implode(' || ', $queryfilterbounds);
-$queryfilter = "FILTER({$queryfilterstring})";
-  
-
-
-			
-		
-		
 
 }
 if (user_access('administer site configuration'))
   {
-  dpm($result);
-  dpm($individual_queries);
-  dpm($relationsandcmodels_sparqlmapping_hash);
+  //dpm($result);
+  //dpm($individual_queries);
+  //dpm($relationsandcmodels_sparqlmapping_hash);
   }
 	$related = array();
     
@@ -1005,7 +969,7 @@ EOQ;
     //@TODO xacml filter still missing. 	
     $queryresults=array();
     $queryresults = $connection->repository->ri->sparqlQuery($fullquery);
-    dpm(sizeof($queryresults));
+    //dpm(sizeof($queryresults));
     //$related_sparql_results=array();
 
     //@TODO make related object function in islandora_ontologies module and not in this particular one.
