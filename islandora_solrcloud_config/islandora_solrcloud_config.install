@@ -12,7 +12,7 @@ function islandora_solrcloud_config_uninstall() {
 
   // Removing variables.
   $variables = array(
-    'islandora_solr_cloud_profile_externalfields',
+    'islandora_solrcloud_setting_delete','islandora_solrcloud_setting_uniqueid','islandora_solrcloud_setting_uniqueid_prefix'
   );
   foreach ($variables as $variable) {
     variable_del($variable);

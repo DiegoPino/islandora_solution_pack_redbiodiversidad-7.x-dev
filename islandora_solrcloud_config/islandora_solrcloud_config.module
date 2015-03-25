@@ -33,9 +33,9 @@ function islandora_solrcloud_config_menu() {
     'title' => 'Solrcloud Settings',
     'description' => 'Configure Solrcloud search settings.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('islandora_solrcloud_config_admin_solrcloud_settings'),
+    'page arguments' => array('islandora_solrcloud_admin'),
     'access arguments' => array('administer islandora solr'),
-    'file' => 'includes/admin.inc',
+    'file' => 'includes/admin.form.inc',
     'type' => MENU_LOCAL_TASK,
   );
   return $items;
@@ -61,6 +61,57 @@ function islandora_solrcloud_config_islandora_solr_results_alter(&$search_result
   }   }
 }
 }
+/**
+ * Implements hook_islandora_object_purged().
+ * If you are using this module, means you are implementing Solr Cloud, then chances are fedoragsearch is 
+ * not removing correctly your deleted documents from Solr
+ * So we need to implement this locally, passing to /update handler <delete> query to Solr directly. No harm at all. 
+ */
+
+function islandora_solrcloud_config_islandora_object_purged($pid)
+  {
+  //variables islandora_solrcloud_setting_delete, is set for now in the solr display config form
+  $delete_solrdoc_from_islandora = variable_get('islandora_solrcloud_setting_delete',FALSE);
+  if ($delete_solrdoc_from_islandora)
+    {
+    $path_parts = parse_url(variable_get('islandora_solr_url', 'localhost:8080/solr'));
+    $solr = new Apache_Solr_Service($path_parts['host'], $path_parts['port'], $path_parts['path'] . '/');
+    // Query is executed.
+    try {
+      $newpid=utf8_encode(variable_get('islandora_solrcloud_setting_uniqueid_prefix','').$pid);
+      $newpid = htmlspecialchars($newpid, ENT_NOQUOTES, 'UTF-8');
+      $rawDeletePost = '<delete><id>' . $newpid . '</id></delete>';
+      
+      $results= $solr->delete($rawDeletePost,$timeout = 3600);
+      //We will leave commit out right now, softcommit should be enable and configured. If no we could en with a lot of
+      // PERFORMANCE WARNING: Overlapping onDeckSearchers=X in Solr's log
+      /*$rawCommitPost = '<commit waitSearcher="true" softCommit="true"/>';
+      $results2= $solr->delete($rawCommitPost,$timeout = 3600);*/
+      // We can't use stock $solr->commit() because it adds deprecated options, so we will have to send the commit directly, but
+      //_sendRawPost is protected, so we will use ->delete which is just a wrapper to _sendRawPost to build our own <commit> xml
+     }
+    catch (Exception $e) {
+      drupal_set_message(check_plain(t('Error deleting Document <PID> $newpid from Solr index')) . ' ' . $e->getMessage(), 'error');
+    }
+
+  
+    if (isset($results)) {
+      $solr_results = json_decode($results->getRawResponse(), TRUE);
+      if ($solr_results['responseHeader']['status']==0) {
+        drupal_set_message(t('Delete from index for document id: %newpid, object pid: %pid, was send to Solr',array('%newpid'=>$newpid,'%pid'=>$pid)),'status');
+      }
+      else {
+         drupal_set_message(t('An error with code %code happened when trying to delete from Solr index, document id: %newpid for object pid: %pid ',array('%code'=>$solr_results['responseHeader']['status'],'%newpid'=>$newpid,'%pid'=>$pid)),'error');
+      }
+    }
+   
+    
+    
+  }
+}
+
+
+
 
 
 
