@@ -668,6 +668,8 @@
 								This is the person or institution to contact with questions about the use, interpretation of a dataset.</description>
                   <required>FALSE</required>
                   <title>Creator</title>
+                  <id>eml-creator</id>
+                  <group>eml-fieldsets</group>
                   <tree>TRUE</tree>
                   <actions>
                     <create>
@@ -1094,6 +1096,8 @@
                   <required>FALSE</required>
                   <title>Metadata Provider</title>
                   <tree>TRUE</tree>
+                  <id>eml-metadataprovider</id>
+                  <group>eml-fieldsets</group>
                   <actions>
                     <create>
                       <path>/eml:eml[1]/eml:dataset[1]</path>
@@ -1536,6 +1540,8 @@
                   <required>FALSE</required>
                   <title>Associated Party</title>
                   <tree>TRUE</tree>
+                  <id>eml-associatedParty</id>
+                  <group>eml-fieldsets</group>
                 </properties>
                 <children>
                   <element name="associatedParty">
@@ -2062,6 +2068,8 @@
                   <required>FALSE</required>
                   <title>Distribution</title>
                   <tree>TRUE</tree>
+                  <id>eml-distribution</id>
+                  <group>eml-fieldsets</group>
                   <actions>
                     <create>
                       <path>/eml:eml[1]/eml:dataset[1]</path>
@@ -2175,6 +2183,8 @@
                   <required>FALSE</required>
                   <title>Coverage</title>
                   <tree>TRUE</tree>
+                  <id>eml-coverage</id>
+                  <group>eml-fieldsets</group>
                   <actions>
                     <create>
                       <path>/eml:eml[1]/eml:dataset[1]</path>
@@ -2824,6 +2834,8 @@
                   <required>FALSE</required>
                   <title>Primary Contact</title>
                   <tree>TRUE</tree>
+                  <id>eml-contact</id>
+                  <group>eml-fieldsets</group>
                   <actions>
                     <create>
                       <path>/eml:eml[1]/eml:dataset[1]</path>
@@ -3243,6 +3255,8 @@
                   <required>FALSE</required>
                   <title>Methods</title>
                   <tree>TRUE</tree>
+                  <id>eml-methods</id>
+                  <group>eml-fieldsets</group>
                   <actions>
                     <create>
                       <path>/eml:eml[1]/eml:dataset[1]</path>
@@ -3669,6 +3683,8 @@
                   <required>FALSE</required>
                   <title>Project</title>
                   <tree>TRUE</tree>
+                  <id>eml-project</id>
+                  <group>eml-fieldsets</group>
                   <actions>
                     <create>
                       <path>/eml:eml[1]/eml:dataset[1]</path>
