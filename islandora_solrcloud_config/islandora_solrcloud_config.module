@@ -33,7 +33,7 @@ function islandora_solrcloud_config_menu() {
     'title' => 'Solrcloud Settings',
     'description' => 'Configure Solrcloud search settings.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('islandora_solrcloud_admin'),
+    'page arguments' => array('islandora_solrcloud_admin_form'),
     'access arguments' => array('administer islandora solr'),
     'file' => 'includes/admin.form.inc',
     'type' => MENU_LOCAL_TASK,

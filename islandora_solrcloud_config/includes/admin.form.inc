@@ -28,8 +28,8 @@ function islandora_solrcloud_admin_form(array $form, array &$form_state) {
     'islandora_solrcloud_setting_uniqueid' => array(
      '#type' => 'textfield',
       '#title' => t('The Solr field name used as unique ID in our current Solr Schema'),
-      '#default_value' => variable_get('islandora_solrcloud_setting_uniqueid', 'pid'),
-      '#description' => t("The selected collection will de parsed differentle, showing Taxon Records and EOL associated info in addition to linked islandora objects. The purpouse of this is to generate a different and simpler view for Objects belonging to this solution pack"),
+      '#default_value' => variable_get('islandora_solrcloud_setting_uniqueid', 'PID'),
+      '#description' => '',
       '#size' => 105,
       '#autocomplete_path' => 'islandora_solr/autocomplete_luke',
     ),
