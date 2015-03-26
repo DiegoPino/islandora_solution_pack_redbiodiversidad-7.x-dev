@@ -21,6 +21,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	$module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
 	module_load_include('inc', 'islandora_solr_search', 'includes/utilities');
 	module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+  
 	    
 	$islandora_object = $variables['islandora_object'];
 	$pid = $islandora_object->id;
@@ -487,9 +488,19 @@ $xslt = new XSLTProcessor();
 $xslt->importStyleSheet($xsl);
 $html = $xslt->transformToXML(simplexml_load_string($dwc));
 $variables['islandora_dwc_html'] = '<article><dl class="dl-horizontal">'.$html.'</dl></article>';
-	
+$variables['related_info'] =array();
 if (array_intersect(array('biodiversity:TaxonCModel','biodiversity:SimpledwcCModel'),$islandora_object->models))
 {
+
+	
+	module_load_include('inc', 'islandora_solr_search', 'includes/utilities');
+	module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+  //@TODO make this dynamic, same as our other semantic stuff
+  $related_ocurrences=islandora_red_biodiversidad_getparents_via_solr(array('RELS_EXT_taxonOfId_uri_ms','RELS_EXT_identifies_uri_ms'),$pid);
+  
+  $variables['related_info']['title'] = 'Occurrences for this taxon';
+  $variables['related_info']['numFound']=$related_ocurrences['numFound'];
+  $variables['related_info']['objects']=$related_ocurrences['objects'];
 			
 if (empty($islandora_object->label) || ($islandora_object->label==$object_pid) || in_array('biodiversity:SimpledwcCModel',$islandora_object->models))//something is wrong with our xslt or this object was not originated from our FORM
 {

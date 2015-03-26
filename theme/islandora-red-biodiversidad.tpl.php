@@ -85,14 +85,41 @@
     <?php print $variables['metadata']; ?>  
  
  <?php endif; ?>
-</div>
-  
-
-
-
-
-
-
+ 
+<?php if ($variables['related_info']): ?>
+   <div class="panel panel-default">
+ 	  <div class="panel-heading">
+ 	        <h4 class="panel-title">
+ 	          <a data-toggle="collapse" data-parent="#accordion" href="#collapseRel">
+ 	             <i class="fa fa-sitemap fa-x2"></i>
+ 				<?php print t($variables['related_info']['title']); ?>
+        <span class="badge">
+          <?php print($variables['related_info']['numFound']); ?></span>
+ 	          </a>
+ 	        </h4>
+ 	      </div>
+  <div id="collapseRel" class="panel-collapse collapse">
+        <div class="panel-body">
+ <?php $row_result = 0; ?>
+ <?php foreach($variables['related_info']['objects'] as $key => $results): ?>
+   <!-- Search result -->
+   <div class="islandora-solr-search-result clear-block <?php print $row_result % 2 == 0 ? 'odd' : 'even'; ?>">
+     <div class="islandora-solr-search-result-inner">
+       <!-- Metadata -->
+       <dl class="solr-fields islandora-inline-metadata">
+           <dt class="solr-label">
+             <a href="<?php print $results['solr_doc']['PID_fullurl'];?>"><?php print $results['solr_doc']['fgs_label_s']; ?></a>
+           </dt>
+       </dl>
+     </div>
+   </div>
+ <?php $row_result++; ?>
+ <?php endforeach; ?>
+ </div>
+ </div>
+   </div>
+   <?php endif; ?>
+ </div>
 <div class="panel-group" id="datastreams">
   <div class="panel panel-default">
 	  <div class="panel-heading">

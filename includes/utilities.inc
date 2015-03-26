@@ -375,4 +375,69 @@ function islandora_red_biodiversidad_getxacml_solrquery_restrictions() {
   $fq .= "((*:* -" . variable_get('islandora_xacml_api_rels_viewable_user', 'rels.isViewableByUser') . ":[* TO *]) AND (*:* -" . variable_get('islandora_xacml_api_rels_viewable_role', 'rels.isViewableByRole') . ":[* TO *]))";
   return $fq;
 }
+/** This function uses Solr !join sintax to get parent documents, mimics a simple sparql query
+ *Assumes our schema.xml and foxmltosolr.xslt is used 
+*/
+
+function islandora_red_biodiversidad_getparents_via_solr($rels_ext_fields, $pid )
+{
+  if (count($rels_ext_fields)==0) {
+    return array(); 
+    }
+  module_load_include('inc', 'islandora_solr_search', 'includes/utilities');
+  $qp = new IslandoraSolrQueryProcessor();
+  $qp->buildQuery("*:*");
+  $qp->solrParams['fl'] = 'PID,PID_fullurl,fgs_label_s';
+  $filters=array();
+  
+  //Build the first !join
+  $direct_rels=array_shift($rels_ext_fields);
+  
+  $luceneReservedCharacters = preg_quote('+-&|!(){}[]^"~*?:\\');
+    //Not nice: we are using a nested query so we need to double escape our only value, the famouse PID
+  $pid= preg_replace_callback(
+        '/([' . $luceneReservedCharacters . '])/',
+        function($matches) {
+            return '\\' . $matches[0];
+        },
+        $pid);
+  $filters[] = format_string('_query_:{!join from=!direct_rels to=PID_uri}PID:!pid', array(
+      '!direct_rels' => $direct_rels,
+      '!pid' => islandora_solr_lesser_escape($pid),
+    ));
+  
+  //*:* AND _query_:"{!join to=PID_uri from=RELS_EXT_identifies_uri_ms}PID_uri:* AND _query_:{!join from=RELS_EXT_taxonOfId_uri_ms to=PID_uri}PID:umce\\:a79c6f05\-87ce\-49e3\-b01a\-b4ac6e15ecba"*:*
+  foreach($rels_ext_fields as $rels_ext_field) {
+    
+    $filters[] = format_string('_query_:"{!join to=PID_uri from=!rels_ext_field}PID_uri:*', array(
+        '!rels_ext_field' => $rels_ext_field,
+      ));
+  }
+  $filters[]='*:*';
+ 
+ 
+  $filters_string=implode(' AND ',array_reverse($filters)).'"*:*';
+  $qp->solrParams['fq'] = $filters_string;
+  $xacml_restrictions=islandora_red_biodiversidad_getxacml_solrquery_restrictions();
+  if (!empty($xacml_restrictions)) {
+  $qp->solrParams['fq'] = $qp->solrParams['fq']." AND ( ".$xacml_restrictions." )";
+  }
+  
+  
+  $qp->solrLimit = 1000;
+  $qp->executeQuery(FALSE);
+ 
+  $results=$qp->islandoraSolrResult;
+  if (isset($results['response']) && ($results['response']['numFound']>0)) {
+    return array('objects'=>$results['response']['objects'],'numFound'=>$results['response']['numFound']);
+    
+  }
+  return array();
+
+  
+  
+}
+
+
+
 
