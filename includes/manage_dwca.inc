@@ -35,11 +35,11 @@ function islandora_red_biodiversidad_dwcarchive_manage_form(array $form, array &
 		{
 		$source_collection_pid=$item->nodeValue;
 		}
+
+  $all_content_models=islandora_get_content_models();
+  $content_models = array_intersect_key($implemented_models,$all_content_models);
   
-  
-  
-  $content_models = array_intersect($implemented_models,islandora_get_content_models());
-$map_options = function($o) {
+  $map_options = function($o) {
     return filter_xss($o['label']);
   };
    $all_collections= array_map($map_options, islandora_basic_collection_get_collections());
