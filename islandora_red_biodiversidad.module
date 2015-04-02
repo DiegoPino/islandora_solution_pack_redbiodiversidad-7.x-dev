@@ -804,13 +804,13 @@ function islandora_red_biodiversidad_islandora_ontologies_vlot_info() {
 	 	 	 	'color' => 'rgb(194,157,138)',
 	 	 	 	),
    	 	 	 'biodiversity:SimpledwcCModel'=>array(		
-   	 	 	 	'cmodel_label' => 'MaterialSample',
+   	 	 	 	'cmodel_label' => 'Simple Darwin Core',
    	 	 	 	'color' => 'rgb(219,216,198)',
    	 	 	 	),
-      	 	 'default'=>array(		
-      	 	 	 'cmodel_label' => 'Object',
-      	 	 	 'color' => 'rgb(126,135,129)',
-      	 	 	 ),
+      	 'default'=>array(		
+      	 	 	'cmodel_label' => 'Object',
+      	 	 	'color' => 'rgb(126,135,129)',
+      	 	 ),
 			 )
 		);
 		

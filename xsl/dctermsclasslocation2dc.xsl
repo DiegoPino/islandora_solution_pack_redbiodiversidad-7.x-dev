@@ -177,7 +177,7 @@ This XSL StyleSheet only processes the first ocurrence of every class
                     <xsl:comment> Source node is <xsl:value-of select="name()"/>
                 </xsl:comment>
                 </xsl:when> 
-                <xsl:when test="name()='dwc:decimaLongitude'">
+                <xsl:when test="name()='dwc:decimalLongitude'">
                     <coverage xmlns="http://purl.org/dc/elements/1.1/">
                         <xsl:value-of select="local-name()"/> = <xsl:apply-templates select="* | node()"/>
                     </coverage>

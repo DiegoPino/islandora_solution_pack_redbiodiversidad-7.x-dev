@@ -101,6 +101,7 @@
   <div id="collapseRel" class="panel-collapse collapse">
         <div class="panel-body">
  <?php $row_result = 0; ?>
+ <?php if (count($variables['related_info']['objects'])>0): ?>
  <?php foreach($variables['related_info']['objects'] as $key => $results): ?>
    <!-- Search result -->
    <div class="islandora-solr-search-result clear-block <?php print $row_result % 2 == 0 ? 'odd' : 'even'; ?>">
@@ -115,6 +116,9 @@
    </div>
  <?php $row_result++; ?>
  <?php endforeach; ?>
+<?php else: ?>
+  <?php print t('No ocurrences for this taxon'); ?>
+  <?php endif; ?> 
  </div>
  </div>
    </div>

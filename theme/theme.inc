@@ -499,8 +499,8 @@ if (array_intersect(array('biodiversity:TaxonCModel','biodiversity:SimpledwcCMod
   $related_ocurrences=islandora_red_biodiversidad_getparents_via_solr(array('RELS_EXT_taxonOfId_uri_ms','RELS_EXT_identifies_uri_ms'),$pid);
   
   $variables['related_info']['title'] = 'Occurrences for this taxon';
-  $variables['related_info']['numFound']=$related_ocurrences['numFound'];
-  $variables['related_info']['objects']=$related_ocurrences['objects'];
+  $variables['related_info']['numFound']=isset($related_ocurrences['numFound'])?$related_ocurrences['numFound']:0;
+  $variables['related_info']['objects']=isset($related_ocurrences['objects'])?$related_ocurrences['objects']:array();
 			
 if (empty($islandora_object->label) || ($islandora_object->label==$object_pid) || in_array('biodiversity:SimpledwcCModel',$islandora_object->models))//something is wrong with our xslt or this object was not originated from our FORM
 {
