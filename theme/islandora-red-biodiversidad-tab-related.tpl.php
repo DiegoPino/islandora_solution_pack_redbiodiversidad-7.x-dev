@@ -23,6 +23,7 @@
             <?php print $variables['related_sparql_results'];?>
           </p>
         <?php endif; ?> 
+        <div id="Legend" class="externalLegend"></div>
         <?php if(isset($variables['vlot'])): ?> 
           <?php print $variables['vlot'];?>
         <?php endif; ?>
