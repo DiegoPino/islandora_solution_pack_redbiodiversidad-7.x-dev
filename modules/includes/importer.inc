@@ -324,14 +324,14 @@ if (module_exists('islandora_ontologies'))
 			//If case of dupicate objects we can´t discard/join new objects because we could end with two relations to the same...should we check this in getingestinfo?
 			}
 		}
-	    // Test implementation, try to use ontologies, if ontologie module is enabled
+	  // Test implementation, try to use ontologies, if ontologie module is enabled
 		
 		//Ok, now things are going to get complicated. If we wan´t to be able to relate objects using existing ontologies some compromises must be done
 		//- An excel file is a bidimensional representation, so be must deal with an Star Model, one center object that relates to others...but this could lead to duplicated objects...
-	    //Or: assume that every selected cmodel is a center of something that relates (possible) to all others...
+	  //Or: assume that every selected cmodel is a center of something that relates (possible) to all others...
 		//To avoid duplication we could just get an MD5 from an entire record an create an MD5 index of objects by CMODEL. Every time we wan´t to add a new object we first check if this md5 exist. If so avoid creation...
 		//We keep track of every other object originated from the same excel row and construct our relations from there. If the to be create object already exists, we replace the relation with this one.
-		//Must: we need the object->id to be defined during getIngestInfo, not on preprocess?
+		//Must: we need the object->id to be defined during getIngestInfo, not on preprocess
 		
 	
 	$objects_realinfo=static::getIngestInfo($excel_file,$contentmodels_xml_proccessing_data,$content_models,$form_state['values']['namespace']); 
@@ -396,9 +396,7 @@ if (module_exists('islandora_ontologies'))
 			if (($highestRow)>1)//Es decir tengo al menos el header con los campos y un registro
 				{
 				$internalTuque=islandora_get_tuque_connection();
-			
-					
-	   	    	$rowHeaders = $sheet->rangeToArray('A1:'.$highestColumn.'1', NULL, TRUE, TRUE,FALSE);//Devuelve los titulos de cada columna
+   	    $rowHeaders = $sheet->rangeToArray('A1:'.$highestColumn.'1', NULL, TRUE, TRUE,FALSE);//Devuelve los titulos de cada columna
 				
 				//Ok, now we must see which fields belong to which cmodel, just intersect the array preserving the original row data.
 				
@@ -424,7 +422,7 @@ if (module_exists('islandora_ontologies'))
 						//we will use this structure to keep track of md5 to avoid duplicates
 						$md5_index_by_cmodel[$cmodels]=array();//Fill this up
 						//see what possible relations we can use and remap them so we can acces them more easilly
-						foreach($content_models_with_processing_info[$cmodels]['localrel'] as $ontologie => $prop)//We can´t deal with multiple ontologies here...@todo fix it somehow..
+						foreach($content_models_with_processing_info[$cmodels]['localrel'] as $ontologie => $prop)//We can´t deal with multiple ontologies here...@TODO fix it somehow..
 							{
 								foreach($prop as $propname=>$propinfo)
 								{
@@ -503,17 +501,18 @@ if (module_exists('islandora_ontologies'))
   									}	
   								}
               }
-						
-						 
-						    
-						
 						if (sizeof($datoscombinados)>1) //At least two fields...
 							{
 							//Now get an md5 representation of data	
+              //April 2015. I found a bug. We are not respecting Ontology restrictions using only MD5. If we only enforce md5 as check, then it's possible we add not allowed relations to a same object many times
+              //So we need a way of discerning here if the object's md5 is already present AND the existing object does not already have all allowed relations in place...this is complicated!
+              //Typical example. An incomplete darwin core Event Record could end being related to multiple locations.
+              // MD5 check defines it's the same object (no eventID given to discern) but two different locations can't be associated to the same event.
 							$md5=md5(implode(array_values($datoscombinados)));	
 							if (!array_key_exists($md5,$md5_index_by_cmodel[$cmodel]))
 								{
-   	   							 if (!array_key_exists($content_models_with_processing_info[$cmodel]['title'],$datoscombinados))//means we dont have an ID for this record
+   	   						//we are creating a new object
+                  if (!array_key_exists($content_models_with_processing_info[$cmodel]['title'],$datoscombinados))//means we dont have an ID for this record
    	   						 	{
    	   						 		$datoscombinados[$content_models_with_processing_info[$cmodel]['title']]=++$content_models_with_processing_info[$cmodel]['lastIDfromSolr'];
    	   						 	}
@@ -530,6 +529,7 @@ if (module_exists('islandora_ontologies'))
 								}
 								else
 								{
+                //we are reusing and existing object
 								$thisrow[$cmodel]=$md5_index_by_cmodel[$cmodel][$md5];
 								//error_log('We allready have this record',0);	
 								}
@@ -917,7 +917,7 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
 				}
   		  	 if ($this->isDwC($xml)) {//verifico si el DwC quedo bien hecho
 				//error_log("MI XSLT para DWC".var_export($this->DWC2DC,true),0);	
-  	 	        $this->dc = static::runXSLTransform(array('input' => $xml, 'xsl' => $this->DWC2DC));
+  	 	    $this->dc = static::runXSLTransform(array('input' => $xml, 'xsl' => $this->DWC2DC));
 	 	        
   			 }
    	         if (empty($this->dc)) {

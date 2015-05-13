@@ -170,26 +170,33 @@
 		             position: 'topleft'
 		         }
 		     );
-		   controlCluster.addTo(lMap);
-		
+          
+       
+       controlCluster.addTo(lMap);
+		   
+       
+  
 		
 		for (var row in controlCluster._layers) {
 		           leaflet_meta[L.Util.stamp(controlCluster._layers[row].layer)] = controlCluster._layers[row].name;
 		       }
-		   
+           $(document).trigger('leaflet.controlCluster', [controlCluster,leaflet_meta]); 
+           console.log('adding controlcluster trigger');  
 			   lMap.on('overlayadd', function (a) {
-				       
+				    if  (leaflet_meta.hasOwnProperty(L.Util.stamp(a.layer))) {    
  				  var clusterGroup_index = leaflet_meta[L.Util.stamp(a.layer)];
  				
  				  clusterLayers[clusterGroup_index].addLayers(markers_byclusterGroup[clusterGroup_index]);
-			       });
+        }
+             });
 			  lMap.on('overlayremove', function (a) {
-				
+				  if  (leaflet_meta.hasOwnProperty(L.Util.stamp(a.layer))) {
 				  var clusterGroup_index = leaflet_meta[L.Util.stamp(a.layer)];
 				 
 				  clusterLayers[clusterGroup_index].removeLayers(markers_byclusterGroup[clusterGroup_index]);
 			           //markers.removeLayers(markers_category[category_index]);
-			       });	  
+               }
+             });	  
 		
 		
 		
@@ -233,7 +240,7 @@
         // Required when the View has "Use AJAX" set to Yes.
         this.features = null;
         /* S I D E B A R   F I L T E R */
-        var sidebar = L.control.sidebar('sidebar', {
+        /*var sidebar = L.control.sidebar('sidebar', {
             position: 'left'
         });
         /*lMap.addControl(sidebar);
