@@ -43,7 +43,7 @@ function islandora_red_biodiversidad_menu() {
   );
   $items['islandora/red_biodiversidad/autocomplete/%'] = array(
     'title' => 'Form Callbacks',
-	'description' => 'Autocomplete a Field from DwC',
+  'description' => 'Autocomplete a Field from DwC',
     'page callback' => 'islandora_red_biodiversidad_autocomplete',
     'page arguments' => array(3),
     'type' => MENU_CALLBACK,
@@ -116,14 +116,14 @@ function islandora_red_biodiversidad_collection_access($islandora_object) {
   $models = $islandora_object->models;
   
   if (isset($islandora_object['COLLECTION_POLICY']))//Es coleccion de algun tipo
-  	{
-	    $policy = new CollectionPolicy($islandora_object['COLLECTION_POLICY']->content);
-	    $policy_content_models = $policy->getContentModels();//Entrega los modelos de contenido que permite esta coleccion
-		
-	    if (array_intersect(array('biodiversity:biodiversityCModel'), array_keys($policy_content_models)) && array_intersect(array('islandora:collectionCModel'), $models)) {
-	      return TRUE; //Es decir es coleccion y sus hijos pueden ser de modelo biodiversity:biodiversityCModel
-	    }
-  	}
+    {
+      $policy = new CollectionPolicy($islandora_object['COLLECTION_POLICY']->content);
+      $policy_content_models = $policy->getContentModels();//Entrega los modelos de contenido que permite esta coleccion
+    
+      if (array_intersect(array('biodiversity:biodiversityCModel'), array_keys($policy_content_models)) && array_intersect(array('islandora:collectionCModel'), $models)) {
+        return TRUE; //Es decir es coleccion y sus hijos pueden ser de modelo biodiversity:biodiversityCModel
+      }
+    }
  
  
   return FALSE;
@@ -155,16 +155,16 @@ function islandora_red_biodiversidad_generate_dwca_access($islandora_object) {
  */
 
 function islandora_red_biodiversidad_islandora_view_print_object($islandora_object)
-	{
-	$output = theme('islandora_red_biodiversidad_print', array('islandora_object' =>$islandora_object,'islandora_content'=>NULL));		
-	return $output;	
-	} 
+  {
+  $output = theme('islandora_red_biodiversidad_print', array('islandora_object' =>$islandora_object,'islandora_content'=>NULL));    
+  return $output;  
+  } 
 
 
 
 function islandora_red_biodiversidad_map_display($islandora_object) {
   $output = theme('islandora_red_biodiversidad_map',
-    array('islandora_object' => $islandora_object,'results'=>NULL));
+    array('islandora_object' => $islandora_object,'results'=>NULL,'limit_to_cmodel'=>array()));
   return $output;
 }
 function islandora_red_biodiversidad_dw_related_display($islandora_object) {
@@ -215,16 +215,16 @@ function islandora_red_biodiversidad_biodiversity_biodiversityCModel_islandora_v
   
     drupal_add_js(array('islandora' => array('print_link' => 'islandora/object/' . $object->id . '/print_object')), array('type' => 'setting'));
     //drupal_add_js($path . '/js/add_print.js');
-	
-	
-	$models = $object->models;
+  
+  
+  $models = $object->models;
     if (array_intersect(array('biodiversity:DWCACModel'), $models)) {
-	 $output = theme('islandora_dwca', array('islandora_object' => $object));
-	}
-	else
-	{
-	  $output = theme('islandora_dwc', array('islandora_object' => $object));	
-	}
+   $output = theme('islandora_dwca', array('islandora_object' => $object));
+  }
+  else
+  {
+    $output = theme('islandora_dwc', array('islandora_object' => $object));  
+  }
 
   
   return array('' => $output);
@@ -258,35 +258,35 @@ function islandora_red_biodiversidad_theme($existing, $type, $theme, $path) {
   return array(
     'islandora_dwc' => array(
      'file' => 'theme/theme.inc',
-	  'template' => 'theme/islandora-red-biodiversidad',
-	   'pattern' => 'islandora_red_biodiversidad__',
+    'template' => 'theme/islandora-red-biodiversidad',
+     'pattern' => 'islandora_red_biodiversidad__',
       'variables' => array('islandora_object' => NULL),
-	  'render element'=>'eol_render_element',
+    'render element'=>'eol_render_element',
     ),
     'islandora_red_biodiversidad_print' => array(
-	  'file' => 'theme/print.inc',
+    'file' => 'theme/print.inc',
       'template' => 'theme/islandora-red-biodiversidad-print',
       'variables' => array('islandora_object' => NULL, 'content' => NULL,
         'islandora_content' => NULL)
     ),
     // Themes the output of the  tab.
     'islandora_red_biodiversidad_map' => array(
-	  'file' => 'theme/theme.inc',
+    'file' => 'theme/theme.inc',
       'template' => 'theme/islandora-red-biodiversidad-map',
       'variables' => array('islandora_object' => NULL,'results'=>NULL),
     ),
     'islandora_dwc_related' => array(
-	  'file' => 'theme/theme.inc',
+    'file' => 'theme/theme.inc',
       'template' => 'theme/islandora-red-biodiversidad-tab-related',
       'variables' => array('islandora_object' => NULL),
     ),
       'islandora_dwca' => array(
        'file' => 'theme/theme.inc',
-  	  'template' => 'theme/islandora-red-biodiversidad-dwca',
+      'template' => 'theme/islandora-red-biodiversidad-dwca',
         'variables' => array('islandora_object' => NULL),
       ),
-	
-	
+  
+  
   );
 }
 
@@ -401,16 +401,16 @@ function islandora_red_biodiversidad_islandora_required_objects(IslandoraTuque $
     'islandora_red_biodiversidad' => array(
       'title' => 'Islandora Red Biodiversidad',
       'objects' => array(
-		$biodiversidad_content_model_dwca,
-		$biodiversidad_content_model,
-		$biodiversidad_content_model_simpledwc,
-		$biodiversidad_content_model_occurrencedwc,
-		$biodiversidad_content_model_eventdwc,
-		$biodiversidad_content_model_identificationdwc,
-		$biodiversidad_content_model_locationdwc,
-		$biodiversidad_content_model_taxondwc,
-		$biodiversidad_content_model_materialsampledwc,
-		$biodiversidad_content_model_geologicalcontextdwc,
+    $biodiversidad_content_model_dwca,
+    $biodiversidad_content_model,
+    $biodiversidad_content_model_simpledwc,
+    $biodiversidad_content_model_occurrencedwc,
+    $biodiversidad_content_model_eventdwc,
+    $biodiversidad_content_model_identificationdwc,
+    $biodiversidad_content_model_locationdwc,
+    $biodiversidad_content_model_taxondwc,
+    $biodiversidad_content_model_materialsampledwc,
+    $biodiversidad_content_model_geologicalcontextdwc,
         $biodiversidad_collection,
       ),
     ),
@@ -530,16 +530,16 @@ function islandora_red_biodiversidad_xml_form_builder_get_transforms() {
   $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
   return array(
     'dwc2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwc2dc.xsl",
-	'dwcclass2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclass2dc.xsl",
-	'dwcclassevent2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassevent2dc.xsl",
-	'dwcclasstaxon2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclasstaxon2dc.xsl",
-	'dwcclassoccurrence2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassoccurrence2dc.xsl",
-	'dctermsclasslocation2dc_redbiodiversidad.xsl' => "$module_path/xsl/dctermsclasslocation2dc.xsl",
-	'dwcclassidentification2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassidentification2dc.xsl",
-	'dwcclassgeologicalcontext2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassgeologicalcontext2dc.xsl",
-	'dwcclassmaterialsample2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassmaterialsample2dc.xsl",
-	'eml2dc.xsl' => "$module_path/xsl/invalid_eml211toDublinCore.xsl",
-	
+  'dwcclass2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclass2dc.xsl",
+  'dwcclassevent2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassevent2dc.xsl",
+  'dwcclasstaxon2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclasstaxon2dc.xsl",
+  'dwcclassoccurrence2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassoccurrence2dc.xsl",
+  'dctermsclasslocation2dc_redbiodiversidad.xsl' => "$module_path/xsl/dctermsclasslocation2dc.xsl",
+  'dwcclassidentification2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassidentification2dc.xsl",
+  'dwcclassgeologicalcontext2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassgeologicalcontext2dc.xsl",
+  'dwcclassmaterialsample2dc_redbiodiversidad.xsl' => "$module_path/xsl/dwcclassmaterialsample2dc.xsl",
+  'eml2dc.xsl' => "$module_path/xsl/invalid_eml211toDublinCore.xsl",
+  
   );
 }
 /** Implements hook_xml_form_builder_get_self_transforms().
@@ -560,7 +560,7 @@ function islandora_red_biodiversidad_xml_form_builder_get_self_transforms() {
  * Implements hook_islandora_content_model_forms_form_associations().
  *Diego Pino Navarro, Febrero 2014
  *Este hook implementa la asociación de Formas HTML con el modelo de datos
- */								
+ */                
 function islandora_red_biodiversidad_islandora_content_model_forms_form_associations() {
   return array(
     'islandora_red_biodiversidad_dwc_form' => array(
@@ -611,7 +611,7 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'transform' => 'dctermsclasslocation2dc_redbiodiversidad.xsl',
       'template' => FALSE,
     ),
-	/*
+  /*
     'islandora_red_biodiversidad_dwcclassmaterialsample_form' => array(
       'content_model' => 'biodiversity:MaterialSampleCModel',
       'form_name' => 'Darwin Core form Class: MaterialSample',
@@ -628,13 +628,13 @@ function islandora_red_biodiversidad_islandora_content_model_forms_form_associat
       'transform' => 'dctermsclassgeologicalcontext2dc_redbiodiversidad.xsl',
       'template' => FALSE,
     ),*/
-	'islandora_red_biodiversidad_dwcaeml_form' => array(
+  'islandora_red_biodiversidad_dwcaeml_form' => array(
       'content_model' => 'biodiversity:DWCACModel',
       'form_name' => 'Darwin Core Archive EML form',
       'dsid' => 'EML',
       'title_field' => array('dataset','title'),
       'transform' => 'eml2dc.xsl',
-	  'self_transform' => 'emlself.xsl',
+    'self_transform' => 'emlself.xsl',
       'template' => FALSE,
     ),
   );
@@ -704,210 +704,210 @@ function islandora_red_biodiversidad_biodiversity_DWCACModel_islandora_ingest_st
 */
 
 function islandora_red_biodiversidad_form_alter(&$form, &$form_state, $form_id) {
-	
-	if (isset($form['form_step_id']['#value']))
-		{
-		if (($form_id == 'islandora_ingest_form') && ($form['form_step_id']['#value']=='xml_form_builder_metadata_step')) //We are dealing with the form asocciated as default for this content model
-			{
-			switch($form_state['islandora']['shared_storage']['models'][0])
-				{
-				case 'biodiversity:OccurrenceCModel':
-				case 'biodiversity:simpledwcCModel':
-				if (isset($form['Occurrence']['record_level_terms']['institutionCode']))//First check if it´s still there!
-					{
-					$institutioncode = variable_get('islandora_red_biodiversidad_setting_institution_code', 'CBUCN');
-					$form['Occurrence']['record_level_terms']['institutionCode']['#default_value']=$institutioncode;
-					$form['Occurrence']['record_level_terms']['institutionID']['#default_value']=$institutioncode;
-					 //@TODO we will get this and other values from a global configuration value	
-					}
-				if (isset($form['Occurrence']['dwc_fields_occurrence']['occurrenceID']))//First check if it´s still there!	
-					{
-					module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
-					$lastid=islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr('biodiversity:OccurrenceCModel');
-					if (sizeof($lastid)>0)
-						{
-						$form['Occurrence']['dwc_fields_occurrence']['occurrenceID']['#default_value']=++$lastid[1];	
-						}
-					}
-				break;
-				case 'biodiversity:DWCACModel':
-				//Enable only when debugging!
-				//dpm($form_state['islandora']['step_storage']);
-				//dpm($form_state['islandora']['shared_storage']);
-				//dpm($form['additionalMetadata']['metadata']['gbif']);
-				if (isset($form['additionalMetadata']['metadata']['gbif']['collectionIdentifier']))
-					{
-					 $form['additionalMetadata']['metadata']['gbif']['collectionIdentifier']['#value']=$form_state['islandora']['shared_storage']['source_collection'];		
-					}
-				
-				
-				if (isset($form['eml_packageid']))//First check if it´s still there!
-					{
-					$form['eml_packageid']['#value']='system'; //@TODO we will get this and other values from a global configuration value	
-					}
-				}
-			}
-		}
-	
-	
-	}
-	
+  
+  if (isset($form['form_step_id']['#value']))
+    {
+    if (($form_id == 'islandora_ingest_form') && ($form['form_step_id']['#value']=='xml_form_builder_metadata_step')) //We are dealing with the form asocciated as default for this content model
+      {
+      switch($form_state['islandora']['shared_storage']['models'][0])
+        {
+        case 'biodiversity:OccurrenceCModel':
+        case 'biodiversity:simpledwcCModel':
+        if (isset($form['Occurrence']['record_level_terms']['institutionCode']))//First check if it´s still there!
+          {
+          $institutioncode = variable_get('islandora_red_biodiversidad_setting_institution_code', 'CBUCN');
+          $form['Occurrence']['record_level_terms']['institutionCode']['#default_value']=$institutioncode;
+          $form['Occurrence']['record_level_terms']['institutionID']['#default_value']=$institutioncode;
+           //@TODO we will get this and other values from a global configuration value  
+          }
+        if (isset($form['Occurrence']['dwc_fields_occurrence']['occurrenceID']))//First check if it´s still there!  
+          {
+          module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+          $lastid=islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr('biodiversity:OccurrenceCModel');
+          if (sizeof($lastid)>0)
+            {
+            $form['Occurrence']['dwc_fields_occurrence']['occurrenceID']['#default_value']=++$lastid[1];  
+            }
+          }
+        break;
+        case 'biodiversity:DWCACModel':
+        //Enable only when debugging!
+        //dpm($form_state['islandora']['step_storage']);
+        //dpm($form_state['islandora']['shared_storage']);
+        //dpm($form['additionalMetadata']['metadata']['gbif']);
+        if (isset($form['additionalMetadata']['metadata']['gbif']['collectionIdentifier']))
+          {
+           $form['additionalMetadata']['metadata']['gbif']['collectionIdentifier']['#value']=$form_state['islandora']['shared_storage']['source_collection'];    
+          }
+        
+        
+        if (isset($form['eml_packageid']))//First check if it´s still there!
+          {
+          $form['eml_packageid']['#value']='system'; //@TODO we will get this and other values from a global configuration value  
+          }
+        }
+      }
+    }
+  
+  
+  }
+  
 /* 
  * This are Validation Functions used in our Ingest Forms
 */
-	function islandora_red_biodiversidad_lat_validate(&$element, &$form_state)
-		{
-			if (!preg_match('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', $element['#value']))
-			{
-			form_error($element, t('You must enter a valid Decimal Latitud'));	
-			}
-		
-		}
-	function islandora_red_biodiversidad_long_validate(&$element, &$form_state)
-		{
-		if (!preg_match('/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', $element['#value']))
-		{
-		form_error($element, t('You must enter a valid Decimal Longitud'));	
-		}
-		}
+  function islandora_red_biodiversidad_lat_validate(&$element, &$form_state)
+    {
+      if (!preg_match('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', $element['#value']))
+      {
+      form_error($element, t('You must enter a valid Decimal Latitud'));  
+      }
+    
+    }
+  function islandora_red_biodiversidad_long_validate(&$element, &$form_state)
+    {
+    if (!preg_match('/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', $element['#value']))
+    {
+    form_error($element, t('You must enter a valid Decimal Longitud'));  
+    }
+    }
 
 
 function islandora_red_biodiversidad_islandora_ontologies_vlot_info() {
-		
-		return array('islandora_red_biodiversidad'=>array(
-			 'biodiversity:TaxonCModel'=>array(		
-	         	'cmodel_label' => 'Taxon',
-	         	'color' => 'rgb(130,172,144)',
-				),
-			'biodiversity:OccurrenceCModel'=>array(		
-			    'cmodel_label' => 'Occurrence',
-			    'color' => 'rgb(249,160,27)',
-				),	
-			'biodiversity:EventCModel'=>array(		
-				'cmodel_label' => 'Event',
-				'color' => 'rgb(239,117,32)',
-			 	),
-			'biodiversity:LocationCModel'=>array(		
-				'cmodel_label' => 'Location',
-				'color' => 'rgb(48,52,53)',
-				 ),
-	 		'biodiversity:IdentificationCModel'=>array(		
-	 			'cmodel_label' => 'Identification',
-	 			'color' => 'rgb(142,163,174)',
-	 			 ),
-	 	 	'biodiversity:MaterialSampleCModel'=>array(		
-	 	 		'cmodel_label' => 'MaterialSample',
-	 	 		'color' => 'rgb(199,217,227)',
-	 	 		 ),
-	 	 	 'biodiversity:GeologicalContextCModel'=>array(		
-	 	 	 	'cmodel_label' => 'GeologicalContext',
-	 	 	 	'color' => 'rgb(194,157,138)',
-	 	 	 	),
-   	 	 	 'biodiversity:SimpledwcCModel'=>array(		
-   	 	 	 	'cmodel_label' => 'Simple Darwin Core',
-   	 	 	 	'color' => 'rgb(219,216,198)',
-   	 	 	 	),
-      	 'default'=>array(		
-      	 	 	'cmodel_label' => 'Object',
-      	 	 	'color' => 'rgb(126,135,129)',
-      	 	 ),
-			 )
-		);
-		
-		
-	}	
-	
+    
+    return array('islandora_red_biodiversidad'=>array(
+       'biodiversity:TaxonCModel'=>array(    
+             'cmodel_label' => 'Taxon',
+             'color' => 'rgb(130,172,144)',
+        ),
+      'biodiversity:OccurrenceCModel'=>array(    
+          'cmodel_label' => 'Occurrence',
+          'color' => 'rgb(249,160,27)',
+        ),  
+      'biodiversity:EventCModel'=>array(    
+        'cmodel_label' => 'Event',
+        'color' => 'rgb(239,117,32)',
+         ),
+      'biodiversity:LocationCModel'=>array(    
+        'cmodel_label' => 'Location',
+        'color' => 'rgb(48,52,53)',
+         ),
+       'biodiversity:IdentificationCModel'=>array(    
+         'cmodel_label' => 'Identification',
+         'color' => 'rgb(142,163,174)',
+          ),
+        'biodiversity:MaterialSampleCModel'=>array(    
+          'cmodel_label' => 'MaterialSample',
+          'color' => 'rgb(199,217,227)',
+           ),
+         'biodiversity:GeologicalContextCModel'=>array(    
+           'cmodel_label' => 'GeologicalContext',
+           'color' => 'rgb(194,157,138)',
+           ),
+            'biodiversity:SimpledwcCModel'=>array(    
+              'cmodel_label' => 'Simple Darwin Core',
+              'color' => 'rgb(219,216,198)',
+              ),
+         'default'=>array(    
+              'cmodel_label' => 'Object',
+              'color' => 'rgb(126,135,129)',
+            ),
+       )
+    );
+    
+    
+  }  
+  
 
 
-		/**
-		*Leaflet Map styles
-		*/
+    /**
+    *Leaflet Map styles
+    */
 function islandora_red_biodiversidad_leaflet_map_info() {
-		  return array(
-		    'islandora_red_biodiversidad' => array(
-		      'label' => 'islandoraredbiodiversidad',
-		      'description' => t('Leaflet Map for islandora red biodiversidad module'),
-		      'settings' => array(
-		        'zoom' => 4,
-		        'minZoom' => 1,
-		        'maxZoom' => 18,
-		        'dragging' => TRUE,
-		        'touchZoom' => TRUE,
-		        'scrollWheelZoom' => TRUE,
-		        'doubleClickZoom' => TRUE,
-		        'zoomControl' => TRUE,
-		        'attributionControl' => TRUE,
-		        'trackResize' => TRUE,
-		        'fadeAnimation' => TRUE,
-		        'zoomAnimation' => TRUE,
-		        'closePopupOnClick' => TRUE,
-				'singleMarkerMode'=> TRUE,
-				'zoomToBoundsOnClick' => TRUE,
-				'showCoverageOnHover' => TRUE,
-				'spiderfyOnMaxZoom' => TRUE,
-				'disableClusteringAtZoom' => FALSE,
-			    'maxClusterRadius' => 80,
-			    'addRegionToolTips' => TRUE,
-				'layerControl' => TRUE,
-				'zoomControl' =>TRUE,
-		      ),
-		      'attribution' => array(
-		        'prefix' => '',
-		      ),
-		      'layers' => array(
-		        'Open Street Map' => array( 
-				  'type' => 'xyz',
-		          'urlTemplate' => 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-		          'options' => array(
-		            'attribution' => '© OpenStreetMap contributors',
-		          ),
-		        ),
-		        'Hight Contrast' => array(
-				'type' => 'xyz',		          
-		          'urlTemplate' => 'http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png',
-		          'options' => array(
-		          'attribution' => '© stamen.com',
-		          ),
-		        ),
-		        'ESRI Ocean' => array(
-				'type' => 'xyz',		          
-		          'urlTemplate' => 'http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}',
-		          'options' => array(
-		          'attribution' => 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
-				  'maxZoom:'=>13,
-		          ),
-		        ),
-		        'ESRI DeLorme' => array(
-				'type' => 'xyz',		          
-		          'urlTemplate' => 'http://server.arcgisonline.com/ArcGIS/rest/services/Specialty/DeLorme_World_Base_Map/MapServer/tile/{z}/{y}/{x}',
-		          'options' => array(
-		          'attribution' => 'Tiles &copy; Esri &mdash; Copyright: &copy;2012 DeLorme',
-				  'maxZoom:'=>11,
-		          ),
-		        ),			
-		      ),
-		    ),
-		  );
-		}		
-		/**
-		 * Implements hook_library().
-		 */
+      return array(
+        'islandora_red_biodiversidad' => array(
+          'label' => 'islandoraredbiodiversidad',
+          'description' => t('Leaflet Map for islandora red biodiversidad module'),
+          'settings' => array(
+            'zoom' => 4,
+            'minZoom' => 1,
+            'maxZoom' => 18,
+            'dragging' => TRUE,
+            'touchZoom' => TRUE,
+            'scrollWheelZoom' => TRUE,
+            'doubleClickZoom' => TRUE,
+            'zoomControl' => TRUE,
+            'attributionControl' => TRUE,
+            'trackResize' => TRUE,
+            'fadeAnimation' => TRUE,
+            'zoomAnimation' => TRUE,
+            'closePopupOnClick' => TRUE,
+        'singleMarkerMode'=> TRUE,
+        'zoomToBoundsOnClick' => TRUE,
+        'showCoverageOnHover' => TRUE,
+        'spiderfyOnMaxZoom' => TRUE,
+        'disableClusteringAtZoom' => FALSE,
+          'maxClusterRadius' => 80,
+          'addRegionToolTips' => TRUE,
+        'layerControl' => TRUE,
+        'zoomControl' =>TRUE,
+          ),
+          'attribution' => array(
+            'prefix' => '',
+          ),
+          'layers' => array(
+            'Open Street Map' => array( 
+          'type' => 'xyz',
+              'urlTemplate' => 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              'options' => array(
+                'attribution' => '© OpenStreetMap contributors',
+              ),
+            ),
+            'Hight Contrast' => array(
+        'type' => 'xyz',              
+              'urlTemplate' => 'http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png',
+              'options' => array(
+              'attribution' => '© stamen.com',
+              ),
+            ),
+            'ESRI Ocean' => array(
+        'type' => 'xyz',              
+              'urlTemplate' => 'http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}',
+              'options' => array(
+              'attribution' => 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+          'maxZoom:'=>13,
+              ),
+            ),
+            'ESRI DeLorme' => array(
+        'type' => 'xyz',              
+              'urlTemplate' => 'http://server.arcgisonline.com/ArcGIS/rest/services/Specialty/DeLorme_World_Base_Map/MapServer/tile/{z}/{y}/{x}',
+              'options' => array(
+              'attribution' => 'Tiles &copy; Esri &mdash; Copyright: &copy;2012 DeLorme',
+          'maxZoom:'=>11,
+              ),
+            ),      
+          ),
+        ),
+      );
+    }    
+    /**
+     * Implements hook_library().
+     */
 function  islandora_red_biodiversidad_library() {
 
-		  $path=drupal_get_path('module', 'islandora_red_biodiversidad');
-		  $libraries['leaflet_markercluster_layercontrol'] = array(
-		    'title' => 'Leaflet Markercluster Layer Control',
-		    'version' => 0.1,
-		    'js' => array(
-		      array(
-		        'type' => 'file',
-		        'data' => "$path/js/leaflet.markercluster.layercontrol.js",
-		        'group' => JS_LIBRARY,
-		        'preprocess' => FALSE,
-		        'weight' => 2,
-		      ),
-		    ), 
-		  );
+      $path=drupal_get_path('module', 'islandora_red_biodiversidad');
+      $libraries['leaflet_markercluster_layercontrol'] = array(
+        'title' => 'Leaflet Markercluster Layer Control',
+        'version' => 0.1,
+        'js' => array(
+          array(
+            'type' => 'file',
+            'data' => "$path/js/leaflet.markercluster.layercontrol.js",
+            'group' => JS_LIBRARY,
+            'preprocess' => FALSE,
+            'weight' => 2,
+          ),
+        ), 
+      );
       $libraries['leaflet_sidebar'] = array(
         'title' => 'Leaflet Sidebar',
         'version' => 1.1,
@@ -941,178 +941,198 @@ function  islandora_red_biodiversidad_library() {
         ), 
       ); 
 
-		  return $libraries;
-		}
+      return $libraries;
+    }
 function islandora_red_biodiversidad_leaflet_map_prebuild_alter(&$vars = NULL) {
-		  if (!isset($vars['map']['settings']['maxClusterRadius']) || $vars['map']['settings']['maxClusterRadius'] > 0) {
+      if (!isset($vars['map']['settings']['maxClusterRadius']) || $vars['map']['settings']['maxClusterRadius'] > 0) {
         drupal_add_library('islandora_red_biodiversidad', 'leaflet_sidebar');
         drupal_add_library('islandora_red_biodiversidad', 'leaflet_fullscreen');
-		    drupal_add_library('islandora_red_biodiversidad', 'leaflet_markercluster_layercontrol');
-		    $options = array('type' => 'file', 'weight' => 2);
-		    drupal_add_js(drupal_get_path('module', 'islandora_red_biodiversidad') . '/js/leaflet.markercluster.layercontrol.js', $options);
-		    // Increase weight so we're included after 'leaflet_markercluster_drupal.js'
-		   
-		  }
-		}
-	
+        drupal_add_library('islandora_red_biodiversidad', 'leaflet_markercluster_layercontrol');
+        $options = array('type' => 'file', 'weight' => 2);
+        drupal_add_js(drupal_get_path('module', 'islandora_red_biodiversidad') . '/js/leaflet.markercluster.layercontrol.js', $options);
+        // Increase weight so we're included after 'leaflet_markercluster_drupal.js'
+       
+      }
+    }
+  
 function islandora_red_biodiversidad_validateandpopulateTaxon(&$form, &$form_state)
-	{        
-	
-		 //drupal_set_message(t('You just performed an ajax reload.'));
-		 // $text = $form_state['values']['html_command_example'];
-		  $selector ='#edit-dwc-fields-taxon-scientificname';
-		  $commands = array();
-	 
-	 
-		  $parametro=urlencode(trim($form['Taxon']['dwc_fields_taxon']['scientificName']['#value']));
-	 
-		  $url ="http://api.gbif.org/v0.9/species/match?strict=true&verbose=true&name=".$parametro;
-		  //drupal_set_message($url);
-		  $response = drupal_http_request($url);
-		    if (!empty($response->error)) {
-		      $msg_args = array(
-		        '%url' => $url,
-		        '@code' => $response->code,
-		        '%error' => $response->error,
-		      );
-		      drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
-		      return FALSE;
-		    }
-		    $data = drupal_json_decode($response->data);
-		
-			//Ya tengo la info, solo voy a sacar el match más cercano
-			if ($data['matchType']=="EXACT")//perfecto, ahora saco el resto de la info
-				{
-				if (array_key_exists('usageKey',$data))
-					{
-						if ($data['rank']=="SPECIES")
-							{
-							$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-scientificname','val',array($data['scientificName']));
-							$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-taxonid','val',array($data['usageKey']));
-							$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-source','val',array("http://www.gbif.org/species/".$data['usageKey']));
-							}
-						$url2 ="http://api.gbif.org/v0.9/species/".$data['usageKey'];
-				  	    $response2 = drupal_http_request($url2);
-				  	    if (!empty($response2->error)) {
-				  	      $msg_args = array(
-				  	        '%url' => $url2,
-				  	        '@code' => $response2->code,
-				  	        '%error' => $response2->error,
-				  	      );
-				  	      drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
-				  	      return FALSE;
-				  	    }
-						 $data2 = drupal_json_decode($response2->data);
-						 if (array_key_exists('phylum',$data2))
-						 	{
-						 	$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-phylum','val',array($data2['phylum']));	
-						 	}
-						 if (array_key_exists('clazz',$data2))
-						 	{
-						 	$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-class','val',array($data2['clazz']));	
-						 	}
-						 if (array_key_exists('order',$data2))
-						 	{
-						 	$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-order','val',array($data2['order']));		
-						 	}
-						 if (array_key_exists('family',$data2))
-						 	{
-						 	$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-family','val',array($data2['family']));		
-						 	}
-						 if (array_key_exists('genus',$data2))
-						 	{
-						 	$commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-genus','val',array($data2['genus']));		
-						 	}
-					 
-					 
-					 
-					 
-					}
-				
-				}
-				return array('#type' => 'ajax', '#commands' => $commands);
-		
-	}	
-	
-	
+  {        
+  
+     //drupal_set_message(t('You just performed an ajax reload.'));
+     // $text = $form_state['values']['html_command_example'];
+      $selector ='#edit-dwc-fields-taxon-scientificname';
+      $commands = array();
+   
+   
+      $parametro=urlencode(trim($form['Taxon']['dwc_fields_taxon']['scientificName']['#value']));
+      //Updated to GBIF api 1.0  
+      $url ="http://api.gbif.org/v1/species/match?strict=true&verbose=true&name=".$parametro;
+      //drupal_set_message($url);
+      $response = drupal_http_request($url);
+        if (!empty($response->error)) {
+          $msg_args = array(
+            '%url' => $url,
+            '@code' => $response->code,
+            '%error' => $response->error,
+          );
+          drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+          return FALSE;
+        }
+        $data = drupal_json_decode($response->data);
+    
+      //Ya tengo la info, solo voy a sacar el match más cercano
+      if ($data['matchType']=="EXACT")//perfecto, ahora saco el resto de la info
+        {
+        if (array_key_exists('usageKey',$data))
+          {
+            if ($data['rank']=="SPECIES")
+              {
+              $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-scientificname','val',array($data['scientificName']));
+              $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-taxonid','val',array($data['usageKey']));
+              $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-source','val',array("http://www.gbif.org/species/".$data['usageKey']));
+              }
+            //Updated to GBIF api 1.0  
+            $url2 ="http://api.gbif.org/v1/species/".$data['usageKey'];
+                $response2 = drupal_http_request($url2);
+                if (!empty($response2->error)) {
+                  $msg_args = array(
+                    '%url' => $url2,
+                    '@code' => $response2->code,
+                    '%error' => $response2->error,
+                  );
+                  drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+                  return FALSE;
+                }
+             $data2 = drupal_json_decode($response2->data);
+             if (array_key_exists('kingdom',$data2))
+               {
+               $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-kingdom','val',array($data2['kingdom']));  
+               }
+             if (array_key_exists('phylum',$data2))
+               {
+               $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-phylum','val',array($data2['phylum']));  
+               }
+             if (array_key_exists('clazz',$data2))
+               {
+               $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-class','val',array($data2['clazz']));  
+               }
+            elseif (array_key_exists('class',$data2)) //API 1.0 does not give clazz back anymore
+                {
+                $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-class','val',array($data2['class']));  
+                }
+             if (array_key_exists('order',$data2))
+               {
+               $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-order','val',array($data2['order']));    
+               }
+             if (array_key_exists('family',$data2))
+               {
+               $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-family','val',array($data2['family']));    
+               }
+             if (array_key_exists('genus',$data2))
+               {
+               $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-genus','val',array($data2['genus']));    
+               }
+             if (array_key_exists('authorship',$data2))
+               {
+               $commands[] = ajax_command_invoke('#edit-taxon-dwc-fields-taxon-scientificNameAuthorship','val',array($data2['authorship']));    
+               }
+           
+           
+           
+           
+          }
+        
+        }
+        return array('#type' => 'ajax', '#commands' => $commands);
+    
+  }  
+  
+  
 function islandora_red_biodiversidad_validateandpopulate(&$form, &$form_state)
 {        
-	
-	//drupal_set_message(t('You just performed an ajax reload.'));
-	 // $text = $form_state['values']['html_command_example'];
-	  $selector ='#edit-simpledarwinrecord-dwc-fields-taxon-scientificname';
-	  $commands = array();
-	 
-	 
-	  $parametro=urlencode(trim($form['SimpleDarwinRecord']['dwc_fields_taxon']['scientificName']['#value']));
-	 
-	  $url ="http://api.gbif.org/v0.9/species/match?strict=true&verbose=true&name=".$parametro;
-	  drupal_set_message($url);
-	  $response = drupal_http_request($url);
-	    if (!empty($response->error)) {
-	      $msg_args = array(
-	        '%url' => $url,
-	        '@code' => $response->code,
-	        '%error' => $response->error,
-	      );
-	      drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
-	      return FALSE;
-	    }
-	    $data = drupal_json_decode($response->data);
-		
-		//Ya tengo la info, solo voy a sacar el match más cercano
-		if ($data['matchType']=="EXACT")//perfecto, ahora saco el resto de la info
-			{
-			if (array_key_exists('usageKey',$data))
-				{
-					if ($data['rank']=="SPECIES")
-						{
-						$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-scientificname','val',array($data['scientificName']));
-						$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-taxonid','val',array($data['usageKey']));
-						$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-source','val',array("http://www.gbif.org/species/".$data['usageKey']));
-						}
-					$url2 ="http://api.gbif.org/v0.9/species/".$data['usageKey'];
-			  	    $response2 = drupal_http_request($url2);
-			  	    if (!empty($response2->error)) {
-			  	      $msg_args = array(
-			  	        '%url' => $url2,
-			  	        '@code' => $response2->code,
-			  	        '%error' => $response2->error,
-			  	      );
-			  	      drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
-			  	      return FALSE;
-			  	    }
-					 $data2 = drupal_json_decode($response2->data);
-					
-					 if (array_key_exists('phylum',$data2))
-					 	{
-					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-phylum','val',array($data2['phylum']));	
-					 	}
-					 if (array_key_exists('clazz',$data2))
-					 	{
-					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-class','val',array($data2['clazz']));	
-					 	}
-					 if (array_key_exists('order',$data2))
-					 	{
-					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-order','val',array($data2['order']));		
-					 	}
-					 if (array_key_exists('family',$data2))
-					 	{
-					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-family','val',array($data2['family']));		
-					 	}
-					 if (array_key_exists('genus',$data2))
-					 	{
-					 	$commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-genus','val',array($data2['genus']));		
-					 	}
-					 
-					 
-					 
-					 
-				}
-				
-			}
-			return array('#type' => 'ajax', '#commands' => $commands);
-		
+  
+  //drupal_set_message(t('You just performed an ajax reload.'));
+   // $text = $form_state['values']['html_command_example'];
+    $selector ='#edit-simpledarwinrecord-dwc-fields-taxon-scientificname';
+    $commands = array();
+   
+   
+    $parametro=urlencode(trim($form['SimpleDarwinRecord']['dwc_fields_taxon']['scientificName']['#value']));
+    //Updated to GBIF api 1.0  
+    $url ="http://api.gbif.org/v1/species/match?strict=true&verbose=true&name=".$parametro;
+    drupal_set_message($url);
+    $response = drupal_http_request($url);
+      if (!empty($response->error)) {
+        $msg_args = array(
+          '%url' => $url,
+          '@code' => $response->code,
+          '%error' => $response->error,
+        );
+        drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+        return FALSE;
+      }
+      $data = drupal_json_decode($response->data);
+    
+    //Ya tengo la info, solo voy a sacar el match más cercano
+    if ($data['matchType']=="EXACT")//perfecto, ahora saco el resto de la info
+      {
+      if (array_key_exists('usageKey',$data))
+        {
+          if ($data['rank']=="SPECIES")
+            {
+            $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-scientificname','val',array($data['scientificName']));
+            $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-taxonid','val',array($data['usageKey']));
+            $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-source','val',array("http://www.gbif.org/species/".$data['usageKey']));
+            }
+          $url2 ="http://api.gbif.org/v1/species/".$data['usageKey'];
+              $response2 = drupal_http_request($url2);
+              if (!empty($response2->error)) {
+                $msg_args = array(
+                  '%url' => $url2,
+                  '@code' => $response2->code,
+                  '%error' => $response2->error,
+                );
+                drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+                return FALSE;
+              }
+           $data2 = drupal_json_decode($response2->data);
+            if (array_key_exists('kingdom',$data2))
+             {
+             $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-kingdom','val',array($data2['kingdom']));  
+             }
+           if (array_key_exists('phylum',$data2))
+             {
+             $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-phylum','val',array($data2['phylum']));  
+             }
+           if (array_key_exists('clazz',$data2))
+             {
+             $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-class','val',array($data2['clazz']));  
+             }
+            elseif (array_key_exists('class',$data2))
+              {
+              $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-class','val',array($data2['class']));  
+              }  
+           if (array_key_exists('order',$data2))
+             {
+             $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-order','val',array($data2['order']));    
+             }
+           if (array_key_exists('family',$data2))
+             {
+             $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-family','val',array($data2['family']));    
+             }
+           if (array_key_exists('genus',$data2))
+             {
+             $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-genus','val',array($data2['genus']));    
+             }
+            if (array_key_exists('authorship',$data2))
+              {
+              $commands[] = ajax_command_invoke('#edit-simpledarwinrecord-dwc-fields-taxon-scientificNameAuthorship','val',array($data2['authorship']));    
+              }
+        }
+        
+      }
+      return array('#type' => 'ajax', '#commands' => $commands);
+    
 }
 
 
@@ -1123,20 +1143,20 @@ function islandora_red_biodiversidad_validateandpopulate(&$form, &$form_state)
 *@return a svg representation of the object's absolut URL+ PID
 */
 function islandora_red_biodiversidad_pidtoQR($pid)
-	{ 
-	include('phpqrcode/qrlib.php'); 
-	$dataText=url(NULL, array('absolute' => TRUE))."/islandora/object/".urlencode($pid);
-	
-	$svgTagId   = 'qr'+$pid; 
-	$saveToFile = false; 
-	$imageWidth = 250; // px 
+  { 
+  include('phpqrcode/qrlib.php'); 
+  $dataText=url(NULL, array('absolute' => TRUE))."/islandora/object/".urlencode($pid);
+  
+  $svgTagId   = 'qr'+$pid; 
+  $saveToFile = false; 
+  $imageWidth = 250; // px 
      
-	    // SVG file format support 
-	    $svgCode = QRcode::svg($dataText,$saveToFile, QR_ECLEVEL_L, 4); 
-	  
-	    return $svgCode; 
-		
-	}	
+      // SVG file format support 
+      $svgCode = QRcode::svg($dataText,$saveToFile, QR_ECLEVEL_L, 4); 
+    
+      return $svgCode; 
+    
+  }  
 
 
 /**
@@ -1146,180 +1166,180 @@ function islandora_red_biodiversidad_pidtoQR($pid)
 *@return a full array with info to be displayed or consumed by other functions
 */
 function islandora_red_biodiversidad_eol_getdata($query)
-	{  
-		//We should/are caching this response....
-		//so EOL can rest a bit
-	
+  {  
+    //We should/are caching this response....
+    //so EOL can rest a bit
+  
    
-	$data2=array();
-	  
-	  $query=urlencode(trim($query));
-	  if (!empty($query))
-	  	{
-		if ($cache = cache_get('islandora_red_biodiversidad_'.$query))
-			{	
-				//dpm('cache hit');
-			$data2=$cache->data;		
-			}	
-		else
-			{	
-			
-  	  $url ='http://eol.org/api/search/1.0.json?q='.$query.'&page=1&exact=false&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=';
+  $data2=array();
+    
+    $query=urlencode(trim($query));
+    if (!empty($query))
+      {
+    if ($cache = cache_get('islandora_red_biodiversidad_'.$query))
+      {  
+        //dpm('cache hit');
+      $data2=$cache->data;    
+      }  
+    else
+      {  
+      
+      $url ='http://eol.org/api/search/1.0.json?q='.$query.'&page=1&exact=false&filter_by_taxon_concept_id=&filter_by_hierarchy_entry_id=&filter_by_string=&cache_ttl=';
 
-  	  //drupal_set_message($url);
-  	  $response = drupal_http_request($url);
-  	    if (!empty($response->error)) {
-  	      $msg_args = array(
-  	        '%url' => $url,
-  	        '@code' => $response->code,
-  	        '%error' => $response->error,
-  	      );
-  	      drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
-  	      return FALSE;
-  	    }
-  	    $data = drupal_json_decode($response->data);
-	
-		if ($data['totalResults']>=1)//we got something
-			{
-			//we want the first one, we are searching for exact results only	
-			$eol_data=array_shift($data['results']);		
-			if (isset($eol_data['id'])) 
-				{
-					
-					
-				 $url2 ='http://eol.org/api/pages/1.0/'.$eol_data['id'].'.json?images=1&videos=0&sounds=0&maps=0&text=2&iucn=true&subjects=overview&licenses=cc-&details=true&common_names=true&synonyms=true&references=true&vetted=1&cache_ttl=';	
-		     	 // drupal_set_message($url2);
-		     	  $response2 = drupal_http_request($url2);
-		     	    if (!empty($response->error)) {
-		     	      $msg_args = array(
-		     	        '%url' => $url2,
-		     	        '@code' => $response->code,
-		     	        '%error' => $response->error,
-		     	      );
-		     	      drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
-		     	      return FALSE;
-		     	    }
-		     	    $data2 = drupal_json_decode($response2->data);	//Now we got the whole data
-					//This data is huge!
-					if (!empty($data2['identifier']))//Should be present and equal to $eol_data['id']
-						{
-						//get synonyms and get rid off duplicates.
-						$data2['synonyms']=array_map("unserialize", array_unique(array_map("serialize", $data2['synonyms'])));
-						$data2['vernacularNames'];
-						$data2['references'];
-						$data2['taxonConcepts'];//Links to external sources and their identifiers
-						$data2['dataObjects']; //all the other info
-						
-						cache_set('islandora_red_biodiversidad_'.$query, $data2, 'cache', time() + 86400);	
-						}
-						
-				}
-				
-			}	
-				
-		
-	}
+      //drupal_set_message($url);
+      $response = drupal_http_request($url);
+        if (!empty($response->error)) {
+          $msg_args = array(
+            '%url' => $url,
+            '@code' => $response->code,
+            '%error' => $response->error,
+          );
+          drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+          return FALSE;
+        }
+        $data = drupal_json_decode($response->data);
+  
+    if ($data['totalResults']>=1)//we got something
+      {
+      //we want the first one, we are searching for exact results only  
+      $eol_data=array_shift($data['results']);    
+      if (isset($eol_data['id'])) 
+        {
+          
+          
+         $url2 ='http://eol.org/api/pages/1.0/'.$eol_data['id'].'.json?images=1&videos=0&sounds=0&maps=0&text=2&iucn=true&subjects=overview&licenses=cc-&details=true&common_names=true&synonyms=true&references=true&vetted=1&cache_ttl=';  
+            // drupal_set_message($url2);
+             $response2 = drupal_http_request($url2);
+               if (!empty($response->error)) {
+                 $msg_args = array(
+                   '%url' => $url2,
+                   '@code' => $response->code,
+                   '%error' => $response->error,
+                 );
+                 drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+                 return FALSE;
+               }
+               $data2 = drupal_json_decode($response2->data);  //Now we got the whole data
+          //This data is huge!
+          if (!empty($data2['identifier']))//Should be present and equal to $eol_data['id']
+            {
+            //get synonyms and get rid off duplicates.
+            $data2['synonyms']=array_map("unserialize", array_unique(array_map("serialize", $data2['synonyms'])));
+            $data2['vernacularNames'];
+            $data2['references'];
+            $data2['taxonConcepts'];//Links to external sources and their identifiers
+            $data2['dataObjects']; //all the other info
+            
+            cache_set('islandora_red_biodiversidad_'.$query, $data2, 'cache', time() + 86400);  
+            }
+            
+        }
+        
+      }  
+        
+    
+  }
 }
 
-		return $data2;
-	}
+    return $data2;
+  }
 /**
  * Implements hook_islandora_datastream_alter().
  * We need to alter the  data for the  biodiversity:DWCACModel from the ingested EML stream. We don´t have the Object ID prior to ingesting and we need this value in the EML!
  * We also add dateStamp inside EML 
  */
 function islandora_red_biodiversidad_biodiversity_DWCACModel_EML_islandora_datastream_alter(AbstractObject $object, AbstractDatastream $datastream, array &$context) {
-	
+  
   $modified=false;
   switch ($context['action']) {
     case 'ingest':
-	$dom= new DOMDocument;
-	$dom->loadXML($datastream->content);
-	$dom->preserveWhiteSpace = false;
-	$emlnode=$dom->getElementsByTagName('eml');
-	foreach ($emlnode as $item) {
-		if ($item->getAttribute('packageId')=='system')//system - Our super secret word for "just replace this value with the object's ID"
-			{
-			$link = url('islandora/object/'.$object->id, array('absolute' => TRUE));
-			$item->setAttribute('packageId', $object->id);
-			$alternateid=$dom->getElementsByTagName('alternateIdentifier');
-			foreach($alternateid as $item2)
-				{
-				$item2->nodeValue=$link;
-				}
-			
-			$modified=TRUE;
-			}
-	}
-	$datestamp=$dom->getElementsByTagName('dateStamp');
-  
-	foreach($datestamp as $item3)
-			{	
-			$item3->nodeValue=date("Y-m-d\TH:i:s\Z",time());	
-			$modified=TRUE;
-			}
-	if 	($modified)
-		{
-		$modifiedEML=$dom->saveXML();
-		$datastream->setContentFromString($modifiedEML);
-		
-		}
-	
-	
-	
-	break;
-	
-	case 'modify':
-	//EML		
-	if (sizeof($context['params']['dsString'])>0)
-		{
-		$dom= new DOMDocument;
-		$dom->loadXML($context['params']['dsString']);
-		$dom->preserveWhiteSpace = false;
-		$emlnode=$dom->getElementsByTagName('eml');
-		foreach ($emlnode as $item) {
-			if ($item->getAttribute('packageId')=='system')//system - Our super secret word for "just replace this value with the object's ID"
-				{
-				$link = url('islandora/object/'.$object->id, array('absolute' => TRUE));
-				$item->setAttribute('packageId', $object->id);
-				$alternateid=$dom->getElementsByTagName('alternateIdentifier');
-				
-				foreach($alternateid as $item2)
-					{
-					$item2->nodeValue=$link;
-					}
-				$modified=TRUE;
-				}
-		}
-		$datestamp=$dom->getElementsByTagName('dateStamp');
+  $dom= new DOMDocument;
+  $dom->loadXML($datastream->content);
+  $dom->preserveWhiteSpace = false;
+  $emlnode=$dom->getElementsByTagName('eml');
+  foreach ($emlnode as $item) {
+    if ($item->getAttribute('packageId')=='system')//system - Our super secret word for "just replace this value with the object's ID"
+      {
+      $link = url('islandora/object/'.$object->id, array('absolute' => TRUE));
+      $item->setAttribute('packageId', $object->id);
+      $alternateid=$dom->getElementsByTagName('alternateIdentifier');
+      foreach($alternateid as $item2)
+        {
+        $item2->nodeValue=$link;
+        }
       
-		foreach($datestamp as $item3)
-				{	
-				
-				$item3->nodeValue=date("Y-m-d\TH:i:s\Z",time());	
-			
-				$modified=TRUE;
-				}
-		
-		
-	if 	($modified)
-		{
-		$modifiedEML=$dom->saveXML();	
-		$context['params']['dsString']=$modifiedEML;
-		
-		}
-	}
+      $modified=TRUE;
+      }
+  }
+  $datestamp=$dom->getElementsByTagName('dateStamp');
+  
+  foreach($datestamp as $item3)
+      {  
+      $item3->nodeValue=date("Y-m-d\TH:i:s\Z",time());  
+      $modified=TRUE;
+      }
+  if   ($modified)
+    {
+    $modifiedEML=$dom->saveXML();
+    $datastream->setContentFromString($modifiedEML);
+    
+    }
+  
+  
+  
+  break;
+  
+  case 'modify':
+  //EML    
+  if (sizeof($context['params']['dsString'])>0)
+    {
+    $dom= new DOMDocument;
+    $dom->loadXML($context['params']['dsString']);
+    $dom->preserveWhiteSpace = false;
+    $emlnode=$dom->getElementsByTagName('eml');
+    foreach ($emlnode as $item) {
+      if ($item->getAttribute('packageId')=='system')//system - Our super secret word for "just replace this value with the object's ID"
+        {
+        $link = url('islandora/object/'.$object->id, array('absolute' => TRUE));
+        $item->setAttribute('packageId', $object->id);
+        $alternateid=$dom->getElementsByTagName('alternateIdentifier');
+        
+        foreach($alternateid as $item2)
+          {
+          $item2->nodeValue=$link;
+          }
+        $modified=TRUE;
+        }
+    }
+    $datestamp=$dom->getElementsByTagName('dateStamp');
+      
+    foreach($datestamp as $item3)
+        {  
+        
+        $item3->nodeValue=date("Y-m-d\TH:i:s\Z",time());  
+      
+        $modified=TRUE;
+        }
+    
+    
+  if   ($modified)
+    {
+    $modifiedEML=$dom->saveXML();  
+    $context['params']['dsString']=$modifiedEML;
+    
+    }
+  }
       break;
 
    
-  		}
+      }
 }
 function  islandora_red_biodiversidad_user_presave(&$edit, $account, $category) {
   //@TODO this function will create personall collections for researchers (like a Collections group template)
   /* dpm($edit);
-	dpm($account);
-	dpm($category);*/
-	if ($account->is_new) {
+  dpm($account);
+  dpm($category);*/
+  if ($account->is_new) {
        // $claim = $account->name.'/claims';
        // $edit['graph_claim'] = $claim;
     }
