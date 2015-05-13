@@ -424,7 +424,7 @@ function islandora_red_biodiversidad_getparents_via_solr($rels_ext_fields, $pid 
   }
   
   
-  $qp->solrLimit = 1000;
+  $qp->solrLimit = 10000;
   $qp->executeQuery(FALSE);
  
   $results=$qp->islandoraSolrResult;
