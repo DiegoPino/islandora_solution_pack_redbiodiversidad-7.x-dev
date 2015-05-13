@@ -24,6 +24,11 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
   
 	    
 	$islandora_object = $variables['islandora_object'];
+  $limit_to_cmodel=$variables['limit_to_cmodel']; //This allows us to exclude objects from map based on CMODEL. 
+  //By default it's empty so we plot every related object based on our ontology
+  
+  
+  
 	$pid = $islandora_object->id;
 	drupal_set_title($islandora_object->label);
 	$pathtopoints=array();
@@ -55,9 +60,9 @@ $query_processor->solrQuery = format_string(
 )
 );
 $query_processor->solrStart = 0;
-$query_processor->solrLimit = 10000;
+$query_processor->solrLimit = 30000;
 
-//limit to 10000 for now, leaflet can manage aprox 50.000 cluster points concurrent.
+//limit to 30000 for now, leaflet can manage aprox 50.000 cluster points concurrent.
 //Let's add some base restrictions to comply with Solr module permissiones
 		
 $xacml_restrictions=islandora_red_biodiversidad_getxacml_solrquery_restrictions();
@@ -164,10 +169,6 @@ if (!(array_intersect(array('biodiversity:LocationCModel'), $models)))  {
 	 
  }
 
-
-
-
-//dpm($result);
 $query="";
 $relationsandcmodels_sparqlmapping_hash=array();//This structure is a hash map between Sparql Variables and rels+cmodels form our paths so we don`t have to extract this info from Mulgara.
 $locationinpath=array();
@@ -269,7 +270,7 @@ foreach ($result as $ontologie=>$graphs)
   
 }
 $current_is_location=false;
-  //There is a speciall case: If the object we are currently vistiting is a location, then in our graph paths there will be no locationcmodel! (it´s our starting point). It´s obvios, but we must show in this case all the info.
+  //There is a speciall case: If the object we are currently vistiting is a location, then in our graph paths there will be no locationcmodel! (it´s our starting point). It´s obvious, but we must show in this case all the info.
 if (in_array('biodiversity:LocationCModel',$islandora_object->models))
 {
 $current_is_location=true;
@@ -334,100 +335,90 @@ EOQ;
 			//If the path has a location, then harvest all other objects and add it to the array key of this location. 
 			//If not assume direct relation to this object, means a path thats goes in another direction of our object is the center of a star =) nice deduction of myself!.
 			//This also means that if there are relations to a location starting from here then we must assume that all objects that go in any other direction are related to all found locations and not a particular one.
+      //2015 @TODO e should check/or not if the relations are well formed? 
 			if ($harvestthispath)
 			{
-				//dpm("entrando");
 				foreach($queryresult as $sparqlvar=>$hit)
-				{								
+				{
 					if (($hit['type']=='pid'))
 					{
-            $object_label="";
-            $object_link="";
-            $object_label=$queryresult[$sparqlvar.'_label']['value'];
-            $object_pid=$hit['value'];
-						$model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
-					  $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
-						$model_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $model_label, $m)? $m[2]: $model_label;
-						$model_label=str_replace('CModel','',$model_label)."s";
-						$pathtopoints[$pathoflocation_pid][]=array('type' => 'point','popup' => l($object_label, 'islandora/object/'.$object_pid),'clusterGroup'=> $model_label);
-						
-					  }
-				  }										
-						
-			  }					
-			$harvestthispath=false;
+            $current_cmodel=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
+            if ((in_array($current_cmodel, $limit_to_cmodel)) || empty($limit_to_cmodel)) {
+              $object_label="";
+              $object_link="";
+              $object_label=$queryresult[$sparqlvar.'_label']['value'];
+              $object_pid=$hit['value'];
+              $model_label=$current_cmodel;
+              //@TODO replace this pregmatch call to a static array...we are overforcing our poor php server
+              $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
+              $model_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $model_label, $m)? $m[2]: $model_label;
+              $model_label=str_replace('CModel','',$model_label)."s";
+              $pathtopoints[$pathoflocation_pid][]=array('type' => 'point','popup' => "<span>Object of type $model_label:</span><br>".l($object_label, 'islandora/object/'.$object_pid),'clusterGroup'=> $model_label);
+              }
+            }
+          }
+        }
+        $harvestthispath=false;
 			$pathoflocation_pid="";
 			}
-										
-										
-				
 		}
-		//dpm($results);
-        //dpm($relationsandcmodels_sparqlmapping_hash);
-
-
 	}
 
-	//dpm($pathtopoints);
 	$pathtopoints=array_map("unserialize", array_unique(array_map("serialize", $pathtopoints)));
 //End sparql
 
-}//end check for $results, if no ontology is given or no paths then we won´t get anything from up there. 
+  }//end check for $results, if no ontology is given or no paths then we won´t get anything from up there. 
 }
-$locations2=array();
-$locations3=array();
-		
+	
 		
 $j=0;
 $clustergroup='';
 foreach ($json['response']['docs'] as $key=>$choice) {
-$j++;
-//dpm($choice);
+  $j++;
 
-if ((isset($choice[$mappings['location']['latlong_lat']])) && (isset($choice[$mappings['location']['latlong_long']]))) {
-if ($choice['PID']==$pid)
-	{
-	$clustergroup='Current Object Location';	
-	}
-	else
-	{
-	$clustergroup='All locations in this Repository';	
-	}	
+  if ((isset($choice[$mappings['location']['latlong_lat']])) && (isset($choice[$mappings['location']['latlong_long']]))) {
+   
+    if (empty($limit_to_cmodel)) {
+    //Only add all locations if we don't have a cmodel filter set by theme
+    
+    if ($choice['PID']==$pid) {
+      $clustergroup='Current Object Location';	
+    }
+    else {
+      $clustergroup='All locations in this Repository';	
+    }	
+    
+    $point=array(
+      'type' => 'point',
+      'lat' => (float) $choice[$mappings['location']['latlong_lat']],
+      'lon' => (float) $choice[$mappings['location']['latlong_long']],
+      'leaflet_id' => 'point-'.$key,
+      // 'flags'=>0x01,
+      'popup' => "<span>Object of type $clustergroup:</span><br>".l($choice['fgs_label_mt'][0], $choice['PID_fullurl']).'<br>'.(float) $choice[$mappings['location']['latlong_lat']].",".(float) $choice[$mappings['location']['latlong_long']],
+      'clusterGroup'=>$clustergroup,
+    );
+    //adding points to settings by clustergroup as clustergroup, means all
+    array_push($locations, $point);	
+    }
+    if (array_key_exists($choice['PID'],$pathtopoints)) {
+      //remove duplicates before adding
+      $pathtopoints[$choice['PID']]=array_map("unserialize", array_unique(array_map("serialize", $pathtopoints[$choice['PID']])));
 
+      foreach ($pathtopoints[$choice['PID']] as $objectsinpoint)
+      {
+        $objectsinpoint['lat']=(float) $choice[$mappings['location']['latlong_lat']];
+        $objectsinpoint['lon']=(float) $choice[$mappings['location']['latlong_long']];
+        $objectsinpoint['popup']= $objectsinpoint['popup'].'<br>'.(float) $choice[$mappings['location']['latlong_lat']].",".(float) $choice[$mappings['location']['latlong_long']];
+        //adding points to settings by cmodel as clustergroup
+        array_push($locations, $objectsinpoint);	
+      }
 
-	
-$point=array(
-	'type' => 'point',
-	'lat' => (float) $choice[$mappings['location']['latlong_lat']],
-	'lon' => (float) $choice[$mappings['location']['latlong_long']],
-	'leaflet_id' => 'point-'.$key,
-	// 'flags'=>0x01,
-	'popup' => l($choice['fgs_label_mt'][0], $choice['PID_fullurl']),
-	'clusterGroup'=>$clustergroup,
-);
-if (array_key_exists($choice['PID'],$pathtopoints))
-	{
-		//remove duplicates before adding
-	$pathtopoints[$choice['PID']]=array_map("unserialize", array_unique(array_map("serialize", $pathtopoints[$choice['PID']])));
-	
-	foreach ($pathtopoints[$choice['PID']] as $objectsinpoint)	
-		{
-			$objectsinpoint['lat']=(float) $choice[$mappings['location']['latlong_lat']];
-			$objectsinpoint['lon']=(float) $choice[$mappings['location']['latlong_long']];
-      
-			array_push($locations, $objectsinpoint);	
-		}
-		
-		
-	}		  
-			  
-array_push($locations, $point);	
+    }  
+    
 
-			
+  }
 }
-}
-	
-		
+
 	
 if (!empty($locations)) {
 $styles = module_invoke_all('leaflet_map_info'); 
