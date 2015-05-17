@@ -203,7 +203,8 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/dpino/ontologies/2014/3/untitled-ontology-3#identifies"/>
-                <owl:allValuesFrom rdf:resource="info:fedora/biodiversity:OccurrenceCModel"/>
+                <owl:onClass rdf:resource="info:fedora/biodiversity:OccurrenceCModel"/>
+                <owl:qualifiedCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:qualifiedCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
