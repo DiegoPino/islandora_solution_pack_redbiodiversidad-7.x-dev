@@ -480,35 +480,34 @@ $xslt->importStyleSheet($xsl);
 $html = $xslt->transformToXML(simplexml_load_string($dwc));
 $variables['islandora_dwc_html'] = '<article><dl class="dl-horizontal">'.$html.'</dl></article>';
 $variables['related_info'] =array();
-if (array_intersect(array('biodiversity:TaxonCModel','biodiversity:SimpledwcCModel'),$islandora_object->models))
-{
-
-	
-	module_load_include('inc', 'islandora_solr_search', 'includes/utilities');
-	module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
-  //@TODO make this dynamic, same as our other semantic stuff
-  $related_ocurrences=islandora_red_biodiversidad_getparents_via_solr(array('RELS_EXT_taxonOfId_uri_ms','RELS_EXT_identifies_uri_ms'),$pid);
-  
-  $variables['related_info']['title'] = 'Occurrences for this taxon';
-  $variables['related_info']['numFound']=isset($related_ocurrences['numFound'])?$related_ocurrences['numFound']:0;
-  $variables['related_info']['objects']=isset($related_ocurrences['objects'])?$related_ocurrences['objects']:array();
-			
-if (empty($islandora_object->label) || ($islandora_object->label==$object_pid) || in_array('biodiversity:SimpledwcCModel',$islandora_object->models))//something is wrong with our xslt or this object was not originated from our FORM
-{
-	$domdwc= new DOMDocument;
-	$domdwc->loadXML($dwc);
-	$domdwc->preserveWhiteSpace = false;
-	$dwc_xpath = new DOMXPath($domdwc);
-	$dwc_xpath->registerNamespace('dwc', 'http://rs.tdwg.org/dwc/xsd/simpledarwincore/');
-	$result=$dwc_xpath->evaluate('//dwc:scientificName[text()]');
-	if ($result->length > 0){
-		$title=$result->item(0)->nodeValue;
-	}
-}
-else
-{
-	$title=$islandora_object->label;
-}	
+if (array_intersect(array('biodiversity:TaxonCModel','biodiversity:SimpledwcCModel'),$islandora_object->models)) {
+  if (in_array('biodiversity:SimpledwcCModel',$islandora_object->models))//something is wrong with our xslt or this object was not originated from our FORM
+  {
+  	$namespace='http://rs.tdwg.org/dwc/xsd/simpledarwincore/';
+  }
+  else {
+    module_load_include('inc', 'islandora_solr_search', 'includes/utilities');
+    module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+      //@TODO make this dynamic, same as our other semantic stuff
+    $related_ocurrences=islandora_red_biodiversidad_getparents_via_solr(array('RELS_EXT_taxonOfId_uri_ms','RELS_EXT_identifies_uri_ms'),$pid);
+    $variables['related_info']['title'] = 'Occurrences for this taxon';
+    $variables['related_info']['numFound']=isset($related_ocurrences['numFound'])?$related_ocurrences['numFound']:0;
+    $variables['related_info']['objects']=isset($related_ocurrences['objects'])?$related_ocurrences['objects']:array();
+    $namespace='http://rs.tdwg.org/dwc/dwcrecord/'; 
+  }
+  $domdwc= new DOMDocument;
+  $domdwc->loadXML($dwc);
+  $domdwc->preserveWhiteSpace = false;
+  $dwc_xpath = new DOMXPath($domdwc);
+  $dwc_xpath->registerNamespace('dwc', $namespace);
+  $result=$dwc_xpath->evaluate('//dwc:scientificName[text()]');
+  if ($result->length > 0){
+  	$title=$result->item(0)->nodeValue;
+  }
+  else
+  {
+    $title=$islandora_object->label;
+  }	
 
 if (!empty($title))
 {
@@ -772,6 +771,7 @@ function islandora_red_biodiversidad_preprocess_islandora_dwc_related(array &$va
   $islandora_object = $variables['islandora_object'];
 
   $pid = $islandora_object->id;
+  $this_object_pid=$pid;//needed in case we have to switch to another object as startpoint
   drupal_set_title($islandora_object->label);
   $result=array();
 
@@ -779,6 +779,34 @@ function islandora_red_biodiversidad_preprocess_islandora_dwc_related(array &$va
   {
 		
   module_load_include('inc', 'islandora_ontologies', 'includes/utilities');
+  //Lets test if we got relations starting from this one. If not search if this object is target of someone else
+  
+  if (count(islandora_ontologies_get_current_localrelations($pid))==0) {//means we have to do things different
+$querypre = <<<EOQ
+  SELECT DISTINCT ?object ?predicate
+  FROM <#ri>
+  WHERE {
+    ?object ?predicate <info:fedora/$pid> ;
+            <fedora-model:hasModel> <info:fedora/biodiversity:biodiversityCModel>
+  }
+  limit 1
+EOQ;
+  
+  $connection = islandora_get_tuque_connection();
+  $querypreresults=array();
+  $querypreresults = $connection->repository->ri->sparqlQuery($querypre);
+  foreach($querypreresults as $sparqlvar=>$hit)
+    {
+      try{
+        $islandora_object = islandora_object_load($hit['object']['value']);
+        $pid = $islandora_object->id;
+        }
+  		catch (Exception $e) {
+  			$variables['related_sparql_results'] = t('There are no related Darwin Core objects starting from or to this one.');	
+  		}
+    }
+  }
+  
   $models = $islandora_object->models;
   foreach($models  as $contentmodelpid)
   {
@@ -840,6 +868,14 @@ $relationsandcmodels_sparqlmapping_hash=array();//This structure  stores a hash 
 //So here it comes http://en.wikipedia.org/wiki/Longest_common_subsequence_problem, LCS implementation. I threath every path item (subject predicate object) as a composite Value and add it to an array. Then i calculate LCS on this structure, and also store
 //where this sequence starts in every single path. Then i decide which one i'm going to travel first (getting all intermediate solutions) and on which ones i'm going to travel but only bind to the variables after this solution. Does this makes sense? Yes!
 //But, not yet. We will leave this as @TODO
+
+//@TODO 2015. In case we don't have outgoing relations, but we have ingoing ones(eg. we are at a location, this is only related via related_tolocation from an occurrence). 
+//We could starting by checking if this object has a relation. If not, check if this object is target of another one. If so, assume the CMODEL to be the one this last one.
+
+
+
+
+
 
 
 $individual_queries=array();
@@ -945,23 +981,24 @@ foreach ($result as $ontologie=>$graphs)
 //Now build a filter for those nasty unbound variables that are eatting my PHP memory
 
 }
-if (user_access('administer site configuration'))
-  {
-  //dpm($result);
-  //dpm($individual_queries);
-  //dpm($relationsandcmodels_sparqlmapping_hash);
-  }
+
 	$related = array();
     
 	$related_sparql_results=array();
   $vlot_settings=array(); //this array holds the node and edges data for the vlot Javscript belonging to islandora_ontologies
-	$connection = islandora_get_tuque_connection();
-	$escaped_pid = str_replace(':', '_', $pid);
-	//dpm($relationsandcmodels_sparqlmapping_hash);
+	if (!isset($connection))
+    {
+    $connection = islandora_get_tuque_connection();
+    }
+  $escaped_pid = str_replace(':', '_', $pid);
+	
 if (($connection)){
     $current_contentmodel_vlot=preg_match('/^(.*[\/\#])([^\/\#]+)$/',$current_objects_cmodel[0], $m)? $m[2]: $current_objects_cmodel[0]; //Using the current`s object main CMODEL for this solution Pack. It´s an array, so fetch only the first one...should be only one present, but who knows!
 		
-    $vlot_settings[$islandora_object->id]=array('relates_to'=>array(),'label'=>$islandora_object->label,'nodetype'=>'current_node','node_cmodel'=>$current_contentmodel_vlot,'link'=>"");//We are constructing and adjacency graph(again) from Sparql results and this is our current object
+    $vlot_settings[$pid]=array('relates_to'=>array(),'label'=>$islandora_object->label,'nodetype'=>'node','node_cmodel'=>$current_contentmodel_vlot,'link'=>url("islandora/object/{$pid}",array('absolute'=>TRUE)));//We are constructing and adjacency graph(again) from Sparql results and this is our current object
+    if ($pid==$this_object_pid) {//set the current one
+    $vlot_settings[$pid]['nodetype']='current_node';
+    }
     foreach($individual_queries as $individual_query) {
       $fullquery = <<<EOQ
       SELECT DISTINCT * 
@@ -972,13 +1009,12 @@ EOQ;
     //@TODO xacml filter still missing. 	
     $queryresults=array();
     $queryresults = $connection->repository->ri->sparqlQuery($fullquery);
-    //dpm(sizeof($queryresults));
-    //$related_sparql_results=array();
+   
 
     //@TODO make related object function in islandora_ontologies module and not in this particular one.
     foreach ($queryresults as $queryresult) {//iterate over every computed path
      //store current step in this path as previous object's id
-      $previous_object=$islandora_object->id;
+      $previous_object=$pid;
 					
       $list=array();
       $level=0;
@@ -1027,7 +1063,11 @@ EOQ;
             //Now check if this node is already defined or not. We don´t wan´t to overwrite if it´s already there
             if (!isset($vlot_settings[$object_pid]))
             {
+              
               $vlot_settings[$object_pid]=array('relates_to'=>array(),'label'=>$object_label,'node_cmodel'=>$model_label,'nodetype'=>'node','link'=>url("islandora/object/{$object_pid}",array('absolute'=>TRUE)));
+              if ($object_pid==$this_object_pid) {//set the current one
+              $vlot_settings[$object_pid]['nodetype']='current_node';
+              }
             }
             $previous_object=$object_pid; //now set previous as current
           }
@@ -1040,13 +1080,13 @@ EOQ;
 			if (count($vlot_settings)>1) //only one means the current object (starting object of the graph)
 				{
 				$vlot_graph_style=islandora_ontologies_vlot_get_info('islandora_red_biodiversidad'); //@see hook_islandora_ontologies_vlot_info and islandora_ontologies_vlot_get_info
-				$variables['related_sparql_results']=t('!count Objects in "@label" relations Path',array('!count' => count($vlot_settings),'@label' => $islandora_object->label));
+				$variables['related_sparql_results']=t('!count Objects in "@label" relations Path',array('!count' => count($vlot_settings),'@label' => $vlot_settings[$this_object_pid]['label']));
 				$variables['vlot'] =islandora_ontologies_build_vlot($vlot_graph_style, $vlot_settings, '840','800');
 				$variables['vlot']= drupal_render($variables['vlot']);
 				}
 			else
 				{
-				$variables['related_sparql_results'] = t('There are no related Darwin Core objects from or to this one.');	
+				$variables['related_sparql_results'] = t('There are no related Darwin Core objects starting from this one.');	
 				}	
 		
 	}	
