@@ -15,8 +15,9 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
  
  protected static $internal_pidcache=array();//We need PIDS generated on getingestinfo
  //Because this methid is static, we need to access autside the object scope
+  
  
-protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
+ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
       module_load_include('inc', 'islandora', 'includes/utilities');
 	  if (empty($this->context['results']['pid_cache'])) {
         // Get enough PIDs for half of the remaining items.
@@ -69,8 +70,9 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
    */
   public static function getForm(array &$form_state) {
     // Get the list of valid content models.
+    //$form = parent::getForm($form_state);
     $parent = islandora_object_load($form_state['storage']['parent_pid']);
-
+    module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
     $cm_options = array();
     $ns_options = array(
       NULL => t('Default namespace'),
@@ -80,7 +82,14 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
       $policy = new CollectionPolicy($policy_stream->content);
       $cm_options = array();
       $ns_options = array(NULL => t('Default namespace'));
-      foreach ($policy->getContentModels() as $pid => $info) {
+      $connection2 = islandora_get_tuque_connection();
+      $implemented_models=islandora_red_biodiversidad_list_implemented_cmodels($connection2);
+      unset($connection2);
+      unset($implemented_models['biodiversity:DWCACModel']);// we can´t have a Darwin Core Archive as center of itself...ok!
+      unset($implemented_models['biodiversity:biodiversityCModel']);
+      $realcontentmodels=array_intersect_key($policy->getContentModels(),$implemented_models);
+            
+      foreach ($realcontentmodels as $pid => $info) {
         $cm_options[$pid] =	array(
 			'title' => $info['name'],
 	        'collection' => array( 
@@ -93,12 +102,32 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 	  				'#value'=>'',
 	        	  	'#required' => TRUE,
 					'#message'=>'',
-	  				'#name'=> 'dest_collection['.$pid.']',
+	  			'#name'=> 'dest_collection['.$pid.']',
 					'#id'=>'dest_collection_'.md5($pid),
 	  			)
+	  		),
+        'replacebyobject'=> array( 
+	  		  'data'=> array(
+	        		'#type' => 'textfield',
+	        	  	'#size' => 40,
+					      '#attributes'=>'',
+	        	  	'#description' => t('Enter Object name or PID that you want to use insted of the excel data for this CMODEL<br>. All other row data will be connected to this one. Leave blank to use the provided data'),
+	       	   		'#autocomplete_path' => "islandora/relationships/autocomplete/target/{$pid}", //reusing import entity csv autocomplete
+	  				'#value'=>'',
+	        	  	'#required' => TRUE,
+					'#message'=>'',
+	  			'#name'=> 'replace_object['.$pid.']',
+					'#id'=>'replace_object_'.md5($pid),
+	  			)
 	  		)
+            
+            
 		 	);
-	   
+      if ($pid=='biodiversity:SimpledwcCModel') {
+        //exception. We can't replace this one by an existing one
+        $cm_options[$pid]['replacebyobject']['data']['#attributes']= array('disabled' => TRUE);
+        $cm_options[$pid]['replacebyobject']['data']['#description'] = t('Simple Darwin Core can not be replaced by an existing Object');
+      }
 	  
         $cm_namespace = $info['namespace'];
         if (!empty($cm_namespace)) {
@@ -117,8 +146,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 	
 	
 	
-    return array(
-      'fs' => array(
+    $form['fs'] = array(
         '#type' => 'fieldset',
         '#title' => t('Redbiodiversidad Batch XLS GBIF Importer'),
         '#description' => t('Select the XLS or XLSX containing the GBIF formated data'),
@@ -129,38 +157,44 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
             'file_validate_extensions' => array('xls','xlsx'),
           ),
         ),
-        'fs2' => array(
+      'fs2' => array(
           '#type' => 'fieldset',
           '#title' => t('Content Model'),
           '#description' => t('The content model(s) to assign to the imported objects.'),
           'content_model' => array(
             '#type' => 'tableselect',
-            '#header' => array('title' => t('Name'),'collection'=>t('Additional destination collection')),
+            '#header' => array('title' => t('Name'),'collection'=>t('Additional destination collection'),'replacebyobject'=>'Use an existing Object instead of Excel Data'),
             '#multiple' => TRUE,
             '#options' => $cm_options,
           ),
-		  'extrainfo'=>array(
-              '#type' => 'markup',
-              '#value' =>'<div><em>Note:</em>'.t('The excel File must contain a sheet named "Occurrence". Every column named different as a DWC XML schema field will be included as comma separated pair "columnheader=value" inside dwc:dynamicProperties xml field').'</div>',
-		  ),
+          'extrainfo'=>array(
+            '#type' => 'markup',
+            '#value' =>'<div><em>Note:</em>'.t('The excel File must contain a sheet named "Occurrence" and columns must be named after Darwin Core Schema elements (without the dwc: part). Every column named different as a DWC XML schema field will be included as comma separated pair "columnheader=value" inside dwc:dynamicProperties xml field.We try to be as smart as posible, but if a set of columns belonging to a particular Biodiversity CMODEL have the exact same data in different rows, we must assume they are representing the same object and only one will be created and connected multiple times. Same if you mean the opposite case. If the values differ, then we will create two objects, even when the difference is minimum').'</div>',
+          ),
         ),
-        'namespace' => array(
+      );
+        
+        $form['namespace'] = array(
           '#type' => 'select',
           '#title' => t('Object Namespace'),
           '#description' => t('The namespace in which the imported objects will be created.'),
           '#options' => $ns_options,
-        ),
-		'dest_collection' => array( 
-			'#type' => 'value', 
-		),
-        'submit' => array(
+        );
+        $form['dest_collection'] = array( 
+          '#type' => 'value', 
+        );
+        $form['replace_object'] = array( 
+          '#type' => 'value', 
+        );
+        $form['submit'] = array(
           '#type' => 'submit',
           '#value' => t('Import'),
-        ),
-      ),
-    );
+        );
+         $form_state['storage']['parent_pid'] = $parent->id;
+  //$form['#submit'][1] = 'gbifexcel_importer_form_submit';
+  return $form;  
   }
-
+  
   /**
    * Determine if we're ready to run our batch process.
    *
@@ -229,8 +263,61 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
 				}
 	
 		}
-		
-    return (!empty($form_state['values']['file']) && !empty($content_models) && !empty($form_state['values']['namespace']) && empty($dest_errors));
+  	//Now check if the Objects we wan't to use as replacement are there, and if we got at least a real Excel data field.
+	
+  	$dest_objects = array_filter($form_state['values']['replace_object']);
+  	$dest_objects_errors=array();
+    if (count($dest_objects)==count($content_models)) {
+		  form_set_error('fs2',t('You need at least 1 CMODEL assigned to real Excel data'));
+		  $dest_objects_errors[]=true;
+    }
+    else {
+    foreach($content_models as $cmodel)
+  		{		
+  			$pid='';
+        $dest_object_access=false;
+  			$pid = array_key_exists($cmodel,$dest_objects) ? $dest_objects[$cmodel] : NULL;
+  			if (($form_state['storage']['parent_pid']!=$pid) && !(empty($pid))) //if it's the same as the parent collection the no check required, 
+  				{
+  					$form_state['complete form']['fs']['fs2']['content_model']['#options'][$cmodel]['replacebyobject']['data']['#value']=$pid;	
+  					$islandora_object=islandora_object_load($pid); 
+  					if ($islandora_object)
+  						{
+  			    		$models = $islandora_object->models;
+  			    		if (array_intersect(array($cmodel), $models)) 
+  							{
+  			      	$dest_object_access=islandora_object_access(ISLANDORA_MANAGE_PROPERTIES, $islandora_object);
+  							if ($dest_object_access)
+  								{
+  								$form_state['complete form']['fs']['fs2']['content_model']['#options'][$cmodel]['replacebyobject']['data']['#attributes']['class']=array();	
+								
+  								}
+  							else
+  								{
+  								 form_set_error('dest_object['.$pid.']', t('Sorry, you don\'t have manage rights for choosen Object %s ', array('%s' => $pid)));	
+  								$dest_objects_errors[]=true;
+  								}	
+  			    			}
+  						else
+  							{
+ 								 form_set_error('dest_object['.$pid.']', t('Sorry, the choosen Object %s is not of type %c', array('%s' => $pid,'%c'=>$cmodel)));	
+  							 $form_state['complete form']['fs']['fs2']['content_model']['#options'][$cmodel]['replacebyobject']['data']['#attributes']['class'][] = 'error'; 	
+  							$dest_objects_errors[]=true;
+  							}
+  						}
+  					else //Object does not exist
+  						{
+  						 $form_state['complete form']['fs']['fs2']['content_model']['#options'][$cmodel]['replacebyobject']['data']['#attributes']['class'][] = 'error'; 
+  						 form_set_error('dest_collection['.$pid.']', t('Sorry, the choosen Object %s does not exists', array('%s' => $pid)));	
+  	 				     $dest_objects_errors[]=true;
+							
+  						}	
+			
+  				}
+	
+  		}
+		}
+    return (!empty($form_state['values']['file']) && !empty($content_models) && !empty($form_state['values']['namespace']) && empty($dest_errors) && empty($dest_objects_errors));
   }
 
   /**
@@ -241,14 +328,15 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
   public static function getBatchInfo(array &$form_state) {
     // Load the file.
     module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
-	
-	$excel_file = file_load($form_state['values']['file']);
+	  
+	  $excel_file = file_load($form_state['values']['file']);
 
     // Grab the content models.
     // Cast to an array, in case there are none?
     $content_models = array_filter((array) $form_state['values']['content_model']);
     //We will define all the transform data here, in case we must deal with separate content models inside a same excel row!
     $dest_collection =  $form_state['values']['dest_collection'];
+    $replace_objects =  $form_state['values']['replace_object'];
 	
 	
 	$red_biodiversidad_transform_path = drupal_get_path('module', 'islandora_red_biodiversidad') . '/xsl';
@@ -258,6 +346,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
         'biodiversity:OccurrenceCModel' => array(
           'title' => 'occurrenceID',
 		  'dest_collection'=>$dest_collection['biodiversity:OccurrenceCModel'],
+      'replace_objects'=>$replace_objects['biodiversity:OccurrenceCModel'],
 		  'title_alt' => array('collectionID','collectionCode','catalogNumber'),	
 		  'template' => $red_biodiversidad_template_path.'/dwc_occurrence_template.xml',
 		  'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassoccurrence2dc.xsl',
@@ -266,6 +355,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
           'title' => 'locationID',
 		  'title_alt' => array('locality'),
 		  'dest_collection'=>$dest_collection['biodiversity:LocationCModel'],
+      'replace_objects'=>$replace_objects['biodiversity:LocationCModel'],
 		  'template' => $red_biodiversidad_template_path.'/dcterms_location_template.xml',
 		  'dwc2dc' => $red_biodiversidad_transform_path.'/dctermsclasslocation2dc.xsl',
         ),
@@ -273,6 +363,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
            'title' => 'identificationID',
 		   'title_alt'=>array('identifiedBy','dateIdentified'),
 		   'dest_collection'=>$dest_collection['biodiversity:IdentificationCModel'],
+       'replace_objects'=>$replace_objects['biodiversity:IdentificationCModel'],
 		   'template' => $red_biodiversidad_template_path.'/dwc_identification_template.xml',
 		   'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassidentification2dc.xsl',
         ),
@@ -280,6 +371,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
            'title' => 'eventID',
 		   'title_alt'=>array('fieldNumber','eventDate'),
 		   'dest_collection'=>$dest_collection['biodiversity:EventCModel'],
+       'replace_objects'=>$replace_objects['biodiversity:EventCModel'],
 		   'template' => $red_biodiversidad_template_path.'/dwc_event_template.xml',
 		   'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclassevent2dc.xsl',
         ),
@@ -287,6 +379,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
             'title' => 'occurrenceID', //Sames as OccurrenceCModel
 			'title_alt'=> array('basisOfRecord','catalogNumber'),
 			'dest_collection'=>$dest_collection['biodiversity:SimpledwcCModel'],
+      'replace_objects'=>NULL,
 		    'template' => $red_biodiversidad_template_path.'/dwc_simple_template.xml',
 		    'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclass2dc.xsl',
         ),
@@ -294,6 +387,7 @@ protected function getIdentifier(IslandoraTuque $tuque, $namespace) {
           'title' => 'taxonID',	
 		  'title_alt'=> array('scientificName'),
 		  'dest_collection'=>$dest_collection['biodiversity:TaxonCModel'],
+      'replace_objects'=>$replace_objects['biodiversity:TaxonCModel'],
 		  'template' => $red_biodiversidad_template_path.'/dwc_taxon_template.xml',
 		  'dwc2dc' => $red_biodiversidad_transform_path.'/dwcclasstaxon2dc.xsl',
     ),
@@ -322,6 +416,8 @@ if (module_exists('islandora_ontologies'))
 			//localname property local name
 			//allowsmore (Boolean) TRUE if possible...if this key is absent means the we can´t add this relation
 			//If case of dupicate objects we can´t discard/join new objects because we could end with two relations to the same...should we check this in getingestinfo?
+      //This is a reality, sometimes Different Event Objects have exactly the same dates and info, but belong to different occurrence sets and locations. we check if our ontology has the max min data 
+      //and make this compliant.
 			}
 		}
 	  // Test implementation, try to use ontologies, if ontologie module is enabled
@@ -354,7 +450,8 @@ if (module_exists('islandora_ontologies'))
    *   The ingest info.
    */
   protected static function getIngestInfo($excelfile,$content_models_with_processing_info,$content_models,$pid_namespace) {
-	  try {
+	  
+    try {
 	    	    $inputFileType = PHPExcel_IOFactory::identify(drupal_realpath($excelfile->uri));
 	    	    $objReader = PHPExcel_IOFactory::createReader($inputFileType);
 	    	    $objPHPExcel = $objReader->load(drupal_realpath($excelfile->uri));
@@ -414,7 +511,8 @@ if (module_exists('islandora_ontologies'))
 				//Now only iterate over our selected Cmodels
 				foreach ($content_models as $cmodels)
 					{	
-					
+  				if (empty($content_models_with_processing_info[$cmodels]['replace_objects'])) {
+
 					$tmpexistingfields=array_intersect($rowHeaders_utf8,$dwc_fields[$cmodels]);
 					if (sizeof($tmpexistingfields)>0)
 						{
@@ -437,7 +535,23 @@ if (module_exists('islandora_ontologies'))
 							}
 					
 						}
-					
+					}
+          else { //means we got a replacement object for a bunch of excel columns and rows.
+						//we need the relations but not the headers anymore.
+            foreach($content_models_with_processing_info[$cmodels]['localrel'] as $ontologie => $prop)//We can´t deal with multiple ontologies here...@TODO fix it somehow..
+							{
+								foreach($prop as $propname=>$propinfo)
+								{
+								if (array_key_exists('allowsmore',$propinfo))
+									{
+									if 	(!empty($propinfo['onClass']))
+										{
+										$rels_index_cmodel_to_cmodel[$cmodels][str_replace("info:fedora/","",$propinfo['onClass'])]=array('ns'=>$propinfo['ns'],'localname'=>$propinfo['localname']);	
+										}
+									}	
+								}	
+							}
+          }
 						
 					}
 				//Deal with those fields not present anywhere.
@@ -450,7 +564,8 @@ if (module_exists('islandora_ontologies'))
 				//Now we got for every cmodel a list of fields present in this excel file. great. Now fill the info. One row can generate multiple objects.	
 				//Also check for duplicates.
 				
-				$objectcount=0;	     
+				$objectcount=0;
+        $tmpobject=array();//to store replacement objects, so we don't have to load them everytime.     
 			 	for ($fila = 2; $fila <= (int)$highestRow; $fila++)
 			 		{
 					$thisrow=array();//we empty this every row...it´s just an acumulator of what we have for every row
@@ -468,15 +583,12 @@ if (module_exists('islandora_ontologies'))
 					
 					if (sizeof($existing_fields_inheader)>0)
 					{	
-						
-					
-						
-					foreach($existing_fields_inheader as $cmodel => $cmheaders)
-						{
-							$datoscombinadostmp=array();
+            foreach($existing_fields_inheader as $cmodel => $cmheaders)
+            {
+              $datoscombinadostmp=array();
               $datoscombinados=array();
-							$datoscombinadostmp=array_combine($cmheaders,array_intersect_key($rowData[0],$cmheaders));
-							$datoscombinadostmp=array_map('trim',(array) $datoscombinadostmp); //This removes pre and post whitespaces in each member
+              $datoscombinadostmp=array_combine($cmheaders,array_intersect_key($rowData[0],$cmheaders));
+              $datoscombinadostmp=array_map('trim',(array) $datoscombinadostmp); //This removes pre and post whitespaces in each member
               $datoscombinados=array_filter((array) $datoscombinadostmp, 'strlen');//This filters out FALSE, NULL, '', but leaves 0 in place
               //basisOfRecord is a common field to all different Darwin Core classes. The thing about this, is that even
               //not defined records/empty fields (like an non registered event i.e) will always get at least one value when mapping fields to header values.
@@ -484,62 +596,67 @@ if (module_exists('islandora_ontologies'))
               //if it's, then we can't relay on having > 0 data. 
               
               if (sizeof($datoscombinados)>1) { //Only check for $whatsleft if we got values, we can't define a DWC record based only on this extra values
-  							if (($cmodel=='biodiversity:OccurrenceCModel') || ($cmodel=='biodiversity:SimpledwcCModel'))
-  								{
-  								if (sizeof($whatsleft)>0)
-  									{
-  									$nondwcfields=array_combine($whatsleft,array_intersect_key($rowData[0],$whatsleft));	
-  									$nondwcfieldsasarrayvalues=array();
-  									foreach ($nondwcfields as $key => $values)
-  										{
-  										 $nondwcfieldsasarrayvalues[] = $key.'='.$values;	
-  										}
-  										if (sizeof($nondwcfieldsasarrayvalues)>0)
-  											{
-  											$datoscombinados['dynamicProperties']=implode(",",$nondwcfieldsasarrayvalues);
-  										    }
-  									}	
-  								}
+                if (($cmodel=='biodiversity:OccurrenceCModel') || ($cmodel=='biodiversity:SimpledwcCModel'))
+                {
+                  if (sizeof($whatsleft)>0)
+                  {
+                    $nondwcfields=array_combine($whatsleft,array_intersect_key($rowData[0],$whatsleft));	
+                    $nondwcfieldsasarrayvalues=array();
+                    foreach ($nondwcfields as $key => $values)
+                    {
+                      $nondwcfieldsasarrayvalues[] = $key.'='.$values;	
+                    }
+                    if (sizeof($nondwcfieldsasarrayvalues)>0)
+                    {
+                      $datoscombinados['dynamicProperties']=implode(",",$nondwcfieldsasarrayvalues);
+                    }
+                  }	
+                }
               }
-						if (sizeof($datoscombinados)>1) //At least two fields...
-							{
-							//Now get an md5 representation of data	
-              //April 2015. I found a bug. We are not respecting Ontology restrictions using only MD5. If we only enforce md5 as check, then it's possible we add not allowed relations to a same object many times
-              //So we need a way of discerning here if the object's md5 is already present AND the existing object does not already have all allowed relations in place...this is complicated!
-              //Typical example. An incomplete darwin core Event Record could end being related to multiple locations.
-              // MD5 check defines it's the same object (no eventID given to discern) but two different locations can't be associated to the same event.
-							$md5=md5(implode(array_values($datoscombinados)));	
-							if (!array_key_exists($md5,$md5_index_by_cmodel[$cmodel]))
-								{
-   	   						//we are creating a new object
+              if (sizeof($datoscombinados)>1) //At least two fields...
+              {
+                //Now get an md5 representation of data	
+                //April 2015. I found a bug. We are not respecting Ontology restrictions using only MD5. If we only enforce md5 as check, then it's possible we add not allowed relations to a same object many times
+                //So we need a way of discerning here if the object's md5 is already present AND the existing object does not already have all allowed relations in place...this is complicated!
+                //Typical example. An incomplete darwin core Event Record could end being related to multiple locations.
+                // MD5 check defines it's the same object (no eventID given to discern) but two different locations can't be associated to the same event.
+                $md5=md5(implode(array_values($datoscombinados)));	
+                if (!array_key_exists($md5,$md5_index_by_cmodel[$cmodel]))
+                {
+                  //we are creating a new object
                   if (!array_key_exists($content_models_with_processing_info[$cmodel]['title'],$datoscombinados))//means we dont have an ID for this record
-   	   						 	{
-   	   						 		$datoscombinados[$content_models_with_processing_info[$cmodel]['title']]=++$content_models_with_processing_info[$cmodel]['lastIDfromSolr'];
-   	   						 	}
-								$file[$objectcount]=array('data'=>$datoscombinados,'cmodel'=>$cmodel);		
-								$file[$objectcount]['pid']=self::getInternalIdentifier($internalTuque, $pid_namespace,$pidcachesize);	
-								$file[$objectcount]['localrels']=array();	
-								//check here if we got an DWC ID from Excel, if not autoincrement from Solr	
+                  {
+                    $datoscombinados[$content_models_with_processing_info[$cmodel]['title']]=++$content_models_with_processing_info[$cmodel]['lastIDfromSolr'];
+                  }
+                  $file[$objectcount]=array('data'=>$datoscombinados,'cmodel'=>$cmodel);		
+                  $file[$objectcount]['pid']=self::getInternalIdentifier($internalTuque, $pid_namespace,$pidcachesize);	
+                  $file[$objectcount]['localrels']=array();	
+                  //check here if we got an DWC ID from Excel, if not autoincrement from Solr	
 	   							
 												
-								$thisrow[$cmodel]=$objectcount;
+                  $thisrow[$cmodel]=$objectcount;
 								
-								$md5_index_by_cmodel[$cmodel][$md5]=$thisrow[$cmodel];	
-								$objectcount++;
-								}
-								else
-								{
-                //we are reusing and existing object
-								$thisrow[$cmodel]=$md5_index_by_cmodel[$cmodel][$md5];
-								//error_log('We allready have this record',0);	
-								}
-							}
-						//So we store the desired cmodel and the data in one place...nice.$file aka row is used to keep track from where the data came from excel 
+                  $md5_index_by_cmodel[$cmodel][$md5]=$thisrow[$cmodel];	
+                  $objectcount++;
+                }
+                else
+                {
+                  //we can reuse and existing object
+                  //to resolve the bug we found , we should at this point make a ontology check. If the object does not allow more relations we mark it so. If it allows more relations we reuse it.
+                  //For now, users will have to deal with DarwinCore ID's to define this.
+                  $thisrow[$cmodel]=$md5_index_by_cmodel[$cmodel][$md5];
+                
+                
+                
+                  //error_log('We allready have this record',0);	
+                }
+              }
+              //So we store the desired cmodel and the data in one place...nice.$file aka row is used to keep track from where the data came from excel 
 						
-						}
+            }
 					
 					
-					}
+          }
 					//Collect what we have for this row and build relations...
 					foreach($thisrow as $cmodel => $objectcountid)
 						{
@@ -566,30 +683,61 @@ if (module_exists('islandora_ontologies'))
 												$file[$objectcountid]['localrels'][]=array(
 													'localname'=>$prop['localname'],
 													'ns'=>$prop['ns'],
-													'targetobject'=>$file[$thisrow[$target]]['pid'],	
-									);	
-									}}
+													'targetobject'=>$file[$thisrow[$target]]['pid'],
+									      );	
+									    }
+                  if (!empty($content_models_with_processing_info[$target]['replace_objects']))   //If we got a replacement object we add relations to it. 
+									  $file[$objectcountid]['localrels'][]=array(
+										  'localname'=>$prop['localname'],
+										  'ns'=>$prop['ns'],
+										  'targetobject'=>$content_models_with_processing_info[$target]['replace_objects'],
+                     
+                    
+                    
+                    
+                    );	
+                  }
 								if ((isset($file[$objectcountid]['localrels'])) &&	is_array($file[$objectcountid]['localrels']))
 									{
 									$file[$objectcountid]['localrels'] = array_map("unserialize", array_unique(array_map("serialize", $file[$objectcountid]['localrels'])));//We get rid of duplicates here.
 									//error_log('Got relations for:'.var_export($file[$objectcountid]['localrels'],true),0);	
 									}
 								}
-								
-								
-							
 							}
-							
-							
 						}
-					
-					
-					
-				
+            //Now try to do the inverse operation.Get all replace_objects, load them and add the back relations(uh, oh!).Hope we don't run out of time, or we will have to add an additional
+            //batch operation for this..
+            foreach($rels_index_cmodel_to_cmodel as $cmodel=>$rels){
+              if (!empty($content_models_with_processing_info[$cmodel]['replace_objects'])) {
+								foreach($rels_index_cmodel_to_cmodel[$cmodel] as $target=>$prop)
+									{
+  									if (isset($thisrow[$target]))//Only add the relation if there is an target object of this cmodel present in this row.
+  											{
+                  				if (!isset($tmpobject[$cmodel]))
+                            {
+                            $tmpobject[$cmodel] = islandora_object_load($content_models_with_processing_info[$cmodel]['replace_objects'])->relationships;
+                            $tmpobject[$cmodel]->autoCommit = FALSE;//lets delay the commit
+                            }
+                  				
+                          if (count($tmpobject[$cmodel]->get($prop['ns'],$prop['localname'],$file[$thisrow[$target]]['pid'])==0))
+                            {
+                          //means we don´t have already this relation in place...we can proceed	
+                            $tmpobject[$cmodel]->add($prop['ns'],$prop['localname'],$file[$thisrow[$target]]['pid']);
+                            }
+                        } 
+                  }   
+              }
+            }
+          
 				
 				}
-			     $objPHPExcel->disconnectWorksheets();
-				 unset($sheet);
+			   $objPHPExcel->disconnectWorksheets();
+         foreach($tmpobject as $cmode=>$relation)
+           {
+             $relation->commitRelationships();
+           }   
+         unset($tmpobject);
+         unset($sheet);
 				 unset($objPHPExcel);
 				 unset($objReader);
 				 unset($rels_index_cmodel_to_cmodel);
@@ -627,10 +775,10 @@ if (module_exists('islandora_ontologies'))
   public function preprocess() {
     $preprocessed = array();
     $item_class = $this->itemClass;
- 	
-	$file_contents = file_get_contents(drupal_realpath($this->file['object_info']->uri));
+ 	  $file_contents = file_get_contents(drupal_realpath($this->file['object_info']->uri));
     $wholedata=unserialize($file_contents); 		
     $total = count($wholedata);
+    $localconnection=$this->connection;
 	//$internal_setID_counter=0;
 	$date = date_create();
 	//$this->setId=1;
@@ -643,7 +791,7 @@ if (module_exists('islandora_ontologies'))
       $item = $item_class::getOne($tempfile);
       if ($item) {
         $this->parameters['namespace'] = $this->getNamespace($item);
-        $preprocessed[] = $object = new IslandoraImporterBatchObject($this->connection, $item, $this->parameters);
+        $preprocessed[] = $object = new IslandoraImporterBatchObject($localconnection, $item, $this->parameters);
         $object->addRelationships();
 		//Added local generated id (using uui parameter from islandoras configuration)
 		    $object->id=$item->getCurrentPid();
@@ -668,8 +816,8 @@ if (module_exists('islandora_ontologies'))
 		unset($object);
 	  }
     }
-	unset ($tempfile);
-	unset ($wholedata);
+	  unset ($tempfile);
+	  unset ($wholedata);
     return $preprocessed;
   }
 }
@@ -734,10 +882,10 @@ class RedbiodiversidadBatchImportObject extends IslandoraImportObject {
   	      'data' => $info['object_info'][$key]['data'],
   	      'content_model' => $info['object_info'][$key]['cmodel'],
   	      'dwc2dc' => $info['content_model'][$info['object_info'][$key]['cmodel']]['dwc2dc'],//every cmodel has a different one
-  		  'template'=>	$info['content_model'][$info['object_info'][$key]['cmodel']]['template'],
-  		  'titlefield'=> $info['content_model'][$info['object_info'][$key]['cmodel']]['title'],
-  		  'localrels'=>$info['object_info'][$key]['localrels'],
-  		  'pid'=>$info['object_info'][$key]['pid'],
+  		    'template'=>	$info['content_model'][$info['object_info'][$key]['cmodel']]['template'],
+  		    'titlefield'=> $info['content_model'][$info['object_info'][$key]['cmodel']]['title'],
+  		    'localrels'=>$info['object_info'][$key]['localrels'],
+  		    'pid'=>$info['object_info'][$key]['pid'],
   		);
 		 	
   	    unset($info['object_info'][$key]);//Ok, we got one, unset this from the  big big source
