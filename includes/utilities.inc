@@ -222,7 +222,7 @@ function islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr($cmodel_pid)
 	$mappings = array(
       'biodiversity:OccurrenceCModel' => array(
         'field' => 'dwc.occurrenceID',
-		'default' => 'occurrence',
+		    'default' => 'occurrence',
       ),
       'biodiversity:LocationCModel' => array(
         'field' => 'dwc.locationID',
@@ -245,7 +245,7 @@ function islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr($cmodel_pid)
 		 'default' => 'event',
       ),
       'biodiversity:SimpledwcCModel' => array(
-          'field' => 'dwc.occurrenceID', //Sames as OccurrenceCModel
+      'field' => 'dwc.occurrenceID', //Sames as OccurrenceCModel
 		  'default' => 'sdwc_occurrence',
       ),
       'biodiversity:TaxonCModel' => array(
@@ -267,7 +267,7 @@ function islandora_red_biodiversidad_getlast_dwc_mainid_viaSolr($cmodel_pid)
     );
    
     $biodiversidad_query_field = $mappings[$cmodel_pid]['field']."_ms";
-    $stub="[* TO *]";
+    $stub="[$institutioncode TO *]";
    
     $query_processor = new IslandoraSolrQueryProcessor();
     $query_processor->solrQuery = format_string(
