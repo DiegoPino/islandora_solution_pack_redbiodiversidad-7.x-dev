@@ -561,7 +561,7 @@ function islandora_red_biodiversidad_xml_form_builder_get_self_transforms() {
  *Diego Pino Navarro, Febrero 2014
  *Este hook implementa la asociación de Formas HTML con el modelo de datos
  */                
-function islandora_red_biodiversidad_islandora_content_model_forms_form_associations() {
+function islandora_red_biodiversidad_islandora_xml_form_builder_form_associations() {
   return array(
     'islandora_red_biodiversidad_dwc_form' => array(
       'content_model' => 'biodiversity:SimpledwcCModel',
