@@ -98,7 +98,7 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
 	        	  	'#size' => 40,
 					'#attributes'=>'',
 	        	  	'#description' => t('Enter collection name or PID, leave blank to use only parent Collection'),
-	       	   		'#autocomplete_path' => 'import_entity_csv/autocomplete', //reusing import entity csv autocomplete
+	       	   		'#autocomplete_path' => 'islandora/relationships/autocomplete/target/islandora:collectionCModel', //reusing import entity csv autocomplete
 	  				'#value'=>'',
 	        	  	'#required' => TRUE,
 					'#message'=>'',
