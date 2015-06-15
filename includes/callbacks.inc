@@ -81,3 +81,69 @@ function islandora_red_biodiversidad_autocomplete($type) {
 }
 
 
+function islandora_red_biodiversidad_nominatimgeocoding(array $searchparams)
+  {        
+      $geolocated=array();
+      if (count($searchparams)==0) {
+        return array();
+      }
+      $parametro=implode(",", array_map('urlencode',$searchparams));
+      //open.mapquestapi.com/nominatim V1 API for geocoding
+      $url ="http://open.mapquestapi.com/nominatim/v1/search.php";
+      $params = array(
+         'format' => 'json',
+         'limit' => 3,
+         'addressdetails' => 1,
+         'osm_type' => 'N',
+         );
+      
+      
+    
+      $response = drupal_http_request($url . "?q=$parametro&" . drupal_http_build_query($params));
+     
+        if (!empty($response->error)) {
+          $msg_args = array(
+            '%url' => $url,
+            '@code' => $response->code,
+            '%error' => $response->error,
+          );
+          drupal_set_message(t('Red de Biodiversidad, the HTTP request %url returned the following error (code @code): %error.', $msg_args), 'error');
+          return FALSE;
+        }
+        $data = drupal_json_decode($response->data);
+    
+      $nodefound=FALSE;
+      if (count($data))
+        {
+          foreach($data as $key=>$found)
+          {
+           if ($found['osm_type']=='node') 
+             {
+               //Tomo un osm_type=node
+               $geolocated['boundingbox']= $data[$key]['boundingbox'];
+               $geolocated['licence']=$data[$key]['licence'];
+               $geolocated['lat']= $data[$key]['lat'];
+               $geolocated['lon'] = $data[$key]['lon'];
+               $geolocated['display_name'] = $data[$key]['display_name'];
+               $geolocated['address']= $data[$key]['address'];
+               $nodefound=TRUE;
+               break;
+             } 
+          }
+          if (!$nodefound)
+            {
+         
+        //Tomo el primero, sea cual sea
+        $geolocated['boundingbox']= $data[0]['boundingbox'];
+        $geolocated['licence']=$data[0]['licence'];
+        $geolocated['lat']= $data[0]['lat'];
+        $geolocated['lon'] = $data[0]['lon'];
+        $geolocated['display_name'] = $data[0]['display_name'];
+        $geolocated['address']= $data[0]['address'];
+           }
+        }
+     
+        return $geolocated;
+    
+  }  
+
