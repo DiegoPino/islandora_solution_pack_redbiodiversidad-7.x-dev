@@ -335,7 +335,7 @@
 									<access>TRUE</access>
 									<default_value>UCN</default_value>
 									<required>FALSE</required>
-									<title>Institution Code</title>
+									<title>Institution ID</title>
 									<tree>TRUE</tree>
 									<actions>
 										<create>
