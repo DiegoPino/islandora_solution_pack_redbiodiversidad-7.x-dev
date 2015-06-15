@@ -53,7 +53,7 @@ This XSL StyleSheet only processes the first ocurrence of every class
             <xsl:choose>
                 <xsl:when test="name()='dwc:basisOfRecord'">
                     <type xmlns="http://purl.org/dc/elements/1.1/">
-                        <xsl:value-of select="local-name()"/> = <xsl:apply-templates select="* | node()"/>
+                        <xsl:apply-templates select="* | node()"/>
                     </type>
                     <xsl:text> </xsl:text>
                     <xsl:comment> Source node is <xsl:value-of select="name()"/>
