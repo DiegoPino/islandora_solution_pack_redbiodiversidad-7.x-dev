@@ -452,7 +452,24 @@ source file. -->
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-
+    <xsl:template match="dwc:basisOfRecord">
+      <xsl:choose>
+          <xsl:when test="normalize-space(.)">
+        <type xmlns="http://purl.org/dc/elements/1.1/">
+            <xsl:apply-templates/>
+        </type>
+        <xsl:text> </xsl:text>
+        <xsl:comment> Source node is <xsl:value-of select="name()"/>
+    </xsl:comment> 
+     </xsl:when>
+            <xsl:otherwise>
+                <!-- This is for when the element is null.
+-->
+                <xsl:comment> Node <xsl:value-of select="name()"/> had no content.</xsl:comment>
+            </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
+    
     <xsl:template match="dwc:eventDate">
         <xsl:choose>
             <xsl:when test="normalize-space(.)">
