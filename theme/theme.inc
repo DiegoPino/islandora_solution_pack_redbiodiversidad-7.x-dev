@@ -21,6 +21,7 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
 	$module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
 	module_load_include('inc', 'islandora_solr_search', 'includes/utilities');
 	module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
+  module_load_include('inc', 'islandora_red_biodiversidad', 'includes/callbacks');
   
 	    
 	$islandora_object = $variables['islandora_object'];
@@ -30,7 +31,8 @@ function islandora_red_biodiversidad_preprocess_islandora_red_biodiversidad_map(
   
   
 	$pid = $islandora_object->id;
-	drupal_set_title($islandora_object->label);
+  $currentlabel = $islandora_object->label;
+	drupal_set_title($currentlabel );
 	$pathtopoints=array();
 		
 	$mappings = array(
@@ -53,6 +55,7 @@ $biodiversidad_query_field = $mappings['location']['latlong_lat'];
 $stub="";
 	    
 $query_processor = new IslandoraSolrQueryProcessor();
+$query_processoronlythis= new IslandoraSolrQueryProcessor(); //We cant' reuse, because after the first query que processor gets modified
 $query_processor->solrQuery = format_string(
 '!biodiversidad_query_field:(!biodiversidad_query)', array(
 	'!biodiversidad_query_field' => $biodiversidad_query_field,
@@ -70,7 +73,7 @@ $xacml_restrictions=islandora_red_biodiversidad_getxacml_solrquery_restrictions(
 		
 		
 $query_processor->solrParams = array(
-'fl' => $mappings['location']['latlong_lat'].",".$mappings['location']['latlong_long'].",PID,fgs_label_mt,PID_fullurl",
+'fl' => $mappings['location']['latlong_lat'].",".$mappings['location']['latlong_long'].",PID,fgs_label_mt,PID_fullurl,dwc.locality_s,dwc.municipality_s,dwc.county_s,dwc.stateProvince_s,dwc.country_s",
 'fq' => format_string(
 '!content_model_field:"info:fedora/!content_model"', array(
 	'!content_model_field' => $content_model_field,
@@ -78,7 +81,7 @@ $query_processor->solrParams = array(
 )
 ),
 );
-        
+ 
 if (!empty($xacml_restrictions)) {
 $query_processor->solrParams['fq'] = $query_processor->solrParams['fq']." AND ( ".$xacml_restrictions." )";
 }
@@ -87,32 +90,55 @@ $url = parse_url(variable_get('islandora_solr_url', 'localhost:8080/solr'));
 $solr = new Apache_Solr_Service($url['host'], $url['port'], $url['path'] . '/');
 $solr->setCreateDocuments(FALSE);
 try {
-$results = $solr->search($query_processor->solrQuery, $query_processor->solrStart, $query_processor->solrLimit, $query_processor->solrParams, 'GET');
-$json = json_decode($results->getRawResponse(), TRUE);
+  
+  $results = $solr->search($query_processor->solrQuery, $query_processor->solrStart, $query_processor->solrLimit, $query_processor->solrParams, 'GET');
+  $json = json_decode($results->getRawResponse(), TRUE);
+//Also get the info from Solr for the current object, fl and fq are the same.
+  
+ $stubonlythis=urlencode($pid);
+ $query_processor->solrQuery = format_string(
+    '!biodiversidad_query_field:"!biodiversidad_query"', array(
+      '!biodiversidad_query_field' => 'PID',
+      '!biodiversidad_query' => $pid,
+    )
+  );
+  $query_processor->solrStart = 0;
+  $query_processor->solrLimit = 1;
+  $resultsonlythis = $solr->search($query_processor->solrQuery, $query_processor->solrStart, $query_processor->solrLimit, $query_processor->solrParams,  'GET');
+  $jsononlythis = json_decode($resultsonlythis->getRawResponse(), TRUE);
+  
+
 }
 catch (Exception $e) {
 watchdog_exception('Islandora Red de Biodiversidad', $e, 'Got an exception while searching latlong for object in Solr ', array(), WATCHDOG_ERROR);
 }
+
+
+
+
+
+
+
 $list = array();
 $locations = array();
 $mapa_variables = array();
 $lati_long = array();
 //This gives us all the locations, but i could need conditional on where i'm standing(calling) also the occurence data and the associated taxons. 
 //Now do some SPARQL Magic...
-
+$models =$islandora_object->models;
 if (module_exists('islandora_ontologies'))
 {
 		
 module_load_include('inc', 'islandora_ontologies', 'includes/utilities');
-$models =$islandora_object->models;
+
 foreach($models  as $contentmodelpid)
 {
-	//dpm($contentmodelpid);
+	//dpm(islandora_ontologies_get_graph_path($contentmodelpid));
 	if ($cache = cache_get('islandora_ontologies_adjacency'.$contentmodelpid))
 	{	
-		//dpm('cache hit');
+		
 		$result=$cache->data;
-		//dpm('hit');
+		
 	}		
 	else
 	{
@@ -138,19 +164,36 @@ foreach($models  as $contentmodelpid)
 	  
 }
 
+//dpm($result);
 //If it´s not a location model object what we are visiting the we must reverse the paths($result) and remove everything until we get to a location model
+//Also we will check direction change:
+//We will allow this type of direction changes
+// If we start with a verse and not end with an inverse or change to inverse and verse back
+//If we start with an inverse and we only change direction once
+//
+
+$current_is_location=false;
+if (in_array('biodiversity:LocationCModel',$models))
+{
+$current_is_location=true;
+//dpm('es locacion!');
+}
 if (!empty($result))
 {
-if (!(array_intersect(array('biodiversity:LocationCModel'), $models)))  {
+
 
 
 	foreach ($result as $ontologie=>&$graphs2)
 			{
 				foreach($graphs2 as $key=>&$rels2)
 					{
-						$rels2=array_reverse($rels2);
-						foreach($rels2 as $cmodel=>&$rel)
-							{
+            if (array_key_exists('info:fedora/biodiversity:LocationCModel',$rels2) && !$current_is_location) {
+              $first=reset($rels2);
+              $directiontolocation=$first[0][1];
+              //dpm($directiontolocation);
+              $rels2=array_reverse($rels2);
+              foreach($rels2 as $cmodel=>&$rel)
+							  {
 								if ($cmodel!="info:fedora/biodiversity:LocationCModel")
 									{
 										unset($graphs2[$key][$cmodel]);
@@ -160,20 +203,21 @@ if (!(array_intersect(array('biodiversity:LocationCModel'), $models)))  {
 										unset($graphs2[$key][$cmodel][0]);
 										break 1;
 									}
-							}
-						$rels2=array_reverse($rels2);	
-					}	
+							  }
+						  $rels2=array_reverse($rels2);	
+					    }
+          }	
 					//Get rid of duplicate paths after removing unnecesarry cmodels
 			$result[$ontologie]=array_map("unserialize", array_unique(array_map("serialize", $graphs2)));
 			}	
 	 
- }
-
+//dpm($result);
 $query="";
 $relationsandcmodels_sparqlmapping_hash=array();//This structure is a hash map between Sparql Variables and rels+cmodels form our paths so we don`t have to extract this info from Mulgara.
 $locationinpath=array();
 foreach ($result as $ontologie=>$graphs)
 {
+  //dpm($graphs);
 	foreach ($graphs as $paths=>$rels)
 	{
 		$o='o';
@@ -184,7 +228,7 @@ foreach ($result as $ontologie=>$graphs)
     $allcmodels=array_keys($rels);//Need this to allow look ahead viewing during foreach
 		foreach($rels as $cmodel=>$rel)
 		{
-			$querytmp="";	
+      $querytmp="";	
 			$otmp="";
       $otmp_extras="";			
 				
@@ -224,7 +268,7 @@ foreach ($result as $ontologie=>$graphs)
           $otmp_extras.="<fedora-model:hasModel> <{$nextcmodel}> ." ; //Lets add also cmodel check. Why? because sometimes relations alone are ambiguos and do generate cycles. But cmodel+relations are acyclic in our implementation
           //@TODO this is throwing an REPO except<fedora-model:state>, runs fine through the risearch web interface...why?
           //$otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:state> <info:fedora/fedora-system:def/model#Active> .";
-					$query.=" $otmp <".$rel[0];
+					$query.=" $otmp <".$rel[0][0];
 					$cur++;
 					$query.="> ?$s$cur"."_$paths $otmp_extras";
                  
@@ -269,12 +313,10 @@ foreach ($result as $ontologie=>$graphs)
 	}	
   
 }
-$current_is_location=false;
-  //There is a speciall case: If the object we are currently vistiting is a location, then in our graph paths there will be no locationcmodel! (it´s our starting point). It´s obvious, but we must show in this case all the info.
-if (in_array('biodiversity:LocationCModel',$islandora_object->models))
-{
-$current_is_location=true;
-}
+
+//dpm($individual_queries);
+  //There is a speciall case: If the object we are currently vistiting is a location, then in our graph paths query result there will be no locationcmodel! (it´s our starting point). It´s obvious, but we must show in this case all the info.
+$everyotherobject=array(); //to store temp all objects that don't have a location
 if (isset($individual_queries) && count($individual_queries)>0) {
 	$connection = islandora_get_tuque_connection();
 	$escaped_pid = str_replace(':', '_', $pid);
@@ -291,6 +333,7 @@ EOQ;
     //@TODO xacml filter still missing. 	
     $queryresults=array();
     $queryresults = $connection->repository->ri->sparqlQuery($fullquery);
+     
     //dpm(sizeof($queryresults));
     //$related_sparql_results=array();
 
@@ -303,31 +346,34 @@ EOQ;
 			//Precheck if location is in path. If so, then process objects for this location. If the current Object belongs to LocationCMODEL, the all paths starting from it are related, so we must compute an exception
 			if  ($current_is_location)
 				{
-				if (!array_key_exists($islandora_object->id,$pathtopoints))
+     		if (!array_key_exists($pid,$pathtopoints))
 					{
-					$pathtopoints[$islandora_object->id]=array();
-				    }
+					$pathtopoints[$pid]=array();
+				  }
 					$harvestthispath=true;
-					$pathoflocation_pid=$islandora_object->id;	
+					$pathoflocation_pid=$pid;	
 					
 				}
 			else
 				{	
+         
 				foreach($queryresult as $sparqlvar=>$hit)
 				{	
 					if ($hit['type']=='pid')	
 					{
 						if ($relationsandcmodels_sparqlmapping_hash[$sparqlvar][0]=='info:fedora/biodiversity:LocationCModel')
 						{
-						
-							if (!array_key_exists($hit['value'],$pathtopoints))
+						  if (!array_key_exists($hit['value'],$pathtopoints))
 							{
 								$pathtopoints[$hit['value']]=array();
 							}
 							$harvestthispath=true;
 							$pathoflocation_pid=$hit['value'];
 						}
-					
+            else
+            {
+				
+            }
 					}	
 				}
 			
@@ -335,7 +381,7 @@ EOQ;
 			//If the path has a location, then harvest all other objects and add it to the array key of this location. 
 			//If not assume direct relation to this object, means a path thats goes in another direction of our object is the center of a star =) nice deduction of myself!.
 			//This also means that if there are relations to a location starting from here then we must assume that all objects that go in any other direction are related to all found locations and not a particular one.
-      //2015 @TODO e should check/or not if the relations are well formed? 
+      //2015 @TODO we should check/or not if the relations are well formed? 
 			if ($harvestthispath)
 			{
 				foreach($queryresult as $sparqlvar=>$hit)
@@ -353,10 +399,33 @@ EOQ;
               $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
               $model_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $model_label, $m)? $m[2]: $model_label;
               $model_label=str_replace('CModel','',$model_label)."s";
-              $pathtopoints[$pathoflocation_pid][]=array('type' => 'point','popup' => "<span>Object of type $model_label:</span><br>".l($object_label, 'islandora/object/'.$object_pid),'clusterGroup'=> $model_label);
+              $pathtopoints[$pathoflocation_pid][$object_pid]=array('type' => 'point','popup' => "<span>Object of type $model_label:</span><br>".l($object_label, 'islandora/object/'.$object_pid),'clusterGroup'=> $model_label);
               }
             }
           }
+        }
+        else //assume infered relation to every location, store in $everyotherobject
+        {
+  			
+          foreach($queryresult as $sparqlvar=>$hit)
+  				{
+  					if (($hit['type']=='pid'))
+  					{
+              $current_cmodel=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
+              if ((in_array($current_cmodel, $limit_to_cmodel)) || empty($limit_to_cmodel)) {
+                $object_label="";
+                $object_link="";
+                $object_label=$queryresult[$sparqlvar.'_label']['value'];
+                $object_pid=$hit['value'];
+                $model_label=$current_cmodel;
+                //@TODO replace this pregmatch call to a static array...we are overforcing our poor php server
+                $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
+                $model_label=preg_match('/^(.*[\:\/])([^\:\/]+)$/', $model_label, $m)? $m[2]: $model_label;
+                $model_label=str_replace('CModel','',$model_label)."s";
+                $everyotherobject[$object_pid]=array('type' => 'point','popup' => "<span>Object of type $model_label:</span><br>".l($object_label, 'islandora/object/'.$object_pid),'clusterGroup'=> $model_label);
+                }
+              }
+            }
         }
         $harvestthispath=false;
 			$pathoflocation_pid="";
@@ -365,28 +434,31 @@ EOQ;
 	}
 
 	$pathtopoints=array_map("unserialize", array_unique(array_map("serialize", $pathtopoints)));
+ 
 //End sparql
 
   }//end check for $results, if no ontology is given or no paths then we won´t get anything from up there. 
 }
 	
-		
+
 $j=0;
 $clustergroup='';
+$jsonreversed=array();
 foreach ($json['response']['docs'] as $key=>$choice) {
   $j++;
-
   if ((isset($choice[$mappings['location']['latlong_lat']])) && (isset($choice[$mappings['location']['latlong_long']]))) {
-   
+    //Inverse hash, we store the PID as key and the json response as value
+    $jsonreversed[$choice['PID']]=$key;
+    
     if (empty($limit_to_cmodel)) {
     //Only add all locations if we don't have a cmodel filter set by theme
     
-    if ($choice['PID']==$pid) {
-      $clustergroup='Current Object Location';	
-    }
-    else {
-      $clustergroup='All locations in this Repository';	
-    }	
+      if ($choice['PID']==$pid) {
+        $clustergroup='Current Object Location';	
+      }
+      else {
+        $clustergroup='All locations in this Repository';	
+      }	
     
     $point=array(
       'type' => 'point',
@@ -400,24 +472,130 @@ foreach ($json['response']['docs'] as $key=>$choice) {
     //adding points to settings by clustergroup as clustergroup, means all
     array_push($locations, $point);	
     }
-    if (array_key_exists($choice['PID'],$pathtopoints)) {
-      //remove duplicates before adding
-      $pathtopoints[$choice['PID']]=array_map("unserialize", array_unique(array_map("serialize", $pathtopoints[$choice['PID']])));
-
-      foreach ($pathtopoints[$choice['PID']] as $objectsinpoint)
-      {
-        $objectsinpoint['lat']=(float) $choice[$mappings['location']['latlong_lat']];
-        $objectsinpoint['lon']=(float) $choice[$mappings['location']['latlong_long']];
-        $objectsinpoint['popup']= $objectsinpoint['popup'].'<br>'.(float) $choice[$mappings['location']['latlong_lat']].",".(float) $choice[$mappings['location']['latlong_long']];
-        //adding points to settings by cmodel as clustergroup
-        array_push($locations, $objectsinpoint);	
-      }
-
-    }  
-    
-
+   
   }
 }
+//Now compute the computed/related objects according to their relations
+
+$variables['wasgeocoded']=false;
+$variables['geocoded']='hola';
+foreach ($pathtopoints as $locationpid=>$objectsinpoint) {
+if (array_key_exists($locationpid,$jsonreversed)) {
+  
+  //remove duplicates before adding
+  if (count($everyotherobject)>0)
+    {
+      //objectsinpoint=array_merge($objectsinpoint,$everyotherobject);
+    }
+  
+  $choice=$json['response']['docs'][$jsonreversed[$locationpid]];
+  foreach ($objectsinpoint as $objectinpoint)
+  {
+    $objectinpoint['lat']=(float) $choice[$mappings['location']['latlong_lat']];
+    $objectinpoint['lon']=(float) $choice[$mappings['location']['latlong_long']];
+    $objectinpoint['popup']= $objectinpoint['popup'].'<br>'.(float) $choice[$mappings['location']['latlong_lat']].",".(float) $choice[$mappings['location']['latlong_long']];
+    //adding points to settings by cmodel as clustergroup
+    array_push($locations, $objectinpoint);	
+  }
+}
+else {
+//Means we don't have this location in our Solr points query 
+//So lets call our geodecoder and get the info from there using what we got from solr for the current location object
+  
+  $query_processor->solrQuery = format_string(
+   '!biodiversidad_query_field:"!biodiversidad_query"', array(
+     '!biodiversidad_query_field' => 'PID',
+     '!biodiversidad_query' => $locationpid,
+   )
+ );
+ $query_processor->solrStart = 0;
+ $query_processor->solrLimit = 1;
+ $resultsonlythis = $solr->search($query_processor->solrQuery, $query_processor->solrStart, $query_processor->solrLimit, $query_processor->solrParams,  'GET');
+ $jsononlythis = json_decode($resultsonlythis->getRawResponse(), TRUE);
+  
+  
+  
+  
+  if ($jsononlythis['response']['numFound']>=1)
+    { 
+      
+      $geodecodeparam[]=$jsononlythis['response']['docs'][0]['dwc.locality_s'];
+      $geodecodeparam[]=$jsononlythis['response']['docs'][0]['dwc.municipality_s'];
+      $geodecodeparam[]=$jsononlythis['response']['docs'][0]['dwc.county_s'];
+      $geodecodeparam[]=$jsononlythis['response']['docs'][0]['dwc.stateProvince_s'];
+      $geodecodeparam[]=$jsononlythis['response']['docs'][0]['dwc.country_s'];
+      $geodecoded=islandora_red_biodiversidad_nominatimgeocoding(array_filter($geodecodeparam)); 
+      if (count($geodecoded)>0)
+      {
+        $variables['wasgeocoded']=true;
+        $variables['geodecoded']="";
+        $rows=array();
+        $rows2=array();
+        //$variables['geodecoded']=theme('table', array('header' => array_keys($geodecoded), 'rows' => $geodecoded));
+       
+        $message="<p>".t("Lat/long data was not available for object "). $jsononlythis['response']['docs'][0]['fgs_label_mt'][0];
+        $message.="<br>".t("so we geodecoded on the fly it's metadata for display purpouses")."</p>";
+        drupal_set_message($message,'status',FALSE);
+        foreach ($geodecoded as $key=>$value)
+          {
+            if ($key=='display_name') {
+              $variables['geodecoded'].="<h4>$value</h4>";
+            }
+            else
+            {
+              switch ($key) {
+                case 'address':
+                foreach($value as $desc=>$info)
+                  {
+                    $rows2[]=array($desc,$info);
+                  }
+                break;
+                case 'boundingbox':
+                  $rows[]=array($key,implode(";",$value));
+                break;
+                default: $rows[]=array($key,$value); 
+              }
+            }
+          }
+          $variables['geodecoded'].="<h2>".t("Geocoded data for ").$jsononlythis['response']['docs'][0]['fgs_label_mt'][0]."</h2><br>";
+          if (count($rows)>0) {
+            
+          $variables['geodecoded'].=theme('table', array('header' => array(), 'rows' => $rows))."<br>";
+          }
+          if (count($rows2)>0) {
+          $variables['geodecoded'].="<h2>".t('Address')."</h2>".theme('table', array('header' => array(), 'rows' => $rows2));
+          }
+          if ((count($everyotherobject)>0) && $current_is_location)
+            {
+              
+              $objectsinpoint=array_merge($objectsinpoint,$everyotherobject);
+            }
+        
+        
+        
+       
+        foreach ($objectsinpoint as $objectinpoint)
+        {
+          $objectinpoint['lat']=(float) $geodecoded['lat'];
+          $objectinpoint['lon']=(float) $geodecoded['lon'];
+          $objectinpoint['popup']= $objectinpoint['popup'].'<br>'.(float) $geodecoded['lat'].",".(float) $geodecoded['lat'].'<br>'.t('This location was geocoded from metadata');
+          //adding points to settings by cmodel as clustergroup
+          array_push($locations, $objectinpoint);	
+        }
+        
+      }
+    
+    }
+
+ //$jsononlythis
+  //$geodecoded=islandora_red_biodiversidad_nominatimgeocoding(array $searchparams)
+  
+  
+  }  
+}
+
+
+
 
 	
 if (!empty($locations)) {
@@ -630,7 +808,7 @@ if (!empty($title))
 				'#type' => 'fieldset',
 				'#id' => 'eol-overview',
 				'#tree' => TRUE,
-				'#title'=>t('Overview'),
+				'#title'=>t('Media and Images'),
 				'#group' => 'eol_info',
 		        '#collapsible' => TRUE,
 		        '#collapsed' => FALSE,	
@@ -795,6 +973,7 @@ EOQ;
   $connection = islandora_get_tuque_connection();
   $querypreresults=array();
   $querypreresults = $connection->repository->ri->sparqlQuery($querypre);
+  dpm($querypreresults);
   foreach($querypreresults as $sparqlvar=>$hit)
     {
       try{
@@ -934,7 +1113,7 @@ foreach ($result as $ontologie=>$graphs)
           $otmp_extras.="<fedora-model:hasModel> <{$nextcmodel}> ." ; //Lets add also cmodel check. Why? because sometimes relations alone are ambiguos and do generate cycles. But cmodel+relations are acyclic in our implementation
           //@TODO this is throwing an REPO except<fedora-model:state>, runs fine through the risearch web interface...why?
           //$otmp_extras.="?".$s.$cur_extras."_$paths <fedora-model:state> <info:fedora/fedora-system:def/model#Active> .";
-					$query.=" $otmp <".$rel[0];
+					$query.=" $otmp <".$rel[0][0];
 					$cur++;
 					$query.="> ?$s$cur"."_$paths $otmp_extras";
                  
@@ -1033,7 +1212,7 @@ EOQ;
           $object_pid=$hit['value'];
 						
           $model_label=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][0];
-          $relation=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0];	//Aca hay que revisar....pueden ser varios y estoy sacando el primero
+          $relation=$relationsandcmodels_sparqlmapping_hash[$sparqlvar][1][0][0];	//Aca hay que revisar....pueden ser varios y estoy sacando el primero
 						
           //Make CMODEL something people can actually read 
           $model_label=preg_match('/^(.*[\/\#])([^\/\#]+)$/', $model_label, $m)? $m[2]: $model_label;
