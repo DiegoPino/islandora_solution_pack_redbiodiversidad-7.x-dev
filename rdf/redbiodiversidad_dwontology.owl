@@ -165,9 +165,9 @@
     </owl:ObjectProperty>
 	
 	<!-- FOAF -->
-    <owl:ObjectProperty rdf:about="http://xmlns.com/foaf/0.1/depiction"  rdfs:label="depiction" rdfs:comment="A depiction of some thing.">
+    <owl:ObjectProperty rdf:about="http://xmlns.com/foaf/0.1/depiction" rdfs:label="depiction" rdfs:comment="A depiction of some thing.">
       <rdfs:isDefinedBy rdf:resource="http://xmlns.com/foaf/0.1/"/>
-      <owl:inverseOf rdf:resource="http://xmlns.com/foaf/0.1/depicts"/>
+      <!-- <owl:inverseOf rdf:resource="http://xmlns.com/foaf/0.1/depicts"/> -->
     </owl:ObjectProperty>
 	
 	
@@ -294,7 +294,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://xmlns.com/foaf/0.1/depicts"/>
+                <owl:onProperty rdf:resource="http://xmlns.com/foaf/0.1/depiction"/>
                 <owl:allValuesFrom rdf:resource="info:fedora/islandora:sp_basic_image"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -313,7 +313,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://xmlns.com/foaf/0.1/depicts"/>
+                <owl:onProperty rdf:resource="http://xmlns.com/foaf/0.1/depiction"/>
                 <owl:allValuesFrom rdf:resource="info:fedora/islandora:sp_basic_image"/>
             </owl:Restriction>
         </rdfs:subClassOf>
