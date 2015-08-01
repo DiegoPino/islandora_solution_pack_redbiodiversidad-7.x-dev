@@ -935,16 +935,13 @@ function islandora_red_biodiversidad_preprocess_islandora_dwca(array &$variables
 	
 }
 
-
 /*
 Having an Ontology defined or not, we display related objects on a tab for every Object belonging to his solution pack provided CMODELS
 */
-
 function islandora_red_biodiversidad_preprocess_islandora_dwc_related(array &$variables) {
   $module_path = drupal_get_path('module', 'islandora_red_biodiversidad');
   module_load_include('inc', 'islandora_red_biodiversidad', 'includes/utilities');
-  
-
+   global $_islandora_ontologies_solr_queryclass;
   
   $islandora_object = $variables['islandora_object'];
 
@@ -973,7 +970,7 @@ EOQ;
   $connection = islandora_get_tuque_connection();
   $querypreresults=array();
   $querypreresults = $connection->repository->ri->sparqlQuery($querypre);
-  dpm($querypreresults);
+  //dpm($querypreresults);
   foreach($querypreresults as $sparqlvar=>$hit)
     {
       try{
@@ -1242,10 +1239,9 @@ EOQ;
             //Now check if this node is already defined or not. We don´t wan´t to overwrite if it´s already there
             if (!isset($vlot_settings[$object_pid]))
             {
-              
               $vlot_settings[$object_pid]=array('relates_to'=>array(),'label'=>$object_label,'node_cmodel'=>$model_label,'nodetype'=>'node','link'=>url("islandora/object/{$object_pid}",array('absolute'=>TRUE)));
               if ($object_pid==$this_object_pid) {//set the current one
-              $vlot_settings[$object_pid]['nodetype']='current_node';
+                $vlot_settings[$object_pid]['nodetype']='current_node';
               }
             }
             $previous_object=$object_pid; //now set previous as current
@@ -1255,9 +1251,46 @@ EOQ;
   }
 }
 			
-			$variables['related'] = $related;
-			if (count($vlot_settings)>1) //only one means the current object (starting object of the graph)
+			 $variables['related'] = $related;
+			 $_SESSION['islandora_ontologies_facet_filters']=array();
+     
+      if (count($vlot_settings)>1) //only one means the current object (starting object of the graph)
 				{
+        $_islandora_ontologies_solr_queryclass = new IslandoraSolrQueryProcessor();
+        $query = "*:*";
+        $solr_cloud_prefix=variable_get('islandora_solrcloud_setting_uniqueid_prefix','');
+        function addcloudprefix($pid,$prefix)
+        {
+            return("\"".$prefix.$pid."\"");
+        }
+
+       
+        $pids = array_map("addcloudprefix", array_keys($vlot_settings),array_fill(0 , count($vlot_settings) , $solr_cloud_prefix));
+       
+        
+        $params2=array();
+        $params2['ids']=implode(" ",$pids);
+        // Build and execute Apache Solr query.
+        $params=array();
+      
+        $_islandora_ontologies_solr_queryclass->buildQuery($query, $params);
+        
+        
+        $_islandora_ontologies_solr_queryclass->solrParams['fq'][] = "PID_fullurl:({$params2['ids']})";
+        $_islandora_ontologies_solr_queryclass->solrParams['hl'] = 'false';
+      
+    
+         $_islandora_ontologies_solr_queryclass->solrLimit=2;
+        $_islandora_ontologies_solr_queryclass->executeQuery(TRUE,TRUE);
+   
+        if (empty($_islandora_ontologies_solr_queryclass->islandoraSolrResult)) {
+          drupal_set_message('error en solr');
+        }  
+        $_SESSION['islandora_ontologies_facet_filters'] = array(
+          'numFound'=>$_islandora_ontologies_solr_queryclass->islandoraSolrResult['response']['numFound'],
+          'fq' =>"PID_fullurl:({$params2['ids']})",
+          'f' => array(),
+        );  
 				$vlot_graph_style=islandora_ontologies_vlot_get_info('islandora_red_biodiversidad'); //@see hook_islandora_ontologies_vlot_info and islandora_ontologies_vlot_get_info
 				$variables['related_sparql_results']=t('!count Objects in "@label" relations Path',array('!count' => count($vlot_settings),'@label' => $vlot_settings[$this_object_pid]['label']));
 				$variables['vlot'] =islandora_ontologies_build_vlot($vlot_graph_style, $vlot_settings, '840','800');
@@ -1299,4 +1332,3 @@ function islandora_red_biodiversidad_preprocess_darwincore(array &$variables) {
 			$variables['ficha']=$ficha;
 			$variables['metadata'] = islandora_retrieve_metadata_markup($object, TRUE);
 		}
-
