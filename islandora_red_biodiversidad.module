@@ -43,15 +43,21 @@ function islandora_red_biodiversidad_menu() {
   );
   $items['islandora/red_biodiversidad/autocomplete/%'] = array(
     'title' => 'Form Callbacks',
-  'description' => 'Autocomplete a Field from DwC',
+    'description' => 'Autocomplete a Field from DwC',
     'page callback' => 'islandora_red_biodiversidad_autocomplete',
     'page arguments' => array(3),
     'type' => MENU_CALLBACK,
     'file' => 'includes/callbacks.inc',
     'access arguments' => array('search islandora solr'),
   );
-  
-  
+   $items['islandora/red_biodiversidad/collection_autocomplete'] = array(
+    'page callback' => 'islandora_red_biodiversidad_get_collection_autocomplete',
+    'access callback' => TRUE,
+    'file' => 'includes/utilities.inc',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('search islandora solr'),
+  );
+
   $items['islandora/object/%islandora_object/redbiodiversidadtab'] = array(
     'weight' => 3,
     'title' => 'Map',

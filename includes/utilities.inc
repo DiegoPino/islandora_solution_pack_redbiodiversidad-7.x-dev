@@ -433,11 +433,38 @@ function islandora_red_biodiversidad_getparents_via_solr($rels_ext_fields, $pid 
     
   }
   return array();
-
-  
-  
 }
+/**
+ * Autocomplete for collection selection.
+ *
+ * @param string $string
+ *   Contents of textfield being completed
+ */
+function islandora_red_biodiversidad_get_collection_autocomplete($string = '') {
+  $string = str_replace(':', '\:', $string);
+  $params = array(
+    'fl' => array('dc.title, PID'),
+  );
+  $string = $string ? " +dc.title:$string*" : '';
+  $query = '(+RELS_EXT_hasModel_uri_ms:"info:fedora/islandora:collectionCModel"' . $string . ')';
+  $query .= '(+RELS_EXT_hasModel_uri_ms:"info:fedora/islandora:collectionCModel"' . str_replace('dc.title', 'PID', $string) . ')';
+  $url = parse_url(variable_get('islandora_solr_url', 'localhost:8080/solr'));
+  $solr = new Apache_Solr_Service($url['host'], $url['port'], $url['path'] . '/');
+  $solr->setCreateDocuments(FALSE);
+  try {
+    $results = $solr->search($query, 0, 1000, $params);
+    $json = json_decode($results->getRawResponse(), TRUE);
+  }
+  catch (Exception $e) {
+    watchdog_exception('Islandora Biodiversity', $e, 'Got an exception while searching entities for callback.', array(), WATCHDOG_ERROR);
+  }
+  $list = array();
+  foreach ($json['response']['docs'] as $choice) {
+    $list[$choice['PID']] = $choice['dc.title'][0] . " ~ " . $choice['PID'];
+  }
 
+  drupal_json_output($list);
+}
 
 
 
