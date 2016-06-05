@@ -102,6 +102,8 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
 	        	  	'#required' => TRUE,
 					      '#message'=>'',
 	  			      '#name'=> 'dest_collection['.$pid.']',
+					      '#id'=>'dest-collection-'.md5($pid),
+              
 	  			)
 	  		),
         'replacebyobject'=> array( 
@@ -109,11 +111,13 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
 	        		'#type' => 'textfield',
 	        	  	'#size' => 40,
 	        	  	'#description' => t('Enter Object name or PID that you want to use insted of the excel data for this CMODEL<br>. All other row data will be connected to this one. Leave blank to use the provided data'),
-	       	   		'#autocomplete_path' => "islandora_ontologies/relationships/autocomplete/autocomplete/target/{$pid}", //reusing import entity csv autocomplete
+	       	   		'#autocomplete_path' => "islandora_ontologies/relationships/autocomplete/target/{$pid}", //reusing import entity csv autocomplete
 	  				    '#value'=>'',
 	        	  	'#required' => TRUE,
 					'#message'=>'',
 	  			'#name'=> 'replace_object['.$pid.']',
+					'#id'=>'replace-object-'.md5($pid),
+         
 	  			)
 	  		)
             
