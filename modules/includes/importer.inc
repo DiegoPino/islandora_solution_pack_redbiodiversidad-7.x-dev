@@ -103,6 +103,7 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
 					      '#message'=>'',
 	  			      '#name'=> 'dest_collection['.$pid.']',
 					      '#id'=>'dest-collection-'.md5($pid),
+                '#process' => array('form_process_autocomplete', 'ajax_process_form')
 	  			)
 	  		),
         'replacebyobject'=> array( 
@@ -116,6 +117,7 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
 					'#message'=>'',
 	  			'#name'=> 'replace_object['.$pid.']',
 					'#id'=>'replace-object-'.md5($pid),
+          '#process' => array('form_process_autocomplete', 'ajax_process_form')
 	  			)
 	  		)
             
