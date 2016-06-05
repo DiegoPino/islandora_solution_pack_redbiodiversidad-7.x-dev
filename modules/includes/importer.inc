@@ -96,14 +96,14 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
 	  		  'data'=> array(
 	        		'#type' => 'textfield',
 	        	  	'#size' => 40,
-					'#attributes'=>'',
+					      '#attributes'=>'',
 	        	  	'#description' => t('Enter collection name or PID, leave blank to use only parent Collection'),
 	       	   		'#autocomplete_path' => 'islandora/relationships/autocomplete/target/islandora:collectionCModel', //reusing import entity csv autocomplete
-	  				'#value'=>'',
+	  				    '#value'=>'',
 	        	  	'#required' => TRUE,
-					'#message'=>'',
-	  			'#name'=> 'dest_collection['.$pid.']',
-					'#id'=>'dest_collection_'.md5($pid),
+					      '#message'=>'',
+	  			      '#name'=> 'dest_collection['.$pid.']',
+					      //'#id'=>'dest_collection_'.md5($pid),
 	  			)
 	  		),
         'replacebyobject'=> array( 
@@ -117,7 +117,7 @@ class RedbiodiversidadBatchImporter extends IslandoraBatchImporter {
 	        	  	'#required' => TRUE,
 					'#message'=>'',
 	  			'#name'=> 'replace_object['.$pid.']',
-					'#id'=>'replace_object_'.md5($pid),
+					//'#id'=>'replace_object_'.md5($pid),
 	  			)
 	  		)
             
